@@ -188,7 +188,7 @@ public class BrowseFileOptionWidget implements ModifyListener, OptionWidget {
 					} else if (selection[0] instanceof IFile) {
 						IFile file = (IFile) selection[0];
 						if (extension != null) {
-							if (file.getFileExtension().equals(extension)) {
+							if (extension.equals(file.getFileExtension())) {
 								return new Status(IStatus.OK,
 										OrccActivator.PLUGIN_ID, "");
 							} else {

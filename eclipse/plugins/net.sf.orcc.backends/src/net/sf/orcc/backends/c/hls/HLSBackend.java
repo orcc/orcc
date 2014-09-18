@@ -113,7 +113,7 @@ public class HLSBackend extends CBackend {
 	protected void doInitializeOptions() {
 
 		// Configure paths were files will be generated
-		srcPath = path + File.separator + "HLSBackend";
+		srcPath = outputPath + File.separator + "HLSBackend";
 		commandPath = srcPath + File.separator + "batchCommand";
 		vhdlPath = srcPath + File.separator + "TopVHDL";
 
@@ -316,14 +316,5 @@ public class HLSBackend extends CBackend {
 				commandPath, "command-linux_" + instanceName + ".sh"));
 
 		return result;
-	}
-
-	//FIXME: delete these useless methods
-	@Override
-	protected boolean printInstance(Instance instance) {
-		return false;
-	}
-	@Override
-	protected void doXdfCodeGeneration(Network network) {
 	}
 }

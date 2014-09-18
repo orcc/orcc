@@ -28,18 +28,16 @@
  */
 package net.sf.orcc.ui.refactoring;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import net.sf.orcc.util.FilesManager;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.ltk.core.refactoring.Change;
@@ -82,30 +80,6 @@ public class ChangesFactory {
 	public void clearReplacementMaps() {
 		regexpReplacements.clear();
 		simpleReplacements.clear();
-	}
-
-	/**
-	 * Returns the content of the given file as String or null if an error
-	 * occurred (file not found, given IFile is not a file, etc.).
-	 * 
-	 * @param file
-	 *            The file content
-	 * @return
-	 */
-	private String getFileContent(final IFile file) {
-		try {
-			final InputStream inputStream = file.getContents();
-			final String fileContent = OrccUtil.getContents(inputStream);
-			inputStream.close();
-			return fileContent;
-		} catch (CoreException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (NullPointerException npe) {
-			npe.printStackTrace();
-		}
-		return null;
 	}
 
 	/**
@@ -168,7 +142,7 @@ public class ChangesFactory {
 	 */
 	public Change getReplacementChange(final IFile file,
 			final String changeTitle) {
-		final String content = getFileContent(file);
+		final String content = FilesManager.readFile(file.getFullPath().toString());
 		if (contentNeedsUpdate(content)) {
 			final String newContent = performReplacement(content);
 			final TextFileChange textFileChange = new TextFileChange(

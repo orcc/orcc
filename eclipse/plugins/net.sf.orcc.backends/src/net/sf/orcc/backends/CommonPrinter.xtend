@@ -1,16 +1,10 @@
 package net.sf.orcc.backends
 
-import java.io.BufferedInputStream
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileNotFoundException
-import java.io.IOException
-import java.security.MessageDigest
-import java.security.NoSuchAlgorithmException
 import java.util.List
 import java.util.Map
 import net.sf.orcc.backends.ir.BlockFor
 import net.sf.orcc.backends.ir.InstTernary
+import net.sf.orcc.df.Connection
 import net.sf.orcc.df.Instance
 import net.sf.orcc.df.Port
 import net.sf.orcc.graph.Vertex
@@ -35,12 +29,10 @@ import net.sf.orcc.ir.TypeUint
 import net.sf.orcc.ir.TypeVoid
 import net.sf.orcc.ir.util.AbstractIrVisitor
 import net.sf.orcc.util.OrccLogger
-import org.apache.commons.lang.ArrayUtils
 import org.apache.commons.lang.WordUtils
 import org.eclipse.emf.ecore.EObject
 
 import static net.sf.orcc.OrccLaunchConstants.*
-import net.sf.orcc.df.Connection
 
 /**
  * Define commons methods for all backends printers
@@ -53,20 +45,8 @@ abstract class CommonPrinter extends AbstractIrVisitor<CharSequence> {
 
 	protected var int fifoSize
 	
-	/**
-	 * The algorithm used with MessageDigest. Can be MD, SHA, etc (see <a
-	 * href="http://docs.oracle.com/javase/1.4.2/docs/guide/security/CryptoSpec.html#AppA">
-	 * http://docs.oracle.com/javase/1.4.2/docs/guide/security/CryptoSpec.html#AppA</a>)
-	 */
-	private static val String digestAlgo = "MD5";
-	
 	new() {
 		super(true)
-	}
-
-	new(Map<String, Object> options) {
-		this()
-		setOptions(options)
 	}
 
 	def setOptions(Map<String, Object> options) {
@@ -127,83 +107,10 @@ abstract class CommonPrinter extends AbstractIrVisitor<CharSequence> {
 		}
 	}
 
-	/**
-	 * Return the hash array for the byte[] content
-	 * 
-	 * @param content
-	 * @return a byte[] containing the hash
-	 * @deprecated Use methods in {@link FilesManager} instead
-	 */
-	@Deprecated
-	def private hash(byte[] content) {
-		try {
-			// MessageDigest is NOT thread safe, it must be created locally on
-			// each call, it can't be a member of this class
-			val messageDigest = MessageDigest::getInstance(digestAlgo);
-			return messageDigest.digest(content);
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		}
-		return ArrayUtils::EMPTY_BYTE_ARRAY;
-	}
-
-	/**
-	 * Return the hash array for the file
-	 * 
-	 * @param file
-	 * @return a byte[] containing the hash
-	 * @deprecated Use methods in {@link FilesManager} instead
-	 */
-	@Deprecated
-	def private hash(File file) {
-		try {
-			// MessageDigest is NOT thread safe, it must be created locally on
-			// each call, it can't be a member of this class
-			val messageDigest = MessageDigest::getInstance(digestAlgo);
-
-			val in = new BufferedInputStream(new FileInputStream(file));
-			var theByte = 0;
-			try {
-				while ((theByte = in.read()) != -1) {
-					messageDigest.update(theByte as byte);
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			} finally {
-				in.close();
-			}
-			return messageDigest.digest();
-
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		return ArrayUtils::EMPTY_BYTE_ARRAY;
-	}
-	
-	
-	/**
-	 * Return true if targetFile content need to be replaced by the content's
-	 * value
-	 * 
-	 * @param targetFile
-	 * @param content
-	 * @deprecated Use methods in {@link FilesManager} instead
-	 */
-	@Deprecated
-	def protected needToWriteFile(CharSequence content, File target) {
-		return ! target.exists()
-				|| ! MessageDigest::isEqual(hash(target), hash(content.toString.bytes));
-	}
-	
 	override caseTypeBool(TypeBool type) {
 		"bool"
 	}
-	
+
 	override caseTypeFloat(TypeFloat type) {
 		if(type.half) "half"
 		else if (type.double) "double"

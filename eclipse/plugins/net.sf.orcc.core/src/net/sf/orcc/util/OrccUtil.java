@@ -29,13 +29,7 @@
 package net.sf.orcc.util;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -46,7 +40,6 @@ import java.util.Set;
 
 import net.sf.orcc.OrccProjectNature;
 
-import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -92,27 +85,6 @@ public class OrccUtil {
 	}
 
 	/**
-	 * Creates a new file if needed and returns its path
-	 * 
-	 * @param path
-	 *            the path of the file
-	 * @param fileName
-	 *            the name of the file
-	 * @return the full path to the file
-	 */
-	public static String createFile(String path, String fileName) {
-		// checks output folder exists, and if not creates it
-		String newPath = path + File.separator + fileName;
-		File file = new File(newPath);
-		if (!file.exists()) {
-			try {
-				file.createNewFile();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		return newPath;
-	}
 
 	/**
 	 * If it does not exist, creates the given folder. If the parent folders do
@@ -162,25 +134,6 @@ public class OrccUtil {
 	}
 
 	/**
-	 * Creates a new folder if needed and returns its path
-	 * 
-	 * @param path
-	 *            the path of the folder
-	 * @param fileName
-	 *            the name of the folder
-	 * @return the full path to the folder
-	 */
-	public static String createFolder(String path, String folderName) {
-		// checks output folder exists, and if not creates it
-		String newPath = path + File.separator + folderName;
-		File folder = new File(newPath);
-		if (!folder.exists()) {
-			folder.mkdir();
-		}
-		return newPath;
-	}
-
-	/**
 	 * Search in given folder for files resources with given suffix, and add
 	 * them to the given files list
 	 * 
@@ -195,7 +148,7 @@ public class OrccUtil {
 			if (resource.getType() == IResource.FOLDER) {
 				findFiles(suffix, files, (IFolder) resource);
 			} else if (resource.getType() == IResource.FILE
-					&& resource.getFileExtension().equals(suffix)) {
+					&& suffix.equals(resource.getFileExtension())) {
 				files.add((IFile) resource);
 			}
 		}
@@ -291,27 +244,6 @@ public class OrccUtil {
 		}
 
 		return srcFolders;
-	}
-
-	/**
-	 * Read the given stream and return its content as a String
-	 * 
-	 * @param stream
-	 * @return
-	 * @throws IOException
-	 */
-	public static String getContents(InputStream stream) throws IOException {
-		StringBuilder builder = new StringBuilder();
-		int n = stream.available();
-		while (n > 0) {
-			byte[] bytes = new byte[n];
-			n = stream.read(bytes);
-			String str = new String(bytes, 0, n);
-			builder.append(str);
-			n = stream.available();
-		}
-
-		return builder.toString();
 	}
 
 	/**
@@ -676,36 +608,6 @@ public class OrccUtil {
 	}
 
 	/**
-	 * Create a file and print content inside it. If parent folder doesn't
-	 * exists, create it.
-	 * 
-	 * @param content
-	 *            text to write in file
-	 * @param target
-	 *            file to write content to
-	 * @return true if the file has correctly been written
-	 * @deprecated Use methods in {@link FilesManager} instead
-	 */
-	@Deprecated
-	public static boolean printFile(CharSequence content, File target) {
-		try {
-			if (!target.getParentFile().exists()) {
-				target.getParentFile().mkdirs();
-			}
-			PrintStream ps = new PrintStream(new FileOutputStream(target));
-			ps.print(content);
-			ps.close();
-			return true;
-		} catch (FileNotFoundException e) {
-			OrccLogger.severe("Unable to write file " + target.getPath()
-					+ " : " + e.getCause());
-			OrccLogger.severe(e.getLocalizedMessage());
-			e.printStackTrace();
-			return false;
-		}
-	}
-
-	/**
 	 * Run an external programs with the given commands list
 	 * 
 	 * @param cmdList
@@ -725,28 +627,6 @@ public class OrccUtil {
 			}
 		} catch (Exception e) {
 			OrccLogger.severeln(e.getMessage());
-		}
-	}
-
-	/**
-	 * Sets the contents of the given file, creating it if it does not exist.
-	 * 
-	 * @param file
-	 *            a file
-	 * @param source
-	 *            an input stream
-	 * @throws CoreException
-	 */
-	public static void setFileContents(IFile file, InputStream source)
-			throws CoreException {
-		if (file.exists()) {
-			file.setContents(source, true, false, null);
-		} else {
-			IContainer container = file.getParent();
-			if (container.getType() == IResource.FOLDER) {
-				createFolder((IFolder) container);
-			}
-			file.create(source, true, null);
 		}
 	}
 

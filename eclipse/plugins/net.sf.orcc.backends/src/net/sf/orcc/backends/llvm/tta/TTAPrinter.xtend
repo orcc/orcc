@@ -29,7 +29,6 @@
 package net.sf.orcc.backends.llvm.tta
 
 import net.sf.orcc.backends.CommonPrinter
-import java.util.Map
 
 /*
  * Default TTA Printer.
@@ -37,13 +36,5 @@ import java.util.Map
  * @author Herve Yviquel
  */
 abstract class TTAPrinter extends CommonPrinter {
-	
-	new() {
-		super()
-	}
 
-	new (Map<String, Object> options) {
-		super(options)
-	}
-		
 }

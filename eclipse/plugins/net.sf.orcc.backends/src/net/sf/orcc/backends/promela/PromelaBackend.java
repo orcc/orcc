@@ -138,7 +138,7 @@ public class PromelaBackend extends AbstractBackend {
 
 	@Override
 	protected Result doLibrariesExtraction() {
-		return FilesManager.extract("/runtime/Promela/pylibs", path);
+		return FilesManager.extract("/runtime/Promela/pylibs", outputPath);
 	}
 
 	@Override
@@ -174,7 +174,7 @@ public class PromelaBackend extends AbstractBackend {
 	protected Result doGenerateNetwork(Network network) {
 		networkPrinter.setNetwork(network);
 		return FilesManager.writeFile(networkPrinter.getNetworkFileContent(),
-				path, "main_" + network.getSimpleName() + ".pml");
+				outputPath, "main_" + network.getSimpleName() + ".pml");
 	}
 
 	@Override
@@ -190,12 +190,12 @@ public class PromelaBackend extends AbstractBackend {
 
 		final Result result = Result.newInstance();
 		result.merge(FilesManager.writeFile(
-				schedulerPrinter.getSchedulerFileContent(), path, "schedule_"
+				schedulerPrinter.getSchedulerFileContent(), outputPath, "schedule_"
 						+ network.getSimpleName() + ".xml"));
 		result.merge(FilesManager.writeFile(
-				scheduleInfoPrinter.getSchedulerFileContent(), path,
+				scheduleInfoPrinter.getSchedulerFileContent(), outputPath,
 				"schedule_info_" + network.getSimpleName() + ".xml"));
-		result.merge(FilesManager.writeFile(scriptPrinter.getScriptFileContent(), path,
+		result.merge(FilesManager.writeFile(scriptPrinter.getScriptFileContent(), outputPath,
 				"run_checker_" + network.getSimpleName() + ".py"));
 		return result;
 	}
@@ -205,6 +205,6 @@ public class PromelaBackend extends AbstractBackend {
 		instancePrinter.setActor(actor);
 		instancePrinter.setSchedulingModel(schedulingModel);
 
-		return FilesManager.writeFile(instancePrinter.getInstanceFileContent(), path, actor.getName() + ".pml");
+		return FilesManager.writeFile(instancePrinter.getInstanceFileContent(), outputPath, actor.getName() + ".pml");
 	}
 }

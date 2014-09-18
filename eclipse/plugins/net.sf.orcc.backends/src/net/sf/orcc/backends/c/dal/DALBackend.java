@@ -22,7 +22,6 @@ import net.sf.orcc.backends.transform.ParameterImporter;
 import net.sf.orcc.backends.transform.StoreOnceTransformation;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
-import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.transform.ArgumentEvaluator;
@@ -220,11 +219,11 @@ public class DALBackend extends CBackend {
 
 		final Result result = Result.newInstance();
 		result.merge(FilesManager.writeFile(networkCPrinter.getNetworkFileContent(),
-				path, "pn.xml"));
+				outputPath, "pn.xml"));
 		result.merge(FilesManager.writeFile(
 				networkCPrinter.getFifoSizeHeaderContent(), srcPath, "fifosize.h"));
 		result.merge(FilesManager.writeFile(
-				mappingPrinter.getMappingFileContent(mapping), path, "mapping1.xml"));
+				mappingPrinter.getMappingFileContent(mapping), outputPath, "mapping1.xml"));
 
 		return result;
 	}
@@ -240,21 +239,5 @@ public class DALBackend extends CBackend {
 		result.merge(FilesManager.writeFile(instanceHPrinter.getFileContent(), srcPath, actor.getName() + ".h"));
 
 		return result;
-	}
-
-	// FIXME: following methods will be deleted when C backend is migrated
-	@Override
-	protected void doXdfCodeGeneration(Network network) {
-		// Do nothing
-	}
-
-	@Override
-	protected boolean printActor(Actor actor) {
-		return false;
-	}
-
-	@Override
-	protected boolean printInstance(Instance instance) {
-		return false;
 	}
 }

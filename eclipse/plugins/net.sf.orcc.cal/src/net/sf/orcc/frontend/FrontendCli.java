@@ -420,8 +420,8 @@ public class FrontendCli implements IApplication {
 
 						if (workspaceMap.containsKey(qualifiedName)) {
 							final IFile file = workspaceMap.get(qualifiedName);
-							if (file.getFileExtension().equals(
-									OrccUtil.NETWORK_SUFFIX)) {
+							if (OrccUtil.NETWORK_SUFFIX.equals(file
+									.getFileExtension())) {
 								// Run this method on the sub-network
 								storeReferencedEntities(file, workspaceMap,
 										files);

@@ -40,10 +40,6 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 	
 //	int memoryBaseAddr = 0x30000000
 	int memoryBaseAddr = 0x40000000
-	
-	new() {
-		super()
-	}
 
 	def getContent() '''
 		// Generated from "«network.name»"

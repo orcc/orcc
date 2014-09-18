@@ -50,7 +50,6 @@ import net.sf.orcc.df.util.XdfWriter;
 import net.sf.orcc.ir.transform.RenameTransformation;
 import net.sf.orcc.util.FilesManager;
 import net.sf.orcc.util.OrccLogger;
-import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.Result;
 
 /**
@@ -82,8 +81,8 @@ public class COMPABackend extends CBackend {
 		childrenPrinter.setOptions(getOptions(), printTop);
 
 		// Create the directory tree
-		new File(path, "src").mkdir();
-		srcPath = new File(path, "src").toString();
+		new File(outputPath, "src").mkdir();
+		srcPath = new File(outputPath, "src").toString();
 
 		// Configure the map used in RenameTransformation
 		final Map<String, String> renameMap = new HashMap<String, String>();
@@ -122,8 +121,8 @@ public class COMPABackend extends CBackend {
 	@Override
 	protected Result doLibrariesExtraction() {
 		OrccLogger.trace("Export libraries sources");
-		Result result = FilesManager.extract("/runtime/COMPA/libs", path);
-		result.merge(FilesManager.extract("/runtime/COMPA/cmake", path));
+		Result result = FilesManager.extract("/runtime/COMPA/libs", outputPath);
+		result.merge(FilesManager.extract("/runtime/COMPA/cmake", outputPath));
 
 		return result;
 	}
@@ -150,7 +149,7 @@ public class COMPABackend extends CBackend {
 		netPrinter.setNetwork(network);
 		netPrinter.setOptions(getOptions());
 
-		result.merge(FilesManager.writeFile(netPrinter.getFifoContent(), path
+		result.merge(FilesManager.writeFile(netPrinter.getFifoContent(), outputPath
 				+ "/libs/orcc/include", "fifoAllocations.h"));
 		if (printTop) {
 			result.merge(FilesManager.writeFile(netPrinter.getContent(),
@@ -186,8 +185,7 @@ public class COMPABackend extends CBackend {
 					childrenPrinter.getTestContent(), srcPath,
 					instance.getName() + "_test.h"));
 		} else {
-			String childPath = OrccUtil.createFolder(path,
-					instance.getSimpleName());
+			String childPath = outputPath + File.separator + instance.getSimpleName();
 			result.merge(FilesManager.writeFile(childrenPrinter.getContent(),
 					childPath, instance.getName() + ".c"));
 			result.merge(FilesManager.writeFile(
@@ -202,11 +200,6 @@ public class COMPABackend extends CBackend {
 	}
 
 	@Override
-	protected void doXdfCodeGeneration(Network network) {
-		// FIXME: Override until the C back-end is migrated
-	}
-
-	@Override
 	protected Result doGenerateActor(Actor actor) {
 		final Result result = Result.newInstance();
 		childrenPrinter.setActor(actor);
@@ -218,8 +211,7 @@ public class COMPABackend extends CBackend {
 					childrenPrinter.getTestContent(), srcPath, actor.getName()
 							+ "_test.h"));
 		} else {
-			String childPath = OrccUtil.createFolder(path,
-					actor.getSimpleName());
+			String childPath = outputPath + File.separator + actor.getSimpleName();
 			result.merge(FilesManager.writeFile(childrenPrinter.getContent(),
 					childPath, actor.getName() + ".c"));
 			result.merge(FilesManager.writeFile(

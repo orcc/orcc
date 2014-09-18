@@ -153,7 +153,7 @@ public class NewNetworkWizard extends Wizard implements INewWizard {
 				final IFile selectedFile = (IFile) firstSel;
 				final String fileName = selectedFile.getName();
 				final String ext = selectedFile.getFileExtension();
-				if (ext.isEmpty()) {
+				if (ext == null || ext.isEmpty()) {
 					page.setFileName(fileName);
 				} else {
 					int idx = fileName.indexOf(ext);

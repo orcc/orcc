@@ -48,8 +48,6 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	val List<Procedure> codelets = newArrayList
 	val List<InstCall> callsites = newArrayList
 
-	new() {}
-
 	def getCodelets() {
 		codelets
 	}
