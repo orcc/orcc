@@ -143,20 +143,6 @@ import org.osgi.framework.Bundle;
  * {@link #doAdditionalGeneration(Instance)}</li>
  * </ol>
  * 
- * <p>
- * The following methods were used in previous versions of Orcc. They will be
- * removed and shouldn't be used anymore. Documentation on each method indicates
- * the new alternative to use.
- * <ul>
- * <li>{@link #doTransformActor(Actor)}</li>
- * <li>{@link #transformActors(List)}</li>
- * <li>{@link #doXdfCodeGeneration(Network)}</li>
- * <li>{@link #printActor(Actor)}</li>
- * <li>{@link #printActors(List)}</li>
- * <li>{@link #printChildren(Network)}</li>
- * <li>{@link #printInstance(Instance)}</li>
- * </ul>
- * 
  * @author Matthieu Wipliez
  * @author Antoine Lorence
  * 
@@ -352,10 +338,6 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			final Result result = doGenerateNetwork(network);
 			result.merge(doAdditionalGeneration(network));
 			OrccLogger.traceln("Done in " + getDuration(t0) + "s. " + result);
-
-			// For backward compatibility
-			stopIfRequested();
-			doXdfCodeGeneration(network);
 		}
 
 		// -----------------------------------------------------
@@ -424,16 +406,10 @@ public abstract class AbstractBackend implements Backend, IApplication {
 					beforeGeneration(instance);
 					result.merge(doGenerateInstance(instance));
 					result.merge(doAdditionalGeneration(instance));
-
-					// For backward compatibility only
-					printInstance(instance);
 				} else if (actor != null) {
 					beforeGeneration(actor);
 					result.merge(doGenerateActor(actor));
 					result.merge(doAdditionalGeneration(instance));
-
-					// For backward compatibility only
-					printActor(actor);
 				}
 			}
 
@@ -463,47 +439,6 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 * and additional back-end specific options.
 	 */
 	abstract protected void doInitializeOptions();
-
-	/**
-	 * Do not use or override this method anymore. Instead, fill the
-	 * {@link #childrenTransfos} list with all transformations to apply at Actor
-	 * level.
-	 * 
-	 * @deprecated
-	 */
-	@Deprecated
-	protected void doTransformActor(Actor actor) {
-	}
-
-	/**
-	 * Do not use or override this method anymore. Instead, fill the
-	 * {@link #childrenTransfos} list with all transformations to apply at Actor
-	 * level.
-	 * 
-	 * @deprecated
-	 */
-	@Deprecated
-	final public void transformActors(List<Actor> actors) {
-		OrccLogger.traceln("Transforming actors...");
-		for (Actor actor : actors) {
-			doTransformActor(actor);
-		}
-	}
-
-	/**
-	 * Do not use or override this method anymore. Instead, extends
-	 * {@link #doGenerateNetwork(Network)} to print code from a Network, and/or
-	 * {@link #doGenerateActor(Actor)} or {@link #doGenerateInstance(Instance)}
-	 * to print code from its children.
-	 * 
-	 * @see #doAdditionalGeneration(Network)
-	 * @see #doAdditionalGeneration(Instance)
-	 * @see #doAdditionalGeneration(Actor)
-	 * @deprecated
-	 */
-	@Deprecated
-	protected void doXdfCodeGeneration(Network network) {
-	}
 
 	/**
 	 * Callback called before network generation, just after network
@@ -696,18 +631,6 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	}
 
 	/**
-	 * Do not use or override this method anymore. Instead, extends
-	 * {@link #doGenerateActor(Actor)}.
-	 * 
-	 * @see #doAdditionalGeneration(Actor)
-	 * @deprecated
-	 */
-	@Deprecated
-	protected boolean printActor(Actor actor) {
-		return false;
-	}
-
-	/**
 	 * Callback called before actor generation, just after actors
 	 * transformations. It can be used to perform additional transformations,
 	 * validations, or other operations at actor level.
@@ -743,58 +666,6 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 */
 	protected Result doAdditionalGeneration(final Actor actor) {
 		return Result.newInstance();
-	}
-
-	/**
-	 * Do not use or override this method anymore. Instead, extends
-	 * {@link #doGenerateActor(Actor)} and/or
-	 * {@link #doGenerateInstance(Instance)} .
-	 * 
-	 * @see #doAdditionalGeneration(Actor)
-	 * @see #doAdditionalGeneration(Instance)
-	 * @deprecated
-	 */
-	@Deprecated
-	final public void printChildren(Network network) {
-		OrccLogger.traceln("Printing children...");
-		long t0 = System.currentTimeMillis();
-
-		int numCached = 0;
-		for (final Vertex vertex : network.getChildren()) {
-			final Instance instance = vertex.getAdapter(Instance.class);
-			final Actor actor = vertex.getAdapter(Actor.class);
-			if (instance != null) {
-				if (printInstance(instance)) {
-					++numCached;
-				}
-			} else if (actor != null) {
-				if (printActor(actor)) {
-					++numCached;
-				}
-			}
-		}
-
-		long t1 = System.currentTimeMillis();
-		OrccLogger.traceln("Done in " + ((float) (t1 - t0) / (float) 1000)
-				+ "s");
-
-		if (numCached > 0) {
-			OrccLogger.noticeln(numCached + " entities were not regenerated "
-					+ "because they were already up-to-date.");
-		}
-	}
-
-	/**
-	 * Do not use or override this method anymore. Instead, extends
-	 * {@link #doGenerateInstance(Instance)} .
-	 * 
-	 * @see #doAdditionalGeneration(Actor)
-	 * @see #doAdditionalGeneration(Instance)
-	 * @deprecated
-	 */
-	@Deprecated
-	protected boolean printInstance(Instance instance) {
-		return false;
 	}
 
 	/**

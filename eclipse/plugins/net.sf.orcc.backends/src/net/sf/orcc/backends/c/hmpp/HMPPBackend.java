@@ -149,11 +149,4 @@ public class HMPPBackend extends CBackend {
 		result.merge(FilesManager.writeFile(cmakePrinter.srcCMakeContent(), srcPath, "CMakeLists.txt"));
 		return result;
 	}
-
-	// FIXME: these overrides are needed as long as the c back-end will not
-	// completely be updated to the new infrastructure
-	@Override
-	protected boolean printActor(Actor actor) { return false;}
-	@Override
-	protected boolean printInstance(Instance instance) {return false;}
 }

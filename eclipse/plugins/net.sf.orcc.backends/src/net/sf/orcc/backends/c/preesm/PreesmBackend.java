@@ -126,16 +126,4 @@ public class PreesmBackend extends AbstractBackend {
 				actor.getSimpleName() + ".c"));
 		return result;
 	}
-
-	// TODO: delete when all backends will have been migrated
-	@Override
-	protected boolean printActor(Actor actor) {
-		return false;
-	}
-	@Override
-	protected void doTransformActor(Actor actor) {
-	}
-	@Override
-	protected void doXdfCodeGeneration(Network network) {
-	}
 }

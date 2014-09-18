@@ -317,13 +317,4 @@ public class HLSBackend extends CBackend {
 
 		return result;
 	}
-
-	//FIXME: delete these useless methods
-	@Override
-	protected boolean printInstance(Instance instance) {
-		return false;
-	}
-	@Override
-	protected void doXdfCodeGeneration(Network network) {
-	}
 }

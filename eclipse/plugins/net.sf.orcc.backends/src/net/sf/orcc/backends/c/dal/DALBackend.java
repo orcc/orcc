@@ -22,7 +22,6 @@ import net.sf.orcc.backends.transform.ParameterImporter;
 import net.sf.orcc.backends.transform.StoreOnceTransformation;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
-import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.transform.ArgumentEvaluator;
@@ -240,21 +239,5 @@ public class DALBackend extends CBackend {
 		result.merge(FilesManager.writeFile(instanceHPrinter.getFileContent(), srcPath, actor.getName() + ".h"));
 
 		return result;
-	}
-
-	// FIXME: following methods will be deleted when C backend is migrated
-	@Override
-	protected void doXdfCodeGeneration(Network network) {
-		// Do nothing
-	}
-
-	@Override
-	protected boolean printActor(Actor actor) {
-		return false;
-	}
-
-	@Override
-	protected boolean printInstance(Instance instance) {
-		return false;
 	}
 }

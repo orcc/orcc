@@ -202,11 +202,6 @@ public class COMPABackend extends CBackend {
 	}
 
 	@Override
-	protected void doXdfCodeGeneration(Network network) {
-		// FIXME: Override until the C back-end is migrated
-	}
-
-	@Override
 	protected Result doGenerateActor(Actor actor) {
 		final Result result = Result.newInstance();
 		childrenPrinter.setActor(actor);
