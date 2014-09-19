@@ -142,7 +142,7 @@ public class ChangesFactory {
 	 */
 	public Change getReplacementChange(final IFile file,
 			final String changeTitle) {
-		final String content = FilesManager.readFile(file.getFullPath().toString());
+		final String content = FilesManager.readFile(file.getRawLocation().toString());
 		if (contentNeedsUpdate(content)) {
 			final String newContent = performReplacement(content);
 			final TextFileChange textFileChange = new TextFileChange(
