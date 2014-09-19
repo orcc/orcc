@@ -204,45 +204,28 @@
    <extension
          point="org.eclipse.ltk.core.refactoring.moveParticipants">
       <moveParticipant
-            class="net.sf.orcc.ui.refactoring.NetworkMoveParticipant"
-            id="net.sf.orcc.ui.networkMoveParticipant"
-            name="Network move participant">
+            class="net.sf.orcc.ui.refactoring.OrccMoveParticipant"
+            id="net.sf.orcc.ui.refactoring.orccMoveParticipant"
+            name="Orcc generic move participant">
          <enablement>
             <adapt
                   type="org.eclipse.core.resources.IFile">
-               <test
-                     property="org.eclipse.core.resources.extension"
-                     value="xdf">
-               </test>
+               <or>
+                  <test
+                        property="org.eclipse.core.resources.extension"
+                        value="cal">
+                  </test>
+                  <test
+                        property="org.eclipse.core.resources.extension"
+                        value="xdf">
+                  </test>
+                  <test
+                        property="org.eclipse.core.resources.extension"
+                        value="xdfdiag">
+                  </test>
+               </or>
             </adapt>
          </enablement>
-      </moveParticipant>
-      <moveParticipant
-            class="net.sf.orcc.ui.refactoring.CalMoveParticipant"
-            id="net.sf.orcc.ui.calMoveParticipant"
-            name="Cal move participant">
-         <enablement>
-            <adapt
-                  type="org.eclipse.core.resources.IFile">
-               <test
-                     property="org.eclipse.core.resources.extension"
-                     value="cal">
-               </test>
-            </adapt>
-         </enablement>
-      </moveParticipant>
-      <moveParticipant
-            class="net.sf.orcc.ui.refactoring.DiagramMoveParticipant"
-            id="net.sf.orcc.ui.diagramMoveParticipant"
-            name="Diagram move participant">
-         <enablement>
-            <adapt
-                  type="org.eclipse.core.resources.IFile">
-               <test
-                     property="org.eclipse.core.resources.extension"
-                     value="xdfdiag">
-               </test>
-            </adapt></enablement>
       </moveParticipant>
    </extension>
 </plugin>
