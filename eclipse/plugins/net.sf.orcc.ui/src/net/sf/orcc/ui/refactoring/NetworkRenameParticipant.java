@@ -131,8 +131,6 @@ public class NetworkRenameParticipant extends RenameParticipant {
 	}
 
 	public Change getNetworkContentChanges() {
-		factory.clearReplacementMaps();
-
 		factory.addReplacement("<XDF name=\"" + originalBasename + "\">",
 				"<XDF name=\"" + newBasename + "\">");
 		return factory.getReplacementChange(originalNetworkFile,
@@ -144,7 +142,6 @@ public class NetworkRenameParticipant extends RenameParticipant {
 		final IWorkspaceRoot wpRoot = ResourcesPlugin.getWorkspace().getRoot();
 		if (wpRoot.exists(originalDiagramPath)) {
 
-			factory.clearReplacementMaps();
 			factory.addReplacement(originalFilename + "#/", newFilename + "#/");
 			factory.addReplacement("name=\"" + originalBasename + "\"", "name=\""
 					+ newBasename + "\"");
@@ -157,9 +154,6 @@ public class NetworkRenameParticipant extends RenameParticipant {
 	}
 
 	public Change getOtherNetworksContentChanges() {
-
-		factory.clearReplacementMaps();
-
 		final IPath newFilePath = originalNetworkFile.getFullPath()
 				.removeLastSegments(1).append(newFilename);
 		final IWorkspaceRoot wpRoot = ResourcesPlugin.getWorkspace().getRoot();
@@ -176,9 +170,6 @@ public class NetworkRenameParticipant extends RenameParticipant {
 	}
 
 	public Change getOtherDiagramsContentChanges() {
-
-		factory.clearReplacementMaps();
-
 		final String originalRefinement = originalNetworkFile.getFullPath().toString();
 		final String newRefinement = originalNetworkFile.getFullPath().removeLastSegments(1)
 				.append(newFilename).toString();

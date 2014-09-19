@@ -110,9 +110,6 @@ public class NetworkMoveParticipant extends MoveParticipant {
 	}
 
 	public Change getOtherNetworksContentChanges() {
-
-		factory.clearReplacementMaps();
-
 		final IWorkspaceRoot wpRoot = ResourcesPlugin.getWorkspace().getRoot();
 		final String oldQualifiedName = OrccUtil
 				.getQualifiedName(originalNetworkFile);
@@ -126,8 +123,6 @@ public class NetworkMoveParticipant extends MoveParticipant {
 	}
 
 	public Change getOtherDiagramsContentChanges() {
-		factory.clearReplacementMaps();
-
 		final String originalRefinement = originalNetworkFile.getFullPath()
 				.toString();
 		final String newRefinement = newNetworkPath.toString();

@@ -114,8 +114,6 @@ public class CalRenameParticipant extends RenameParticipant {
 	}
 
 	private Change getFileContentUpdatesChange() {
-		factory.clearReplacementMaps();
-
 		final Pattern actor = Pattern.compile("actor(\\s+)" + originalBasename
 				+ "(\\s*)\\(");
 		factory.addReplacement(actor, "actor$1" + newBasename + "$2" + '(');
@@ -129,8 +127,6 @@ public class CalRenameParticipant extends RenameParticipant {
 	}
 
 	private Change getNetworksContentUpdatesChanges() {
-		factory.clearReplacementMaps();
-
 		final String oldQualifiedName = OrccUtil.getQualifiedName(originalFile);
 		final String newQualifiedName = OrccUtil.getQualifiedName(newFile);
 		factory.addReplacement("<Class name=\"" + oldQualifiedName + "\"/>",
@@ -143,8 +139,6 @@ public class CalRenameParticipant extends RenameParticipant {
 	}
 
 	private Change getDiagramsContentUpdatesChanges() {
-		factory.clearReplacementMaps();
-
 		final IFile irFile = OrccUtil.getFile(originalFile.getProject(),
 				OrccUtil.getQualifiedName(originalFile), OrccUtil.IR_SUFFIX);
 
@@ -163,8 +157,6 @@ public class CalRenameParticipant extends RenameParticipant {
 	}
 
 	private Change getOtherCalContentUpdatesChanges() {
-		factory.clearReplacementMaps();
-
 		final String originalQualifiedName = OrccUtil
 				.getQualifiedName(originalFile);
 		final Pattern importPattern = Pattern.compile("import(\\s+)"

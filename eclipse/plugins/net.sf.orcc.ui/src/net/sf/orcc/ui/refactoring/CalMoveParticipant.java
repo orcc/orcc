@@ -111,8 +111,6 @@ public class CalMoveParticipant extends MoveParticipant {
 	 * @return
 	 */
 	private Change getFileContentUpdatesChange() {
-		factory.clearReplacementMaps();
-
 		final String originalPackage = OrccUtil
 				.getQualifiedPackage(originalFile);
 		final String destinationPackage = OrccUtil
@@ -128,8 +126,6 @@ public class CalMoveParticipant extends MoveParticipant {
 	}
 
 	private Change getOtherCalContentUpdatesChanges() {
-		factory.clearReplacementMaps();
-
 		final String originalQualifiedName = OrccUtil
 				.getQualifiedName(originalFile);
 		final Pattern importPattern = Pattern.compile("import(\\s+)"
@@ -144,8 +140,6 @@ public class CalMoveParticipant extends MoveParticipant {
 	}
 
 	private Change getNetworksContentUpdatesChanges() {
-		factory.clearReplacementMaps();
-
 		final String oldQualifiedName = OrccUtil.getQualifiedName(originalFile);
 		final String newQualifiedName = OrccUtil
 				.getQualifiedName(destinationFile);
@@ -157,8 +151,6 @@ public class CalMoveParticipant extends MoveParticipant {
 	}
 
 	private Change getDiagramsContentUpdatesChanges() {
-		factory.clearReplacementMaps();
-
 		final IFile irFile = OrccUtil.getFile(originalFile.getProject(),
 				OrccUtil.getQualifiedName(originalFile), OrccUtil.IR_SUFFIX);
 

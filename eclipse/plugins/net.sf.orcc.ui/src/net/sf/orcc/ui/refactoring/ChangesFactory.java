@@ -31,6 +31,7 @@ package net.sf.orcc.ui.refactoring;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
 import net.sf.orcc.util.FilesManager;
@@ -41,7 +42,11 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.CompositeChange;
 import org.eclipse.ltk.core.refactoring.TextFileChange;
+import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
+
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 
 /**
  * 
@@ -50,27 +55,93 @@ import org.eclipse.text.edits.ReplaceEdit;
  */
 public class ChangesFactory {
 
+	interface Replacement {
+		boolean isConcerned(String content);
+
+		ReplaceEdit getReplacement(String content);
+	}
+
+	class StandardReplacement implements Replacement {
+		private String pattern;
+		private String replacement;
+
+		public StandardReplacement(String p, String r) {
+		}
+
+		@Override
+		public boolean isConcerned(String content) {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public ReplaceEdit getReplacement(String content) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+	}
+
+	class RegexpReplacement implements Replacement {
+		private Pattern pattern;
+		private String replacement;
+
+		public RegexpReplacement(Pattern p, String r) {
+		}
+
+		@Override
+		public boolean isConcerned(String content) {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public ReplaceEdit getReplacement(String content) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+	}
+
 	final private Map<Pattern, String> regexpReplacements;
 	final private Map<String, String> simpleReplacements;
+
+	final private Multimap<String, Replacement> replacements;
+	final private Map<IFile, MultiTextEdit> results;
 
 	public ChangesFactory() {
 		regexpReplacements = new HashMap<Pattern, String>();
 		simpleReplacements = new HashMap<String, String>();
+		replacements = HashMultimap.create();
+		results = new HashMap<IFile, MultiTextEdit>();
 	}
 
+	@Deprecated
 	public void addReplacement(final Pattern pattern,
 			final String replacement) {
 		regexpReplacements.put(pattern, replacement);
 	}
 
+	@Deprecated
 	public void addReplacement(final String search,
 			final String replacement) {
 		simpleReplacements.put(search, replacement);
 	}
 
-	public void clearReplacementMaps() {
+	public void addReplacement(final String suffix, final Pattern pattern,
+			final String replacement) {
+		replacements.put(suffix, new RegexpReplacement(pattern, replacement));
+	}
+
+	public void addReplacement(final String suffix, final String pattern,
+			final String replacement) {
+		replacements.put(suffix, new StandardReplacement(pattern, replacement));
+	}
+
+	private void clearReplacementMaps() {
 		regexpReplacements.clear();
 		simpleReplacements.clear();
+
+		replacements.clear();
+		results.clear();
 	}
 
 	/**
@@ -83,6 +154,7 @@ public class ChangesFactory {
 		if (subject == null) {
 			return null;
 		}
+
 		String result = subject;
 		for (Map.Entry<Pattern, String> replacement : regexpReplacements
 				.entrySet()) {
@@ -131,6 +203,7 @@ public class ChangesFactory {
 	 *            The built Change label
 	 * @return A Change object, or null if no replacement can be applied
 	 */
+	@Deprecated
 	public Change getReplacementChange(final IFile file,
 			final String changeTitle) {
 		final String content = FilesManager.readFile(file.getRawLocation().toString());
@@ -159,6 +232,7 @@ public class ChangesFactory {
 	 * @return A multi-files Change object, or null if no file have to be
 	 *         updated
 	 */
+	@Deprecated
 	public Change getReplacementChange(final IProject project,
 			final String suffix, final String changeTitle) {
 		final CompositeChange changes = new CompositeChange(changeTitle);
@@ -171,5 +245,18 @@ public class ChangesFactory {
 		}
 
 		return changes.getChildren().length > 0 ? changes : null;
+	}
+
+	public Change getAllChanges() {
+		final CompositeChange result = new CompositeChange("THENAME");
+		for (Entry<IFile, MultiTextEdit> entry : results.entrySet()) {
+			final IFile file = entry.getKey();
+			final TextFileChange fileChange = new TextFileChange("Changes to "
+					+ file.getName(), file);
+			fileChange.setEdit(entry.getValue());
+			result.add(fileChange);
+		}
+		clearReplacementMaps();
+		return result;
 	}
 }
