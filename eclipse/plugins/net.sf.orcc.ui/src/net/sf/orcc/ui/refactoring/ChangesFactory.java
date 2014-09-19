@@ -47,6 +47,7 @@ import org.eclipse.ltk.core.refactoring.CompositeChange;
 import org.eclipse.ltk.core.refactoring.TextFileChange;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
+import org.eclipse.text.edits.TextEdit;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -82,7 +83,7 @@ public class ChangesFactory {
 		public List<ReplaceEdit> getReplacements(final String content) {
 			final List<ReplaceEdit> replacements = new ArrayList<ReplaceEdit>();
 			int idx = 0;
-			while ((idx = content.indexOf(pattern, idx)) != -1) {
+			while ((idx = content.indexOf(pattern, idx + 1)) != -1) {
 				replacements.add(new ReplaceEdit(idx, pattern.length(),
 						replacement));
 				idx += pattern.length();
@@ -125,13 +126,13 @@ public class ChangesFactory {
 	final private Map<String, String> simpleReplacements;
 
 	final private Multimap<String, Replacement> replacements;
-	final private Map<IFile, MultiTextEdit> results;
+	final private Map<IFile, TextEdit> results;
 
 	public ChangesFactory() {
 		regexpReplacements = new HashMap<Pattern, String>();
 		simpleReplacements = new HashMap<String, String>();
 		replacements = HashMultimap.create();
-		results = new HashMap<IFile, MultiTextEdit>();
+		results = new HashMap<IFile, TextEdit>();
 	}
 
 	@Deprecated
@@ -277,12 +278,14 @@ public class ChangesFactory {
 						.toString());
 				for (Replacement replaceInfo : replacements.get(suffix)) {
 					if (replaceInfo.isConcerned(content)) {
-						if (!results.containsKey(file)) {
-							results.put(file, new MultiTextEdit());
+						TextEdit textEdit = results.get(file);
+						if (textEdit == null) {
+							textEdit = new MultiTextEdit();
+							results.put(file, textEdit);
 						}
 						for (ReplaceEdit replaceEdit : replaceInfo
 								.getReplacements(content)) {
-							results.get(file).addChild(replaceEdit);
+							textEdit.addChild(replaceEdit);
 						}
 					}
 				}
@@ -292,7 +295,7 @@ public class ChangesFactory {
 
 	public Change getAllChanges() {
 		final CompositeChange result = new CompositeChange("THENAME");
-		for (Entry<IFile, MultiTextEdit> entry : results.entrySet()) {
+		for (Entry<IFile, TextEdit> entry : results.entrySet()) {
 			final IFile file = entry.getKey();
 			final TextFileChange fileChange = new TextFileChange("Changes to "
 					+ file.getName(), file);

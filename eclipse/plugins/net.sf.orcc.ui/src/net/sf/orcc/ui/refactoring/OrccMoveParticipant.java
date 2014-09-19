@@ -31,9 +31,13 @@ package net.sf.orcc.ui.refactoring;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
+
+import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
@@ -57,6 +61,7 @@ public class OrccMoveParticipant extends MoveParticipant implements
 	private final ChangesFactory factory;
 
 	private IFolder destinationFolder;
+	private IProject originalProject;
 	private final List<IFile> files;
 
 	public OrccMoveParticipant() {
@@ -68,12 +73,13 @@ public class OrccMoveParticipant extends MoveParticipant implements
 
 	@Override
 	protected boolean initialize(Object element) {
+		files.clear();
 		final Object dest = getArguments().getDestination();
 		if (dest instanceof IFolder) {
+			destinationFolder = (IFolder) dest;
 			if (element instanceof IFile) {
-				files.clear();
-				files.add((IFile) element);
-				return true;
+				originalProject = ((IFile) element).getProject();
+				return registerFile((IFile) element);
 			}
 		}
 		return false;
@@ -82,8 +88,17 @@ public class OrccMoveParticipant extends MoveParticipant implements
 	@Override
 	public void addElement(Object element, RefactoringArguments arguments) {
 		if (element instanceof IFile) {
-			files.add((IFile) element);
+			registerFile((IFile) element);
 		}
+	}
+
+	private boolean registerFile(IFile file) {
+		files.add(file);
+		if (OrccUtil.CAL_SUFFIX.equals(file.getFileExtension())) {
+			addCalFilesUpdates(file);
+			return true;
+		}
+		return false;
 	}
 
 	@Override
@@ -100,7 +115,41 @@ public class OrccMoveParticipant extends MoveParticipant implements
 	@Override
 	public Change createChange(IProgressMonitor pm) throws CoreException,
 			OperationCanceledException {
-		return null;
+		factory.computeResults(originalProject);
+		return factory.getAllChanges();
 	}
 
+	private void addCalFilesUpdates(IFile file) {
+		final IFile destinationFile = destinationFolder.getFile(file.getName());
+
+		final String origQualifiedName = OrccUtil.getQualifiedName(file);
+		final String newQualifiedName = OrccUtil
+				.getQualifiedName(destinationFile);
+		final Pattern importPattern = Pattern.compile("import(\\s+)"
+				+ origQualifiedName + "(\\.(\\*|\\w+))(\\s*);");
+
+		final String replacement = "import$1" + newQualifiedName + "$2$4;";
+		factory.addReplacement(OrccUtil.CAL_SUFFIX, importPattern, replacement);
+
+		factory.addReplacement(OrccUtil.NETWORK_SUFFIX, "<Class name=\""
+				+ origQualifiedName + "\"/>", "<Class name=\""
+				+ newQualifiedName + "\"/>");
+
+		final IFile irFile = OrccUtil.getFile(file.getProject(),
+				OrccUtil.getQualifiedName(file), OrccUtil.IR_SUFFIX);
+
+		final String originalRefinement = irFile.getFullPath().toString();
+
+		final String originalRelativeFolder = file.getParent()
+				.getProjectRelativePath().removeFirstSegments(1).toString();
+		final String newRelativeFolder = destinationFolder
+				.getProjectRelativePath().removeFirstSegments(1).toString();
+
+		final String newRefinement = originalRefinement.replace(
+				originalRelativeFolder, newRelativeFolder);
+
+		factory.addReplacement(OrccUtil.DIAGRAM_SUFFIX,
+				"key=\"refinement\" value=\"" + originalRefinement + "\"",
+				"key=\"refinement\" value=\"" + newRefinement + "\"");
+	}
 }
