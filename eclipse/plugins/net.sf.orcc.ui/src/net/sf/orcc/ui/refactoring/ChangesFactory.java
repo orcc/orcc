@@ -38,8 +38,6 @@ import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.CompositeChange;
 import org.eclipse.ltk.core.refactoring.TextFileChange;
@@ -52,19 +50,12 @@ import org.eclipse.text.edits.ReplaceEdit;
  */
 public class ChangesFactory {
 
-	final private ResourceSet resourceSet;
-
 	final private Map<Pattern, String> regexpReplacements;
 	final private Map<String, String> simpleReplacements;
 
 	public ChangesFactory() {
-		resourceSet = new ResourceSetImpl();
 		regexpReplacements = new HashMap<Pattern, String>();
 		simpleReplacements = new HashMap<String, String>();
-	}
-
-	public ResourceSet getResourceSet() {
-		return resourceSet;
 	}
 
 	public void addReplacement(final Pattern pattern,
