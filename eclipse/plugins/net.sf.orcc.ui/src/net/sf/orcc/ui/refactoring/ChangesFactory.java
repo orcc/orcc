@@ -28,16 +28,19 @@
  */
 package net.sf.orcc.ui.refactoring;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.orcc.util.FilesManager;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.CompositeChange;
@@ -56,9 +59,9 @@ import com.google.common.collect.Multimap;
 public class ChangesFactory {
 
 	interface Replacement {
-		boolean isConcerned(String content);
+		boolean isConcerned(final String content);
 
-		ReplaceEdit getReplacement(String content);
+		List<ReplaceEdit> getReplacements(final String content);
 	}
 
 	class StandardReplacement implements Replacement {
@@ -66,18 +69,25 @@ public class ChangesFactory {
 		private String replacement;
 
 		public StandardReplacement(String p, String r) {
+			pattern = p;
+			replacement = r;
 		}
 
 		@Override
-		public boolean isConcerned(String content) {
-			// TODO Auto-generated method stub
-			return false;
+		public boolean isConcerned(final String content) {
+			return content.contains(pattern);
 		}
 
 		@Override
-		public ReplaceEdit getReplacement(String content) {
-			// TODO Auto-generated method stub
-			return null;
+		public List<ReplaceEdit> getReplacements(final String content) {
+			final List<ReplaceEdit> replacements = new ArrayList<ReplaceEdit>();
+			int idx = 0;
+			while ((idx = content.indexOf(pattern, idx)) != -1) {
+				replacements.add(new ReplaceEdit(idx, pattern.length(),
+						replacement));
+				idx += pattern.length();
+			}
+			return replacements;
 		}
 	}
 
@@ -86,18 +96,28 @@ public class ChangesFactory {
 		private String replacement;
 
 		public RegexpReplacement(Pattern p, String r) {
+			pattern = p;
+			replacement = r;
 		}
 
 		@Override
-		public boolean isConcerned(String content) {
-			// TODO Auto-generated method stub
-			return false;
+		public boolean isConcerned(final String content) {
+			return pattern.matcher(content).find();
 		}
 
 		@Override
-		public ReplaceEdit getReplacement(String content) {
-			// TODO Auto-generated method stub
-			return null;
+		public List<ReplaceEdit> getReplacements(final String content) {
+			final List<ReplaceEdit> replacements = new ArrayList<ReplaceEdit>();
+			final Matcher matcher = pattern.matcher(content);
+			while (matcher.find()) {
+				int s = matcher.start();
+				int e = matcher.end();
+				final String replaced = pattern
+						.matcher(content.substring(s, e)).replaceAll(
+								replacement);
+				replacements.add(new ReplaceEdit(s, e - s, replaced));
+			}
+			return replacements;
 		}
 	}
 
@@ -115,14 +135,12 @@ public class ChangesFactory {
 	}
 
 	@Deprecated
-	public void addReplacement(final Pattern pattern,
-			final String replacement) {
+	public void addReplacement(final Pattern pattern, final String replacement) {
 		regexpReplacements.put(pattern, replacement);
 	}
 
 	@Deprecated
-	public void addReplacement(final String search,
-			final String replacement) {
+	public void addReplacement(final String search, final String replacement) {
 		simpleReplacements.put(search, replacement);
 	}
 
@@ -206,7 +224,8 @@ public class ChangesFactory {
 	@Deprecated
 	public Change getReplacementChange(final IFile file,
 			final String changeTitle) {
-		final String content = FilesManager.readFile(file.getRawLocation().toString());
+		final String content = FilesManager.readFile(file.getRawLocation()
+				.toString());
 		if (contentNeedsUpdate(content)) {
 			final String newContent = performReplacement(content);
 			final TextFileChange textFileChange = new TextFileChange(
@@ -245,6 +264,30 @@ public class ChangesFactory {
 		}
 
 		return changes.getChildren().length > 0 ? changes : null;
+	}
+
+	public void computeResults(final IProject project) {
+		final List<IFolder> folders = OrccUtil
+				.getAllDependingSourceFolders(project);
+		List<IFile> files;
+		for (String suffix : replacements.keySet()) {
+			files = OrccUtil.getAllFiles(suffix, folders);
+			for (IFile file : files) {
+				String content = FilesManager.readFile(file.getRawLocation()
+						.toString());
+				for (Replacement replaceInfo : replacements.get(suffix)) {
+					if (replaceInfo.isConcerned(content)) {
+						if (!results.containsKey(file)) {
+							results.put(file, new MultiTextEdit());
+						}
+						for (ReplaceEdit replaceEdit : replaceInfo
+								.getReplacements(content)) {
+							results.get(file).addChild(replaceEdit);
+						}
+					}
+				}
+			}
+		}
 	}
 
 	public Change getAllChanges() {
