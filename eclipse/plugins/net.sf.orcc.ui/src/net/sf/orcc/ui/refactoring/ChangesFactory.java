@@ -155,6 +155,21 @@ public class ChangesFactory {
 		replacements.put(suffix, new StandardReplacement(pattern, replacement));
 	}
 
+	public Change getUniqueFileReplacement(final IFile file, final Pattern pattern, final String repl) {
+		final Replacement replacement = new RegexpReplacement(pattern, repl);
+		final String content = FilesManager.readFile(file.getRawLocation().toString());
+		final MultiTextEdit edits = new MultiTextEdit();
+		if(replacement.isConcerned(content)) {
+			for(ReplaceEdit edit : replacement.getReplacements(content)) {
+				edits.addChild(edit);
+			}
+		}
+
+		final TextFileChange result = new TextFileChange("qsd", file);
+		result.setEdit(edits);
+		return result;
+	}
+
 	private void clearReplacementMaps() {
 		regexpReplacements.clear();
 		simpleReplacements.clear();

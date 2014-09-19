@@ -42,6 +42,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.ltk.core.refactoring.Change;
+import org.eclipse.ltk.core.refactoring.CompositeChange;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.core.refactoring.participants.CheckConditionsContext;
 import org.eclipse.ltk.core.refactoring.participants.ISharableParticipant;
@@ -110,6 +111,29 @@ public class OrccMoveParticipant extends MoveParticipant implements
 	public RefactoringStatus checkConditions(IProgressMonitor pm,
 			CheckConditionsContext context) throws OperationCanceledException {
 		return new RefactoringStatus();
+	}
+
+	@Override
+	public Change createPreChange(IProgressMonitor pm) throws CoreException,
+			OperationCanceledException {
+		CompositeChange change = new CompositeChange("");
+		for (IFile file : files) {
+			if (OrccUtil.CAL_SUFFIX.equals(file.getFileExtension())) {
+
+				final String origPackage = OrccUtil.getQualifiedPackage(file);
+				final String newPackage = OrccUtil
+						.getQualifiedPackage(destinationFolder.getFile(file
+								.getName()));
+
+				final Pattern pattern = Pattern.compile("package(\\s+)"
+						+ origPackage + "(\\s*);");
+				final String replacement = "package$1" + newPackage + "$2;";
+
+				change.add(factory.getUniqueFileReplacement(file, pattern,
+						replacement));
+			}
+		}
+		return change;
 	}
 
 	@Override
