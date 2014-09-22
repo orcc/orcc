@@ -282,7 +282,7 @@ public class ChangesFactory {
 		return changes.getChildren().length > 0 ? changes : null;
 	}
 
-	public void computeResults(final IProject project) {
+	public Change getAllChanges(final IProject project, final String title) {
 		final List<IFolder> folders = OrccUtil
 				.getAllDependingSourceFolders(project);
 		List<IFile> files;
@@ -306,10 +306,7 @@ public class ChangesFactory {
 				}
 			}
 		}
-	}
-
-	public Change getAllChanges() {
-		final CompositeChange result = new CompositeChange("THENAME");
+		final CompositeChange result = new CompositeChange(title);
 		for (Entry<IFile, TextEdit> entry : results.entrySet()) {
 			final IFile file = entry.getKey();
 			final TextFileChange fileChange = new TextFileChange("Changes to "

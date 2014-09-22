@@ -139,8 +139,7 @@ public class OrccMoveParticipant extends MoveParticipant implements
 	@Override
 	public Change createChange(IProgressMonitor pm) throws CoreException,
 			OperationCanceledException {
-		factory.computeResults(originalProject);
-		return factory.getAllChanges();
+		return factory.getAllChanges(originalProject, "Update depending files");
 	}
 
 	private void addCalFilesUpdates(IFile file) {
