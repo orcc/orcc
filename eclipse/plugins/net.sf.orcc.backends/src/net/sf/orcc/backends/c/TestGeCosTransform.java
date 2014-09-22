@@ -1,30 +1,24 @@
-package net.sf.orcc.backends.c;
+package net.sf.orcc.backends.c.compa;
 
-import fr.irisa.cairn.ecore.tools.query.EMFUtils;
+//import fr.irisa.cairn.ecore.tools.query.EMFUtils;
 import fr.irisa.cairn.gecos.gscop.GScopFSM;
-import fr.irisa.cairn.gecos.gscop.GScopPackage;
 import fr.irisa.cairn.gecos.gscop.GScopRoot;
-import fr.irisa.cairn.gecos.gscop.LoopIterator;
 import fr.irisa.cairn.gecos.model.c.generator.XtendCGenerator;
 import fr.irisa.cairn.gecos.model.cdtfrontend.CDTFrontEnd;
-import fr.irisa.cairn.gecos.model.factory.ControlStructureFactory;
-import fr.irisa.cairn.gecos.model.factory.GecosCoreFactory;
-import fr.irisa.cairn.gecos.model.factory.TypeFactory;
+import fr.irisa.cairn.gecos.model.factory.GecosUserBlockFactory;
+import fr.irisa.cairn.gecos.model.factory.GecosUserCoreFactory;
+import fr.irisa.cairn.gecos.model.factory.GecosUserTypeFactory;
 import fr.irisa.cairn.gecos.model.modules.AddSourceToGecosProject;
 import fr.irisa.cairn.gecos.model.modules.CreateProject;
-import fr.irisa.cairn.gecos.model.modules.SaveGecosProject;
-import fr.irisa.cairn.gecos.scop.analysis.dataflow.GecosArrayDataflowAnalysis;
-import fr.irisa.cairn.gecos.scop.transfom.fsm.ActorSplittingTransform;
-import fr.irisa.cairn.gecos.scop.transfom.fsm.HybridFSMCloogCodeGenerator;
-import fr.irisa.cairn.gecos.scop.transfom.fsm.PortInfoGeCosToCAL;
-import fr.irisa.cairn.model.gecos.scop.extractor.ScopExtractorPass;
-import fr.irisa.cairn.model.gecos.scop.scheduling.GScopScheduler;
+import fr.irisa.cairn.gecos.model.scop.almaflow.GecosToCALInfo;
+import fr.irisa.cairn.gecos.model.scop.almaflow.PortInfoGecosToCAL;
+import fr.irisa.cairn.gecos.model.scop.almaflow.UR1OptimizationFlowModule;
+import fr.irisa.cairn.tools.ecore.query.EMFUtils;
 import gecos.blocks.BasicBlock;
 import gecos.blocks.CompositeBlock;
 import gecos.blocks.ForBlock;
 import gecos.blocks.IfBlock;
 import gecos.blocks.WhileBlock;
-import gecos.core.CoreFactory;
 import gecos.core.ParameterSymbol;
 import gecos.core.ProcedureSet;
 import gecos.core.Symbol;
@@ -32,17 +26,15 @@ import gecosproject.GecosProject;
 import gecosproject.GecosSourceFile;
 import gecosproject.GecosprojectFactory;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
-import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.resources.IFile;
 
-import net.sf.orcc.backends.c.NetworkPortInfo.NetworkPortType;
+import net.sf.orcc.backends.c.compa.NetworkPortInfo.NetworkPortType;
 import net.sf.orcc.backends.ir.BlockFor;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
@@ -51,8 +43,6 @@ import net.sf.orcc.ir.Block;
 import net.sf.orcc.ir.BlockBasic;
 import net.sf.orcc.ir.BlockIf;
 import net.sf.orcc.ir.BlockWhile;
-import net.sf.orcc.ir.ExprList;
-import net.sf.orcc.ir.ExprString;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Procedure;
@@ -63,6 +53,7 @@ import net.sf.orcc.util.OrccLogger;
 //import fr.irisa.cairn.model.gecos.scop.scheduling.AbstractGScopScheduler;
 //import fr.irisa.cairn.model.gecos.scop.scheduling.GScopScheduler;
 //import fr.irisa.cairn.model.gecos.scop.scheduling.pluto.ScopPRDGPlutoScheduling;
+import net.sf.orcc.util.OrccUtil;
 
 
 public class TestGeCosTransform {
@@ -90,7 +81,7 @@ public class TestGeCosTransform {
 	}
 	
 	static gecos.blocks.BasicBlock processBasicBlock(BlockBasic bb) {
-		BasicBlock gecosBB = ControlStructureFactory.BBlock();
+		BasicBlock gecosBB = GecosUserBlockFactory.BBlock();
 		for ( Instruction inst : bb.getInstructions() ) {
 			gecos.instrs.Instruction gecosInst = TransformToGecosInstruction.convertToGecosInst(inst, gecosProc);
 			gecosBB.addInstruction(gecosInst);
@@ -99,49 +90,49 @@ public class TestGeCosTransform {
 	}
 	
 	static gecos.blocks.WhileBlock processWhileBlock(BlockWhile wbb ) {
-		WhileBlock gecosWhile = ControlStructureFactory.While(ControlStructureFactory.BBlock());
+		WhileBlock gecosWhile = GecosUserBlockFactory.While(GecosUserBlockFactory.BBlock());
 		return gecosWhile;
 	}
 
 	static IfBlock processIfBlock ( BlockIf ifbb) {
 		gecos.instrs.Instruction condInst = TransformToGecosInstruction.convertToGecosInst(ifbb.getCondition(), gecosProc);
-		CompositeBlock thenBlock = ControlStructureFactory.CompositeBlock();
+		CompositeBlock thenBlock = GecosUserBlockFactory.CompositeBlock();
 		for ( Block b : ifbb.getThenBlocks() ) {
 			gecos.blocks.Block gecosBlock = transformToGecosBlock(b);
 			thenBlock.addChildren(gecosBlock);
 		}
 		if ( ifbb.getElseBlocks().size() != 0 ) {
-			CompositeBlock elseBlock = ControlStructureFactory.CompositeBlock();
+			CompositeBlock elseBlock = GecosUserBlockFactory.CompositeBlock();
 			for ( Block b : ifbb.getElseBlocks() ) {
 				gecos.blocks.Block gecosBlock = transformToGecosBlock(b);
 				elseBlock.addChildren(gecosBlock);
 			}
-			return ControlStructureFactory.IfThenElse(condInst, thenBlock, elseBlock);
+			return GecosUserBlockFactory.IfThenElse(condInst, thenBlock, elseBlock);
 		} else {
-			return ControlStructureFactory.IfThen(condInst, thenBlock);
+			return GecosUserBlockFactory.IfThen(condInst, thenBlock);
 		}
 	}
 
 	static ForBlock processForBlock ( BlockFor fbb) {
-		BasicBlock init = ControlStructureFactory.BBlock();
+		BasicBlock init = GecosUserBlockFactory.BBlock();
 		for ( Instruction inst : fbb.getInit() ) {
 			gecos.instrs.Instruction gecosInst = TransformToGecosInstruction.convertToGecosInst(inst, gecosProc);
 			init.addInstruction(gecosInst);
 		}
-		BasicBlock test = ControlStructureFactory.BBlock();
+		BasicBlock test = GecosUserBlockFactory.BBlock();
 		gecos.instrs.Instruction condInst = TransformToGecosInstruction.convertToGecosInst(fbb.getCondition(), gecosProc);
 		test.addInstruction(condInst);
-		BasicBlock step = ControlStructureFactory.BBlock();
+		BasicBlock step = GecosUserBlockFactory.BBlock();
 		for ( Instruction inst : fbb.getStep() ) {
 			gecos.instrs.Instruction gecosInst = TransformToGecosInstruction.convertToGecosInst(inst, gecosProc);
 			step.addInstruction(gecosInst);
 		}
-		CompositeBlock bodyBlock = ControlStructureFactory.CompositeBlock();
+		CompositeBlock bodyBlock = GecosUserBlockFactory.CompositeBlock();
 		for ( Block b : fbb.getBlocks() ) {
 			gecos.blocks.Block gecosBlock = transformToGecosBlock(b);
 			bodyBlock.addChildren(gecosBlock);
 		}
-		return ControlStructureFactory.For(init, test, step, bodyBlock);
+		return GecosUserBlockFactory.For(init, test, step, bodyBlock);
 	}
 	
 
@@ -154,11 +145,12 @@ public class TestGeCosTransform {
 	public static gecos.core.ParameterSymbol convertToGecosParameter(Param p, int value) {
 		String name = p.getVariable().getName();
 		gecos.types.Type paramType = TransformToGecosInstruction.convertToGeCosType(p.getVariable().getType());
-		gecos.core.ParameterSymbol gecosParam = GecosCoreFactory.paramSymbol(name, paramType);
+		gecos.core.ParameterSymbol gecosParam = GecosUserCoreFactory.paramSymbol(name, paramType);
 		return gecosParam;
 	}
 	
-	public static gecos.core.Procedure createProcedure (Procedure body, Action action, ProcedureSet procedureSet, CompositeBlock gecosBody) {
+	public static gecos.core.Procedure createProcedure (Procedure body, Action action, 
+			ProcedureSet procedureSet, CompositeBlock gecosBody, List<Attribute> arrayAttributes ) {
 		/*Get Parameters */
 		List<ParameterSymbol> paramList = new ArrayList<ParameterSymbol>();
 		int numParam = 0;
@@ -167,8 +159,8 @@ public class TestGeCosTransform {
 			String name = action.getInputPattern().getVariable(p).getName();
 			gecos.types.Type paramType = TransformToGecosInstruction.convertToGeCosType(p.getType());
 			int size = action.getInputPattern().getNumTokensMap().get(p);
-			paramType = TypeFactory.ARRAY(paramType, size);
-			gecos.core.ParameterSymbol paramSym = GecosCoreFactory.paramSymbol(name, paramType);
+			paramType = getPortType(name, paramType, size, arrayAttributes);
+			gecos.core.ParameterSymbol paramSym = GecosUserCoreFactory.paramSymbol(name, paramType);
 			paramList.add(paramSym);
 			procedureSet.getScope().getTypes().add(paramSym.getType());
 			numParam++;
@@ -177,8 +169,8 @@ public class TestGeCosTransform {
 			String name = action.getOutputPattern().getVariable(p).getName();
 			gecos.types.Type paramType = TransformToGecosInstruction.convertToGeCosType(p.getType());
 			int size = action.getOutputPattern().getNumTokensMap().get(p);
-			paramType = TypeFactory.ARRAY(paramType, size);
-			gecos.core.ParameterSymbol paramSym = GecosCoreFactory.paramSymbol(name, paramType);
+			paramType = getPortType(name, paramType, size, arrayAttributes);
+			gecos.core.ParameterSymbol paramSym = GecosUserCoreFactory.paramSymbol(name, paramType);
 			paramList.add(paramSym);
 			procedureSet.getScope().getTypes().add(paramSym.getType());
 			numParam++;
@@ -194,14 +186,12 @@ public class TestGeCosTransform {
 		procedureSet.getScope().getTypes().add(gecosRetType);
 		/* add local variables into procedure */
 		for ( Var v : body.getLocals()) {
-			Symbol sym = CoreFactory.eINSTANCE.createSymbol();
-			sym.setScope(gecosBody.getScope());
-			sym.setType(TransformToGecosInstruction.convertToGeCosType(v.getType()));
-			sym.setName(v.getName());
+			Symbol sym = GecosUserCoreFactory.symbol(v.getName(), 
+					TransformToGecosInstruction.convertToGeCosType(v.getType()), gecosBody.getScope());
 			gecosBody.getScope().getSymbols().add(sym);
 			gecosBody.getScope().getTypes().add(sym.getType());
 		}
-		gecosProc = GecosCoreFactory.proc(procedureSet, body.getName(), gecosRetType, gecosBody, paramList);
+		gecosProc = GecosUserCoreFactory.proc(procedureSet, body.getName(), gecosRetType, gecosBody, paramList);
 		/*int numParam = 0;
 		for ( Param p : body.getParameters() ) {
 			gecos.core.ParameterSymbol paramSym = convertToGecosParameter(p, numParam);
@@ -214,11 +204,29 @@ public class TestGeCosTransform {
 	}
 
 
+	private static gecos.types.Type getPortType(String arrayName, gecos.types.Type paramType, int size,
+			List<Attribute> arrayAttributes) {
+	
+		for ( Attribute att : arrayAttributes ) {
+			if ( att.getName().equals(arrayName) ) {
+				String[] str = att.getStringValue().split(",");
+				int numDims = Integer.parseInt(str[0]);
+				gecos.types.Type type = paramType.copy();
+				for (int i = numDims; i > 0; i--  ) {
+					type = GecosUserTypeFactory.ARRAY(type, Integer.parseInt(str[i]));
+				}
+				return type;
+			}
+		}
+		return GecosUserTypeFactory.ARRAY(paramType, size);
+	}
+
 	public static void exec(Actor actor) {
 
 		OrccLogger.traceln(actor.getName());
-				
+		System.out.println("PkgName " + actor.getPackage());	
 		if ( actor.hasAttribute("gecos")) {
+			
 			OrccLogger.traceln("Actor " + actor.getName() + " will be analyzed by gecos");
 			if ( actor.getActions().size() > 1 ) {
 				OrccLogger.traceln("Actor has more than one action");
@@ -245,64 +253,65 @@ public class TestGeCosTransform {
 			String actorName = actor.getName();
 			
 			Action action = actor.getActions().get(0);
+			Attribute arrAtt = action.getAttribute("gecos");
+			List<Attribute> arrayAtts = new ArrayList<Attribute>();
+			if ( arrAtt != null )
+				arrayAtts = arrAtt.getAttributes();
 			Procedure body = action.getBody();
-			ProcedureSet procedureSet = GecosCoreFactory.procedureSet();
-			TypeFactory.setScope(procedureSet.getScope());
+			ProcedureSet procedureSet = GecosUserCoreFactory.procedureSet();
+			GecosUserTypeFactory.setScope(procedureSet.getScope());
 			/* Add state variables of actor int procedureSet scope */
 			for ( Var v : actor.getStateVars() ) {
-				Symbol sym = CoreFactory.eINSTANCE.createSymbol();
-				sym.setScope(procedureSet.getScope());
-				sym.setType(TransformToGecosInstruction.convertToGeCosType(v.getType()));
-				sym.setName(v.getName());
+				Symbol sym = GecosUserCoreFactory.symbol(v.getName(), 
+						TransformToGecosInstruction.convertToGeCosType(v.getType()), procedureSet.getScope());
 			//	gecos.instrs.Instruction value = TransformToGecosInstruction.convertToGecosInst(v.getInitialValue(), proc);
 			//	sym.setValue(value);
 				procedureSet.getScope().getSymbols().add(sym);
 			}
-			gecos.core.Scope s = GecosCoreFactory.scope();
-			CompositeBlock gecosBody = ControlStructureFactory.CompositeBlock(s);
-			gecosProc = createProcedure(body, action, procedureSet, gecosBody);
-			System.out.println("Gecos Procedure is " + gecosProc);
+			gecos.core.Scope s = GecosUserCoreFactory.scope();
+			CompositeBlock gecosBody = GecosUserBlockFactory.CompositeBlock(s);
+			gecosProc = createProcedure(body, action, procedureSet, gecosBody, arrayAtts);
+			
 			for ( Block b : body.getBlocks() ) {
 				gecos.blocks.Block gecosBlock = transformToGecosBlock(b);
 				gecosBody.addChildren(gecosBlock);
 			}
-			System.out.println(gecosProc.getBody().getScope());
-			procedureSet.getProcedures().add(gecosProc);
+			
+			procedureSet.addProcedure(gecosProc);
 			GecosProject gecosProject = GecosprojectFactory.eINSTANCE.createGecosProject();
 			GecosSourceFile gecosSourceFile = GecosprojectFactory.eINSTANCE.createGecosSourceFile();
 			gecosProject.getSources().add(gecosSourceFile);
 			gecosSourceFile.setName("dummyProgram.c");
 			gecosSourceFile.setModel(procedureSet);
-			new XtendCGenerator(gecosProject, "/home/mythri/src-regen/").compute();
+			new XtendCGenerator(gecosProject, "/home/malle/src-regen/").compute();
+			/*String[] cmd = {"bash", "-c", "sed -i \"s/\\(\\* *[a-z,A-Z,_,0-9]\\+ *\\)\\++/][/g\" /home/mythri/src-regen/_dummyProgram.c"};
+			System.out.println(cmd);
+			try {
+				Process p = Runtime.getRuntime().exec(cmd);
+				p.waitFor();
+				int retVal = p.exitValue();
+				System.out.println("RetrunVale " + retVal);
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}*/
 			CreateProject createProj = new CreateProject("compaGecosProj");
 			GecosProject newProject = createProj.compute();
-			try {
-				AddSourceToGecosProject a = new AddSourceToGecosProject(newProject, "/home/mythri/src-regen/_dummyProgram.c");
-				a.compute();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			AddSourceToGecosProject a = new AddSourceToGecosProject(newProject, "/home/malle/src-regen/dummyProgram.c");
+			a.compute();
 			CDTFrontEnd frontend = new CDTFrontEnd(newProject);
-			try {
-				frontend.compute();
-			} catch (CoreException e) {
-				e.printStackTrace();
-			}  
-			//new XtendCGenerator(gecosProject, "./src-regen/").compute(); 
-			ScopExtractorPass scopExtractorPass = new ScopExtractorPass(newProject);
-			Collection<GScopRoot> scops = scopExtractorPass.compute();
-			System.out.println("ScopExtraction Done");
-			GecosArrayDataflowAnalysis dataflowAnalysis = new GecosArrayDataflowAnalysis(newProject);
-			dataflowAnalysis.compute();
-			System.out.println("DFAnalysis Done");
-			GScopScheduler schedule = new GScopScheduler(newProject, "PLUTO_ISL");
-			schedule.compute();
-			ActorSplittingTransform actorSplitTrans = new ActorSplittingTransform(newProject, numActors, tileSize);
+			frontend.compute();
+			
+//			GecosProject newProject = gecosProject;
+			UR1OptimizationFlowModule actorSplitTrans = new UR1OptimizationFlowModule(newProject,0,numActors,tileSize);
+			UR1OptimizationFlowModule.setFSMBasedCodeGeneration(true);
 			actorSplitTrans.compute();
-			int tileLevel = actorSplitTrans.getTileLevel();
-			HybridFSMCloogCodeGenerator codeGen = new HybridFSMCloogCodeGenerator(newProject, tileLevel);
-			codeGen.compute();
-			printActorNetwork(actorName, numActors, action, newProject,	actorSplitTrans);
+			System.out.println("Project: " + actor.getPackage());
+			
+			printActorNetwork(actorName, numActors, actor, action, newProject,	actorSplitTrans);
 			transformToActorModel();
 			OrccLogger.traceln("Transforming Procedure " + body.getName());
 		} 
@@ -316,191 +325,236 @@ public class TestGeCosTransform {
 	}
 
 	private static void printActorNetwork(String actorName, int numActors,
-			Action action, GecosProject newProject,
-			ActorSplittingTransform actorSplitTrans) {
-		Map<Integer, List<PortInfoGeCosToCAL>> flowOutMap = actorSplitTrans.getFlowOutMap();
-		Map<Integer, List<PortInfoGeCosToCAL>> flowInMap = actorSplitTrans.getFlowInMap();
-		List<GScopFSM> scatterFSMs = new ArrayList<GScopFSM>();
-		GScopFSM gatherFSM = null;
-		List<GScopFSM> actorFSMs = new ArrayList<GScopFSM>();
-		List<GScopFSM> gatherFSMs = new ArrayList<GScopFSM>();
-		for ( gecos.core.Procedure proc : newProject.getAllProcedures() ) {
-			if ( proc.getSymbol().getName().compareTo("scatter") == 0) {
-				List<GScopRoot> roots = EMFUtils.eAllContentsInstancesOf(proc, GScopPackage.eINSTANCE.getGScopRoot());
-				int actorId = 0;
-				for ( GScopRoot root : roots ) {
-					/* append _actorId for all statements */
-				/*	for ( Symbol sym : root.getScope().getSymbols() ) {
-						sym.setName(sym.getName()+"_"+actorId);
-					} */
-					GScopFSM fsm = (GScopFSM)root.getStatements().get(0);
-					for ( LoopIterator it : fsm.getIterators()) {
-						String name = it.getName();
-						it.setName(name+"_"+actorId);
-					}
-					scatterFSMs.add(fsm);
-					actorId++;
-				}
-			} else if ( proc.getSymbol().getName().compareTo("gather") == 0) {
-				List<GScopRoot> roots = EMFUtils.eAllContentsInstancesOf(proc, GScopPackage.eINSTANCE.getGScopRoot());
-				gatherFSM = (GScopFSM)roots.get(0).getStatements().get(0);
-			} else {
-				List<GScopRoot> roots = EMFUtils.eAllContentsInstancesOf(proc, GScopPackage.eINSTANCE.getGScopRoot());
-				actorFSMs.add((GScopFSM)roots.get(0).getStatements().get(0));
-				gatherFSMs.add((GScopFSM)roots.get(1).getStatements().get(0));
-			}
-		}
+			Actor actor, Action action, GecosProject newProject,
+			UR1OptimizationFlowModule actorSplitTrans) {
+		
+		Map<Integer, List<GecosToCALInfo>> actorsMap = actorSplitTrans.getActors(); 
 		//new XtendCGenerator(gecosProject, "./src-regen/").compute();
 		ActorTemplate actorGen = new ActorTemplate();
-		Map<Integer, List<PortInfoGeCosToCAL>> initMapList = actorSplitTrans.getInitMap();
-		Map<Integer, List<PortInfoGeCosToCAL>> writeOutMapList = actorSplitTrans.getWriteOutMap();
-		String pathName = "/home/mythri/orcc-apps-code/Research/src/fr/irisa/compa/gecos/";
-		String fileName = pathName+actorName;
-		String pkgName = "fr.irisa.compa.gecos";
-		List<ActorPortInfo> ipportList = new ArrayList<ActorPortInfo>();
-		List<ActorPortInfo> opportList = new ArrayList<ActorPortInfo>();
-		List<ActorPortInfo> writeoutList = new ArrayList<ActorPortInfo>();
-		/* Scatter Actor */
-		for ( Port p : action.getInputPattern().getPorts() ) {
-			int size = action.getInputPattern().getNumTokensMap().get(p);
-			ActorPortInfo info = new ActorPortInfo(p.getName(), size, 
-					p.getName()+"_initBuffer", p.getType().toString() );
-			ipportList.add(info);
-		}
-		List<List<ActorPortInfo>> opportListScatter = new ArrayList<List<ActorPortInfo>>();
-		for ( Entry<Integer, List<PortInfoGeCosToCAL>> actorEntry : initMapList.entrySet() ) {
-			int actorId = actorEntry.getKey();
-			List<ActorPortInfo> opportforactor = new ArrayList<ActorPortInfo>();
-			for ( PortInfoGeCosToCAL e : actorEntry.getValue() ) {
-				String arrayType = getTypeOfArray(e.arrayName, action);
-				ActorPortInfo info = new ActorPortInfo("Port_"+e.bufferName, e.bufferSize, 
-					e.bufferName, arrayType);
-				opportforactor.add(info);
+		ActorTemplate.arraySizeMap = new HashMap<Symbol, List<gecos.instrs.Instruction>>();
+		ActorTemplate.arraySizeMap.putAll(actorSplitTrans.getArraySizeMap());
+		
+		//FIXME: get correct way of getting package info
+		String pkgName = actor.getFileName();
+		pkgName = pkgName.substring(pkgName.indexOf("/")+1);
+		pkgName = pkgName.substring(pkgName.indexOf("/")+1);
+		pkgName = pkgName.substring(pkgName.indexOf("/")+1);
+		pkgName = pkgName.substring(0, pkgName.lastIndexOf("/"));
+		pkgName = pkgName.replace("/",".");
+		
+		String pathName = actor.getFile().getRawLocation().toOSString();
+		pathName = pathName.substring(0, pathName.lastIndexOf("/")+1);
+		String fileName = actorName;
+		
+		
+		/* Print Actors */
+		for ( int i = 0; i < numActors+1; i++ ) {
+			List<ActorPortInfo> ipportList = new ArrayList<ActorPortInfo>();
+			List<ActorPortInfo> opportList = new ArrayList<ActorPortInfo>();
+			System.out.println("Actor@ " + i + "  " + actorsMap.size());
+			List<GecosToCALInfo> list = actorsMap.get(i);
+			GecosToCALInfo actorEntry = list.get(0);
+			if ( i == numActors )  { //That is scatter
+				ipportList = getPortListFromCALPorts(action, action.getInputPattern().getPorts(), true);
+				List<ActorPortInfo> l = getPortList(actorEntry.ipPortList, action);
+				ipportList.addAll(l);
+			} else {
+				ipportList = getPortList(actorEntry.ipPortList, action);
 			}
-			opportListScatter.add(opportforactor);
-			actorId++;
-		}
-		actorGen.printScatterActor(fileName+"_scatter.cal", scatterFSMs, pkgName, actorName+"_scatter", ipportList, opportListScatter);
-		ipportList.clear();
-		opportList.clear();
-		/* Gather Actor */
-		for ( Entry<Integer, List<PortInfoGeCosToCAL>> actorEntry : writeOutMapList.entrySet() ) {
-			int actorId = actorEntry.getKey();
-			for ( PortInfoGeCosToCAL e : actorEntry.getValue() ) {
-				String arrayType = getTypeOfArray(e.arrayName, action);
-				ActorPortInfo info = new ActorPortInfo("Port_"+e.bufferName, e.bufferSize, 
-					e.bufferName, arrayType);
-				ipportList.add(info);
+			if ( i == numActors  ) { //This is Scatter
+				opportList = getPortListFromCALPorts(action, action.getOutputPattern().getPorts(), false);
+				List<ActorPortInfo> l = getPortList(actorEntry.opPortList, action);
+				opportList.addAll(l);
+			} else {
+				opportList = getPortList(actorEntry.opPortList, action);
 			}
-			actorId++;
-		}
-		for ( Port p : action.getOutputPattern().getPorts() ) {
-			int size = action.getOutputPattern().getNumTokensMap().get(p);
-			ActorPortInfo info = new ActorPortInfo(p.getName(), size, 
-					"tmpBuffer_"+p.getName(), p.getType().toString());
-			opportList.add(info);
-		}
-		actorGen.printGatherActor(fileName+"_gather.cal", gatherFSM, null, pkgName, actorName+"_gather", ipportList, opportList, writeoutList);
-		/* Compute Actors */
-		for (int i = 0; i < numActors; i++ ) {
-			GScopFSM fsm = actorFSMs.get(i);
-			GScopFSM writeoutFSM = gatherFSMs.get(i);
-			ipportList.clear();
-			opportList.clear();
-			writeoutList.clear();
-			/* Generate the list of ports with port name, size, the buffer 
-			 * corresponding to the port */
-			List<PortInfoGeCosToCAL> initMap = initMapList.get(i);
-			if ( initMap != null ) {
-				for ( PortInfoGeCosToCAL e : initMap ) {
-					String varName = e.arrayName;
-					String type = getTypeOfArray(varName, action);
-					ActorPortInfo info = new ActorPortInfo("Port_"+e.bufferName, e.bufferSize, 
-							e.bufferName, type );
-					ipportList.add(info);
+			String suffix = "_part_"+i+".cal";
+			String actorSuffix = "_part_" + i;
+			if ( i == numActors ) {
+				suffix = "_scatter.cal";
+				actorSuffix = "_scatter";
+			} else if ( i == numActors + 1 ) {
+				suffix = "_gather.cal";
+				actorSuffix = "_gather";
+			}
+			String name = OrccUtil.createFile(pathName, fileName+suffix);
+			File f = new File(name);
+			CharSequence c = actorGen.printActorSignature(pkgName, actorName+actorSuffix, ipportList, opportList);
+			String content = c.toString();
+			List<Symbol> symList = getSymbolsForActor(actorEntry);
+			c = actorGen.printActorSymbols(symList);
+			//content.concat(c.toString());
+			content = content + c.toString();
+			//list.remove(0);
+			int actionId = 0;
+			int first = 0;
+			for ( GecosToCALInfo info : list ) {
+				if ( first == 0 ) {
+					first = 1;
+					continue;
 				}
-			}
-			List<PortInfoGeCosToCAL> list = flowInMap.get(i);
-			if ( list != null ) {
-				for ( PortInfoGeCosToCAL port : list ) {
-					String type = getTypeOfArray(port.arrayName, action);
-					ActorPortInfo info = new ActorPortInfo("Port_"+port.bufferName, port.bufferSize, 
-							port.bufferName, type );
-					ipportList.add(info);
-				
+				opportList.clear();
+				ipportList.clear();
+				opportList = getPortList(info.opPortList, action);
+				ipportList = getPortList(info.ipPortList, action);
+
+				List<GScopFSM> fsms = EMFUtils.eAllContentsInstancesOf(info.proc, GScopFSM.class);
+				List<GScopRoot> roots = EMFUtils.eAllContentsInstancesOf(info.proc, GScopRoot.class);
+				boolean scatterInit = false;
+				if ( (first == 1) && (i == numActors) ) {
+					ipportList = getPortListFromCALPorts(action, action.getInputPattern().getPorts(), true);
+					first = 2;
+					scatterInit = true;
 				}
-			}
-			List<PortInfoGeCosToCAL> writeOutMap = writeOutMapList.get(i);
-			if ( writeOutMap != null ) {
-				for ( PortInfoGeCosToCAL e : writeOutMap ) {
-					String type = getTypeOfArray(e.arrayName, action); 
-					ActorPortInfo info = new ActorPortInfo("Port_"+e.bufferName, e.bufferSize, 
-							e.bufferName, type );
-					writeoutList.add(info);
+				if ( fsms.size() != 0 ) {
+					c = actorGen.printAction("action_"+actionId,info.proc, fsms.get(0), ipportList, 
+										opportList, info.guard, info.stateChange, scatterInit);
+				} else {
+					c = actorGen.printAction("action_"+actionId,info.proc, roots.get(0), ipportList, 
+							opportList, info.guard, info.stateChange, scatterInit);
 				}
+				content = content + c.toString();
+				actionId += 1;
 			}
-			list = flowOutMap.get(i);
-			if ( list != null ) {
-				for ( PortInfoGeCosToCAL port : list ) {
-					String type = getTypeOfArray(port.arrayName, action);
-					ActorPortInfo info = new ActorPortInfo("Port_"+port.bufferName, port.bufferSize, 
-							port.bufferName, type );
-					opportList.add(info);
-				}
+			opportList = getPortListFromCALPorts(action, action.getOutputPattern().getPorts(), false);
+			if ( i == numActors ) {
+				c = actorGen.printScatterOut(opportList, i);
+				content = content + c.toString();
 			}
-			actorGen.printActor(fileName+"_part_"+i+".cal", fsm, writeoutFSM, pkgName, actorName+"_part_"+i, ipportList, opportList, writeoutList);
+			c = actorGen.printActorEnd();
+			content = content + c.toString();
+			//content.concat(c.toString());
+			OrccUtil.printFile(content, f);
+			
 		}
+		
+		
 		NetworkTemplate networkGen = new NetworkTemplate();
 		List<String> instanceList = new ArrayList<String>();
 		instanceList.add(actorName+"_scatter");
-		instanceList.add(actorName+"_gather");
+		//instanceList.add(actorName+"_gather");
 		for ( int i = 0; i < numActors; i++ ) {
 			instanceList.add(actorName+"_part_"+i);
 		}
-		List<EdgeInfo> edgeInfo = new ArrayList<EdgeInfo>();
-		List<NetworkPortInfo> portInfo = new ArrayList<NetworkPortInfo>();
-		/* Add ports for the initial data from scatter to actors*/
-		for ( Entry<Integer, List<PortInfoGeCosToCAL>> initMap : initMapList.entrySet() ) {
-			int actorId = initMap.getKey();
-			for ( PortInfoGeCosToCAL entry : initMap.getValue() ) {
-				EdgeInfo e = new EdgeInfo(actorName+"_scatter", 
-						"Port_"+entry.bufferName, actorName+"_part_"+actorId, "Port_"+entry.bufferName);
-				edgeInfo.add(e);
-			}
-			actorId++;
-		}
 		/* Add input ports to the network. These are same as input ports of original actor */
-		for ( Port p : action.getInputPattern().getPorts() ) {
-			String baseType = getBaseType(p.getType());
-			NetworkPortInfo info = new NetworkPortInfo(p.getName(), p.getType().getSizeInBits(), 
-					actorName+"_scatter", baseType, NetworkPortType.Input);
-			portInfo.add(info);
-		}
-		for ( Port p : action.getOutputPattern().getPorts() ) {
-			String baseType = getBaseType(p.getType());
-			NetworkPortInfo info = new NetworkPortInfo(p.getName(), p.getType().getSizeInBits(), 
-					actorName+"_gather", baseType, NetworkPortType.Output);
-			portInfo.add(info);
-		}
-		/* Add ports for the final data from actors to gather */
-		for ( Entry<Integer, List<PortInfoGeCosToCAL>> writeOutMap : writeOutMapList.entrySet() ) {
-			int actorId = writeOutMap.getKey();
-			for ( PortInfoGeCosToCAL entry : writeOutMap.getValue() ) {
-				EdgeInfo e = new EdgeInfo(actorName+"_part_"+actorId, "Port_"+entry.bufferName, actorName+"_gather", "Port_"+entry.bufferName);
-				edgeInfo.add(e);
-			}
-			actorId++;
-		}
+		List<NetworkPortInfo> portInfo = getNetworkPorts(actorName, action);
+		List<EdgeInfo> edgeInfo = new ArrayList<EdgeInfo>();
+		/* Add ports for the initial data from scatter to actors*/
+	//	GecosToCALInfo scatter_info = actorsMap.get(numActors).get(0);
+	//	addEdgesFromScatter(actorName, edgeInfo, scatter_info.opPortList);
+		//GecosToCALInfo gather_info = actorsMap.get(numActors+1).get(0);
+		//addEdgesToGather(actorName, edgeInfo, gather_info.ipPortList);
 		/* Add ports for the data between actors */
-		for ( Entry<Integer, List<PortInfoGeCosToCAL>> entry : flowOutMap.entrySet()) {
-			for ( PortInfoGeCosToCAL p : entry.getValue() ) {
-				String rcvPort = "Port_"+getPortName(p.arrayName, p.actorId, entry.getKey(), flowInMap);
-				EdgeInfo e = new EdgeInfo(actorName+"_part_"+entry.getKey(), "Port_"+p.bufferName, 
-								actorName+"_part_"+p.actorId, rcvPort);
+		for ( int i = 0; i < numActors + 1; i++ ) {
+			GecosToCALInfo actor_info = actorsMap.get(i).get(0);
+			for ( PortInfoGecosToCAL p : actor_info.opPortList ) {
+				int actorId = p.actorId;
+				System.out.println("Send & RcvActorId " + i + "  " + actorId);
+				List<GecosToCALInfo> rcvActorInfoList = actorsMap.get(actorId);
+				String rcvPort = null;
+				for ( GecosToCALInfo rcvActorInfo :   rcvActorInfoList ) {
+					rcvPort = "Port_"+getPortName(p.arrayName,  rcvActorInfo.ipPortList, i);
+					if ( rcvPort != null )
+						break;
+				}
+				String rcvActorName = actorName+"_part_"+p.actorId;
+				if ( p.actorId == numActors  ) {
+					rcvActorName = actorName+"_scatter";
+				} 
+				String sendActorName = actorName+"_part_"+i;
+				if ( i == numActors ) {
+					sendActorName = actorName+"_scatter";
+				}
+				EdgeInfo e = new EdgeInfo(sendActorName, "Port_"+p.bufferName, 
+						rcvActorName, rcvPort);
 				edgeInfo.add(e);
 			}
 		}
-		networkGen.printNetwork(actorName+"_network", instanceList, "fr.irisa.compa.gecos", edgeInfo, portInfo, pathName);
+		networkGen.printNetwork(actorName+"_network", instanceList, pkgName, edgeInfo, portInfo, pathName);
+	}
+
+	private static List<Symbol> getSymbolsForActor(GecosToCALInfo actorEntry) {
+//		List<Symbol> symList = new ArrayList<Symbol>();
+//		return symList;
+		CompositeBlock body = (CompositeBlock)actorEntry.proc.getBody();
+		return body.getChildren().get(1).getScope().getSymbols();
+	}
+
+	private static String getPortName(String arrayName, List<PortInfoGecosToCAL> ipPortList, int srcActorId) {
+		for ( PortInfoGecosToCAL p : ipPortList ) {
+			if ( (p.actorId == srcActorId) && (p.arrayName.compareTo(arrayName) == 0) ) {
+				return p.bufferName;
+			}
+		}
+		return null;
+	}
+
+	private static void addEdgesToGather(String actorName,
+			List<EdgeInfo> edgeInfo, List<PortInfoGecosToCAL> ports) {
+		for ( PortInfoGecosToCAL p : ports ) {
+			int actorId = p.actorId;
+			EdgeInfo e = new EdgeInfo(actorName+"_part_"+actorId, "Port_"+p.bufferName, actorName+"_gather", "Port_"+p.bufferName);
+			edgeInfo.add(e);
+		}
+	}
+
+private static void addEdgesFromScatter(String actorName,
+		List<EdgeInfo> edgeInfo, List<PortInfoGecosToCAL> ports) {
+	for ( PortInfoGecosToCAL p : ports ) {
+		int actorId = p.actorId;
+		EdgeInfo e = new EdgeInfo(actorName+"_scatter", 
+				"Port_"+p.bufferName, actorName+"_part_"+actorId, "Port_"+p.bufferName);
+		edgeInfo.add(e);
+	}
+}
+
+private static List<NetworkPortInfo> getNetworkPorts(String actorName, Action action ) {
+	List<NetworkPortInfo> portInfo = new ArrayList<NetworkPortInfo>();
+	for ( Port p : action.getInputPattern().getPorts() ) {
+		String baseType = getBaseType(p.getType());
+		NetworkPortInfo info = new NetworkPortInfo(p.getName(), p.getType().getSizeInBits(), 
+				actorName+"_scatter", baseType, NetworkPortType.Input);
+		portInfo.add(info);
+	}
+	for ( Port p : action.getOutputPattern().getPorts() ) {
+		String baseType = getBaseType(p.getType());
+		NetworkPortInfo info = new NetworkPortInfo(p.getName(), p.getType().getSizeInBits(), 
+				actorName+"_scatter", baseType, NetworkPortType.Output);
+		portInfo.add(info);
+	}
+	return portInfo;
+}
+
+	private static  List<ActorPortInfo> getPortListFromCALPorts(Action action, List<Port> inputPorts, boolean isInput) {
+		List<ActorPortInfo> portList = new ArrayList<ActorPortInfo>();
+		for ( Port p : inputPorts ) {
+			int size = 0;
+			if ( isInput )
+				size = action.getInputPattern().getNumTokensMap().get(p);
+			else 
+				size = action.getOutputPattern().getNumTokensMap().get(p);
+			ActorPortInfo info = new ActorPortInfo(p.getName(), size, 
+					p.getName()+"_initBuffer", p.getType().toString() );
+			portList.add(info);
+		}
+		return portList;
+	}
+	
+	private static List<ActorPortInfo> getPortList(List<PortInfoGecosToCAL> list, Action action) {
+		List<ActorPortInfo> opportList = new ArrayList<ActorPortInfo>();
+		for ( PortInfoGecosToCAL e : list ) {
+			String arrayName = e.arrayName;
+			if ( e.arrayName.lastIndexOf("_") != -1 ) {
+				arrayName = e.arrayName.substring(0,e.arrayName.lastIndexOf("_"));
+				if ( arrayName.lastIndexOf("_") != -1 ) {
+					arrayName = e.arrayName.substring(0,arrayName.lastIndexOf("_"));
+				}
+			}
+			String arrayType = getTypeOfArray(arrayName, action);
+			ActorPortInfo p = new ActorPortInfo("Port_"+e.bufferName, (int)e.bufferSize, e.bufferName, arrayType);
+			opportList.add(p);
+		}
+		return opportList;
 	}
 
 	private static String getBaseType(Type type) {
@@ -516,30 +570,25 @@ public class TestGeCosTransform {
 		return type.toString();
 	}
 
-	private static String getPortName(String arrayName, int actorId, int srcActorId, Map<Integer, List<PortInfoGeCosToCAL>> flowInMap) {
-		List<PortInfoGeCosToCAL> list = flowInMap.get(actorId);
-		if ( list == null )
-			return null;
-		for ( PortInfoGeCosToCAL p : list ) {
-			if ( (p.actorId == srcActorId) && (p.arrayName.compareTo(arrayName) == 0) ) {
-				return p.bufferName;
-			}
-		}
-		return null;
-	}
-
 	private static String getTypeOfArray(String arrayName, Action action) {
 		String type = null;
 		for ( Port p : action.getInputPattern().getPorts() ) {
 			String name = p.getName();
 			if ( name.compareTo(arrayName) == 0 ) {
 				type = p.getType().toString();
+				return type;
 			}			
 		}
 		for ( Port p : action.getOutputPattern().getPorts() ) {
 			String name = p.getName();
 			if ( name.compareTo(arrayName) == 0 ) {
 				type = p.getType().toString();
+				return type;
+			}
+		}
+		for ( Var v : action.getBody().getLocals() ) {
+			if ( v.getName().equals(arrayName) ) {
+				return v.getType().toString();
 			}
 		}
 		return type;

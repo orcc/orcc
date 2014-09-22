@@ -1,4 +1,4 @@
-package net.sf.orcc.backends.c;
+package net.sf.orcc.backends.c.compa;
 
 public class EdgeInfo {
 	String srcPortName;

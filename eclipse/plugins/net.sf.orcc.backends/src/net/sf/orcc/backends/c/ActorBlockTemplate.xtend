@@ -1,4 +1,4 @@
-package net.sf.orcc.backends.c
+package net.sf.orcc.backends.c.compa
 
 import fr.irisa.cairn.gecos.model.c.generator.ExtendableTypeCGenerator
 import gecos.blocks.BasicBlock
@@ -112,7 +112,7 @@ class ActorBlockTemplate {
 		jump = ""
 		val buffer = new StringBuffer()
 		buffer.append('''
-		if («ActorBlockTemplate::eInstance.generate(ifBlock.condBlock)»)''')
+		if («ActorBlockTemplate::eInstance.generate(ifBlock.testBlock)»)''')
 		comma = ";"
 		jump = "
 "
@@ -187,8 +187,8 @@ class ActorBlockTemplate {
 		comma = ""
 		jump = ""
 		val buffer = new StringBuffer()
-		buffer.append('''while («ActorBlockTemplate::eInstance.generate(whileBlock.condition)»)  do''')
-		buffer.append('''	«ActorBlockTemplate::eInstance.generate(whileBlock.body)»''')
+		buffer.append('''while («ActorBlockTemplate::eInstance.generate(whileBlock.testBlock)»)  do''')
+		buffer.append('''	«ActorBlockTemplate::eInstance.generate(whileBlock.bodyBlock)»''')
 		buffer.append('''end''')
 		comma = ";"
 		jump = "
@@ -219,12 +219,17 @@ class ActorBlockTemplate {
 		val stride = new StringBuffer();
 		stride.append('''«ActorInstructionTemplate::eInstance.generate(scopFor.stride)»''');
 		
-		//if ( stride.toString.compareTo("1") == 0) {
-		if ( false ) {	
-			lowerBound.append('''«ActorInstructionTemplate::eInstance.generate(scopFor.LB)»''')
-			upperBound.append('''«ActorInstructionTemplate::eInstance.generate(scopFor.UB)»''')
-			buffer.append('''foreach int «scopFor.iterator.name» in «lowerBound» .. «upperBound»''')
-			buffer.append('''do''')
+		if ( stride.toString.compareTo("1") == 0) {
+			if (stride.toString.contains("-")) {
+				lowerBound.append('''«ActorInstructionTemplate::eInstance.generate(scopFor.UB)»''')
+				upperBound.append('''«ActorInstructionTemplate::eInstance.generate(scopFor.LB)»''')
+			} else {
+				lowerBound.append('''«ActorInstructionTemplate::eInstance.generate(scopFor.LB)»''')
+				upperBound.append('''«ActorInstructionTemplate::eInstance.generate(scopFor.UB)»''')
+			}
+			buffer.append('''foreach int «scopFor.iterator.name» in «lowerBound» .. «upperBound» ''')
+			buffer.append('''do
+			''')
 			if (scopFor.body instanceof Block) {
 				buffer.append(" " + ActorBlockTemplate::eInstance.generate(scopFor.body) + '''
 				''')

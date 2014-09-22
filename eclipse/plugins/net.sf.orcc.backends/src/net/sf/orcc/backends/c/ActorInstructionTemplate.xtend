@@ -1,12 +1,11 @@
-package net.sf.orcc.backends.c
+package net.sf.orcc.backends.c.compa
 
 import fr.irisa.cairn.gecos.gscop.GScopInstruction
 import fr.irisa.cairn.gecos.gscop.GScopIntConstraintSystem
 import fr.irisa.cairn.gecos.gscop.GScopIntExpressionInstr
 import fr.irisa.cairn.gecos.gscop.GScopRead
 import fr.irisa.cairn.gecos.gscop.GScopWrite
-import fr.irisa.cairn.gecos.model.c.generator.ExtendableTypeCGenerator
-import fr.irisa.cairn.gecos.model.c.generator.Tools
+import fr.irisa.cairn.gecos.model.c.generator.OperatorPrecedenceTools
 import gecos.instrs.AddressInstruction
 import gecos.instrs.ArrayInstruction
 import gecos.instrs.ArrayValueInstruction
@@ -49,13 +48,21 @@ import org.polymodel.algebra.quasiAffine.SimpleQuasiAffineTerm
 import org.polymodel.algebra.reductions.ReductionExpression
 import org.polymodel.algebra.reductions.ReductionOperator
 import org.polymodel.scop.ScopAssignment
+import org.polymodel.algebra.CompositeIntExpression
+import org.polymodel.algebra.CompositeOperator
+
+
+import java.util.ArrayList
+import gecos.types.Type
+import gecos.types.*
+import org.polymodel.algebra.FuzzyBoolean
 
 class ActorInstructionTemplate {
 	
 	public static ActorInstructionTemplate eInstance = new ActorInstructionTemplate();
 
     def printInst(GScopInstruction inst ) {
-    	'''GScopInstruction: «inst.generate»'''
+    	'''«inst.generate»'''
     }
     
     def dispatch generate(GScopInstruction scopInstruction) {
@@ -79,22 +86,89 @@ class ActorInstructionTemplate {
 		'''/* gScopIntConstraintSystem */'''
 	}
 	
+	
+	
 	def dispatch generate(GScopWrite scopWrite) {
 		val buffer = new StringBuffer()
-		buffer.append('''«scopWrite.symbol.name»''')
-		for(IntExpression intExpression : scopWrite.index)
-			buffer.append('''[«ActorInstructionTemplate::eInstance.generate(intExpression)»]''')
+		buffer.append('''«scopWrite.getSymbol().name»''')
+		val numDims = scopWrite.index.size;
+		var List<Instruction> size = ActorTemplate.arraySizeMap.get(scopWrite.getSymbol());//.getType());
+		if ( numDims > 0 )
+			buffer.append("[")
+		var i = 0;
+			
+		for(IntExpression intExpression : scopWrite.index) {
+			buffer.append('''(«ActorInstructionTemplate::eInstance.generate(intExpression)») ''')
+			if ( i < (numDims - 1) ) {
+				buffer.append('''*  «ActorInstructionTemplate::eInstance.generate(size.get(i))»  +''');
+			}
+			i = i + 1;
+		}
+		if ( numDims > 0 )
+			buffer.append("]");
 		'''«buffer.toString»'''
 	}
 	
 	def dispatch generate(GScopRead scopRead) {
 		val buffer = new StringBuffer()
-		buffer.append('''«scopRead.symbol.name»''')
-		for(IntExpression intExpression : scopRead.index)
-			buffer.append('''[«ActorInstructionTemplate::eInstance.generate(intExpression)»]''')
+		buffer.append('''«scopRead.getSymbol().name»''')
+		val numDims = scopRead.index.size;
+		var List<Instruction> size = ActorTemplate.arraySizeMap.get(scopRead.getSymbol());//getSizeArray(scopRead.getSymbol().getType());
+		if ( numDims > 0 )
+			buffer.append("[");
+		
+		var i = 0;
+		for(IntExpression intExpression : scopRead.index) {
+			buffer.append('''(«ActorInstructionTemplate::eInstance.generate(intExpression)»)''')
+			if ( i < (numDims - 1) ) {
+				buffer.append('''*  «ActorInstructionTemplate::eInstance.generate(size.get(i))»  +''');
+			}
+			i = i + 1;
+		}
+		if ( numDims > 0 )
+			buffer.append("]");
 		'''«buffer.toString»'''
 	}
-    
+	
+//	def List<Integer> getSizeArray(Type arrayType) {
+//		var sizeArray = new ArrayList<Integer>();
+//		var type = arrayType;
+//		while ( type instanceof ArrayType ) {
+//			type = (type as ArrayType).getBase();
+//			var size = 1L;
+//			if ( type instanceof ArrayType ) {
+//				var Instruction expr = (type as ArrayType).getSizeExpr();
+//		
+//				if ( expr instanceof IntInstruction ) {
+//					size = (expr as IntInstruction).getValue();
+//				} else if ( expr instanceof GScopIntExpressionInstr) {
+//					var IntExpression intExpr = (expr as GScopIntExpressionInstr).getExpression();
+//					if ( intExpr.isConstant() == FuzzyBoolean.YES ) {
+//						size = intExpr.toAffine().getConstantTerm().getCoef();
+//					} else {
+//						throw new UnsupportedOperationException();
+//					}
+//				} else {
+//					size = type.getSize();
+//				}
+//				System.out.println("Size: " + size);
+//			}
+//			var List<Integer> newSizeArray = new ArrayList<Integer>();
+//			var i = 0;
+//			for ( i = 0; i < sizeArray.size(); i++ ) {
+//				var a = sizeArray.get(i) * size;
+//				var Integer a1 = new Integer(a as int);
+//				newSizeArray.add(a1);
+//			}
+//			sizeArray.clear();
+//			sizeArray.addAll(newSizeArray);
+//			var Integer a2 = new Integer(size as int);
+//			sizeArray.add(a2);
+//	}
+//	sizeArray
+//		
+//	}
+//    
 	def dispatch generate(AddressInstruction addressInstruction) {
 		'''«ActorInstructionTemplate::eInstance.generate(addressInstruction.address)»'''
 	} 
@@ -168,7 +242,7 @@ class ActorInstructionTemplate {
 
 	def dispatch generate(ConvertInstruction convertInstruction) {
 		val buffer = new StringBuffer()
-		val needParenthesis = Tools::needParenthesis(convertInstruction)
+		val needParenthesis = OperatorPrecedenceTools::needParenthesis(convertInstruction)
 		if (needParenthesis)
 			buffer.append('''(''')
 //		if (convertInstruction.eContainer instanceof Instruction && !(convertInstruction.eContainer instanceof RetInstruction))
@@ -199,7 +273,7 @@ class ActorInstructionTemplate {
 
 	def dispatch generate(GenericInstruction genericInstruction) {
 		val buffer = new StringBuffer()
-		val needParenthesis = Tools::needParenthesis(genericInstruction)
+		val needParenthesis = OperatorPrecedenceTools::needParenthesis(genericInstruction)
 		if (needParenthesis)
 			buffer.append('''(''')
 		switch (genericInstruction.name) {
@@ -361,7 +435,7 @@ class ActorInstructionTemplate {
 
 	def dispatch generate(SetInstruction setInstruction) {
 		val buffer = new StringBuffer()
-		val needParenthesis = Tools::needParenthesis(setInstruction)
+		val needParenthesis = OperatorPrecedenceTools::needParenthesis(setInstruction)
 		if (needParenthesis)
 			buffer.append('''(''')
 		buffer.append('''«ActorInstructionTemplate::eInstance.generate(setInstruction.dest)» := «ActorInstructionTemplate::eInstance.generate(setInstruction.source)»''')
@@ -427,12 +501,16 @@ class ActorInstructionTemplate {
 	
 	def generateQuasiAffineTerm(QuasiAffineTerm quasiAffineTerm, IntExpression expression) {
 		val buffer = new StringBuffer()
+		if ( expression != null ) {
 		switch quasiAffineTerm.operator {
 			case QuasiAffineOperator::CEIL : buffer.append('''ceild(«expression.generate», «quasiAffineTerm.coef»)''')
 			case QuasiAffineOperator::DIV : buffer.append('''(«expression.generate») / «quasiAffineTerm.coef»''')
 			case QuasiAffineOperator::FLOOR : buffer.append('''floord(«expression.generate», «quasiAffineTerm.coef»)''')
 			case QuasiAffineOperator::MOD : buffer.append('''(«expression.generate») mod «quasiAffineTerm.coef»''')
 			case QuasiAffineOperator::MUL : buffer.append('''(«expression.generate») * «quasiAffineTerm.coef»''')
+		}
+		} else {
+			buffer.append("null");
 		}
 		'''«buffer.toString»'''
 	}
@@ -446,6 +524,15 @@ class ActorInstructionTemplate {
 	def dispatch generate(NestedQuasiAffineTerm nestedQuasiAffineTerm) {
 		val buffer = new StringBuffer()
 		buffer.append('''«nestedQuasiAffineTerm.generateQuasiAffineTerm(nestedQuasiAffineTerm.expression)»''')
+		'''«buffer.toString»'''
+	}
+	
+	def dispatch generate(CompositeIntExpression expr) {
+		val buffer = new StringBuffer()
+		switch(expr.operator) {
+		case CompositeOperator.DIV:  buffer.append('''(«expr.left») / («expr.right»)''')
+		case CompositeOperator.MOD: buffer.append('''(«expr.left») mod («expr.right»)''')
+		}
 		'''«buffer.toString»'''
 	}
 	
