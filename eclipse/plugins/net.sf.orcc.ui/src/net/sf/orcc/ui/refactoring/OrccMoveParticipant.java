@@ -80,7 +80,8 @@ public class OrccMoveParticipant extends MoveParticipant implements
 			destinationFolder = (IFolder) dest;
 			if (element instanceof IFile) {
 				originalProject = ((IFile) element).getProject();
-				return registerFile((IFile) element);
+				files.add((IFile) element);
+				return true;
 			}
 		}
 		return false;
@@ -89,17 +90,8 @@ public class OrccMoveParticipant extends MoveParticipant implements
 	@Override
 	public void addElement(Object element, RefactoringArguments arguments) {
 		if (element instanceof IFile) {
-			registerFile((IFile) element);
+			files.add((IFile) element);
 		}
-	}
-
-	private boolean registerFile(IFile file) {
-		files.add(file);
-		if (OrccUtil.CAL_SUFFIX.equals(file.getFileExtension())) {
-			addCalFilesUpdates(file);
-			return true;
-		}
-		return false;
 	}
 
 	@Override
@@ -139,6 +131,18 @@ public class OrccMoveParticipant extends MoveParticipant implements
 	@Override
 	public Change createChange(IProgressMonitor pm) throws CoreException,
 			OperationCanceledException {
+		for (IFile file : files) {
+			final String suffix = file.getFileExtension();
+			if(suffix != null) {
+				if (OrccUtil.CAL_SUFFIX.equals(suffix)) {
+					addCalFilesUpdates(file);
+				} else if (OrccUtil.NETWORK_SUFFIX.equals(suffix)) {
+
+				} else if (OrccUtil.DIAGRAM_SUFFIX.equals(suffix)) {
+
+				}
+			}
+		}
 		return factory.getAllChanges(originalProject, "Update depending files");
 	}
 
