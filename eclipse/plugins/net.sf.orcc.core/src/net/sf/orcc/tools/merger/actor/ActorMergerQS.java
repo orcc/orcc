@@ -309,6 +309,7 @@ public class ActorMergerQS extends ActorMergerBase {
 				return schedule;
 			}
 		}
+		OrccLogger.severeln("ActorMergerQS::getSchedule() could not find a schedule for " + actorName + " " + actionName);
 		return null;
 	}
 
