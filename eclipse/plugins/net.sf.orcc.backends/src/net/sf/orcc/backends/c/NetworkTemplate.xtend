@@ -1,4 +1,4 @@
-package net.sf.orcc.backends.c
+package net.sf.orcc.backends.c.compa
 
 import java.io.File
 import net.sf.orcc.util.OrccUtil
