@@ -51,6 +51,7 @@ import org.eclipse.ltk.core.refactoring.participants.CheckConditionsContext;
 import org.eclipse.ltk.core.refactoring.participants.ISharableParticipant;
 import org.eclipse.ltk.core.refactoring.participants.MoveParticipant;
 import org.eclipse.ltk.core.refactoring.participants.RefactoringArguments;
+import org.eclipse.ltk.core.refactoring.resource.MoveResourceChange;
 
 /**
  * This sharable move participant perform all updates necessary when 1 or more
@@ -111,7 +112,7 @@ public class OrccMoveParticipant extends MoveParticipant implements
 	@Override
 	public Change createPreChange(IProgressMonitor pm) throws CoreException,
 			OperationCanceledException {
-		CompositeChange change = new CompositeChange("");
+		CompositeChange change = new CompositeChange("Pre-move updates");
 		for (IFile file : files) {
 			if (OrccUtil.CAL_SUFFIX.equals(file.getFileExtension())) {
 
@@ -126,9 +127,24 @@ public class OrccMoveParticipant extends MoveParticipant implements
 
 				change.add(factory.getUniqueFileReplacement(file, pattern,
 						replacement));
+			} else if (OrccUtil.NETWORK_SUFFIX.equals(file.getFileExtension())) {
+				final IFile diagFile = file.getProject().getFile(
+						file.getProjectRelativePath().removeFileExtension()
+								.addFileExtension(OrccUtil.DIAGRAM_SUFFIX));
+				if(diagFile.exists() && !files.contains(diagFile)) {
+					change.add(new MoveResourceChange(diagFile, destinationFolder));
+				}
+			} else if (OrccUtil.DIAGRAM_SUFFIX.equals(file.getFileExtension())) {
+				final IFile netFile = file.getProject().getFile(
+						file.getProjectRelativePath().removeFileExtension()
+								.addFileExtension(OrccUtil.NETWORK_SUFFIX));
+				if(netFile.exists() && !files.contains(netFile)) {
+					registerNetworksUpdates(netFile);
+					change.add(new MoveResourceChange(netFile, destinationFolder));
+				}
 			}
 		}
-		return change;
+		return change.getChildren().length > 0 ? change : null;
 	}
 
 	@Override
@@ -141,8 +157,6 @@ public class OrccMoveParticipant extends MoveParticipant implements
 					registerCalUpdates(file);
 				} else if (OrccUtil.NETWORK_SUFFIX.equals(suffix)) {
 					registerNetworksUpdates(file);
-				} else if (OrccUtil.DIAGRAM_SUFFIX.equals(suffix)) {
-
 				}
 			}
 		}

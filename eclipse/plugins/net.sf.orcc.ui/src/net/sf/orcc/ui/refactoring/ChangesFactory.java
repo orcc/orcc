@@ -315,6 +315,6 @@ public class ChangesFactory {
 			result.add(fileChange);
 		}
 		clearReplacementMaps();
-		return result;
+		return result.getChildren().length > 0 ? result : null;
 	}
 }
