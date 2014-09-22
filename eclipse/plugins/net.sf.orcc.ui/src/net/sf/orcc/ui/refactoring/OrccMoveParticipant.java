@@ -38,7 +38,10 @@ import net.sf.orcc.util.OrccUtil;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.ltk.core.refactoring.Change;
@@ -135,9 +138,9 @@ public class OrccMoveParticipant extends MoveParticipant implements
 			final String suffix = file.getFileExtension();
 			if(suffix != null) {
 				if (OrccUtil.CAL_SUFFIX.equals(suffix)) {
-					addCalFilesUpdates(file);
+					registerCalUpdates(file);
 				} else if (OrccUtil.NETWORK_SUFFIX.equals(suffix)) {
-
+					registerNetworksUpdates(file);
 				} else if (OrccUtil.DIAGRAM_SUFFIX.equals(suffix)) {
 
 				}
@@ -146,7 +149,7 @@ public class OrccMoveParticipant extends MoveParticipant implements
 		return factory.getAllChanges(originalProject, "Update depending files");
 	}
 
-	private void addCalFilesUpdates(IFile file) {
+	private void registerCalUpdates(IFile file) {
 		final IFile destinationFile = destinationFolder.getFile(file.getName());
 
 		final String origQualifiedName = OrccUtil.getQualifiedName(file);
@@ -174,6 +177,27 @@ public class OrccMoveParticipant extends MoveParticipant implements
 
 		final String newRefinement = originalRefinement.replace(
 				originalRelativeFolder, newRelativeFolder);
+
+		factory.addReplacement(OrccUtil.DIAGRAM_SUFFIX,
+				"key=\"refinement\" value=\"" + originalRefinement + "\"",
+				"key=\"refinement\" value=\"" + newRefinement + "\"");
+	}
+
+	private void registerNetworksUpdates(IFile file) {
+
+		final IFile destinationFile = destinationFolder.getFile(file.getName());
+		final IPath newNetworkPath = destinationFile.getFullPath();
+
+		final IWorkspaceRoot wpRoot = ResourcesPlugin.getWorkspace().getRoot();
+		final String oldQualifiedName = OrccUtil.getQualifiedName(file);
+		final String newQualifiedName = OrccUtil.getQualifiedName(wpRoot
+				.getFile(newNetworkPath));
+		factory.addReplacement(OrccUtil.NETWORK_SUFFIX, "<Class name=\""
+				+ oldQualifiedName + "\"/>", "<Class name=\""
+				+ newQualifiedName + "\"/>");
+
+		final String originalRefinement = file.getFullPath().toString();
+		final String newRefinement = newNetworkPath.toString();
 
 		factory.addReplacement(OrccUtil.DIAGRAM_SUFFIX,
 				"key=\"refinement\" value=\"" + originalRefinement + "\"",
