@@ -1,4 +1,4 @@
-package net.sf.orcc.backends.c.compa;
+package net.sf.orcc.backends.c;
 
 public class NetworkPortInfo {
 	public enum NetworkPortType {

@@ -112,7 +112,7 @@ public class ParametersTab extends AbstractLaunchConfigurationTab {
 			ILaunchConfiguration config = (ILaunchConfiguration) inputElement;
 			Map<String, String> m;
 			try {
-				m = config.getAttribute(PARAMETERS, (Map<?, ?>) null);
+				m = config.getAttribute(PARAMETERS, (Map<String, String>) null);
 			} catch (CoreException e) {
 				return elements;
 			}
@@ -338,7 +338,7 @@ public class ParametersTab extends AbstractLaunchConfigurationTab {
 		}
 
 		if (map.size() == 0) {
-			configuration.setAttribute(PARAMETERS, (Map<?, ?>) null);
+			configuration.setAttribute(PARAMETERS, (Map<String, String>) null);
 		} else {
 			configuration.setAttribute(PARAMETERS, map);
 		}
@@ -346,6 +346,6 @@ public class ParametersTab extends AbstractLaunchConfigurationTab {
 
 	@Override
 	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
-		configuration.setAttribute(PARAMETERS, (Map<?, ?>) null);
+		configuration.setAttribute(PARAMETERS, (Map<String, String>) null);
 	}
 }

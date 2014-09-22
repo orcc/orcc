@@ -1,4 +1,4 @@
-package net.sf.orcc.backends.c.compa;
+package net.sf.orcc.backends.c;
 
 //import fr.irisa.cairn.ecore.tools.query.EMFUtils;
 import fr.irisa.cairn.gecos.gscop.GScopFSM;
@@ -34,7 +34,7 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 
-import net.sf.orcc.backends.c.compa.NetworkPortInfo.NetworkPortType;
+import net.sf.orcc.backends.c.NetworkPortInfo.NetworkPortType;
 import net.sf.orcc.backends.ir.BlockFor;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;

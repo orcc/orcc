@@ -6,22 +6,7 @@
 	</projects>
 	<buildSpec>
 		<buildCommand>
-			<name>fr.loria.eclipse.tom.GomBuilder</name>
-			<arguments>
-			</arguments>
-		</buildCommand>
-		<buildCommand>
-			<name>fr.loria.eclipse.tom.TomBuilder</name>
-			<arguments>
-			</arguments>
-		</buildCommand>
-		<buildCommand>
 			<name>org.eclipse.jdt.core.javabuilder</name>
-			<arguments>
-			</arguments>
-		</buildCommand>
-		<buildCommand>
-			<name>fr.loria.eclipse.tom.TomBuildAnalyser</name>
 			<arguments>
 			</arguments>
 		</buildCommand>

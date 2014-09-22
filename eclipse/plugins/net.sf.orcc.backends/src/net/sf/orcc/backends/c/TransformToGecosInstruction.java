@@ -1,4 +1,4 @@
-package net.sf.orcc.backends.c.compa;
+package net.sf.orcc.backends.c;
 
 import java.util.List;
 

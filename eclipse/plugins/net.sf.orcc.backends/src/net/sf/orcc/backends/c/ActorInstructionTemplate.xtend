@@ -1,4 +1,4 @@
-package net.sf.orcc.backends.c.compa
+package net.sf.orcc.backends.c
 
 import fr.irisa.cairn.gecos.gscop.GScopInstruction
 import fr.irisa.cairn.gecos.gscop.GScopIntConstraintSystem

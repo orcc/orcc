@@ -1,4 +1,4 @@
-package net.sf.orcc.backends.c.compa
+package net.sf.orcc.backends.c
 
 import fr.irisa.cairn.gecos.model.c.generator.ExtendableTypeCGenerator
 import gecos.blocks.BasicBlock
