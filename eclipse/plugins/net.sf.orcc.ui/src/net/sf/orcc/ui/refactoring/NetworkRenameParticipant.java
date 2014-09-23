@@ -67,6 +67,10 @@ public class NetworkRenameParticipant extends RenameParticipant {
 		factory = new ChangesFactory();
 	}
 
+	ChangesFactory getChangesFactory() {
+		return factory;
+	}
+
 	@Override
 	protected boolean initialize(Object element) {
 		if (element instanceof IFile) {
@@ -104,12 +108,10 @@ public class NetworkRenameParticipant extends RenameParticipant {
 	public Change createPreChange(IProgressMonitor pm) throws CoreException,
 			OperationCanceledException {
 
-		final CompositeChange changes = new CompositeChange(
-				"Pre-rename updates");
-		changes.add(getNetworkContentChanges());
-		changes.add(getDiagramContentChanges());
+		registerThisNetworkUpdate();
+		registerThisDiagramUpdate();
 
-		return changes.getChildren().length > 0 ? changes : null;
+		return factory.getAllChanges(originalNetworkFile.getProject(), "Pre-rename updates");
 	}
 
 	@Override
@@ -130,27 +132,20 @@ public class NetworkRenameParticipant extends RenameParticipant {
 		return changes.getChildren().length > 0 ? changes : null;
 	}
 
-	public Change getNetworkContentChanges() {
-		factory.addReplacement("<XDF name=\"" + originalBasename + "\">",
+	public void registerThisNetworkUpdate() {
+		factory.addReplacement(OrccUtil.NETWORK_SUFFIX, "<XDF name=\"" + originalBasename + "\">",
 				"<XDF name=\"" + newBasename + "\">");
-		return factory.getReplacementChange(originalNetworkFile,
-				"Update network name");
 	}
 
-	public Change getDiagramContentChanges() {
+	public void registerThisDiagramUpdate() {
 
 		final IWorkspaceRoot wpRoot = ResourcesPlugin.getWorkspace().getRoot();
 		if (wpRoot.exists(originalDiagramPath)) {
-
-			factory.addReplacement(originalFilename + "#/", newFilename + "#/");
-			factory.addReplacement("name=\"" + originalBasename + "\"", "name=\""
-					+ newBasename + "\"");
-
-			final String title = "Update diagram content";
-			return factory.getReplacementChange(wpRoot.getFile(originalDiagramPath),
-					title);
+			factory.addReplacement(OrccUtil.DIAGRAM_SUFFIX, originalFilename
+					+ "#/", newFilename + "#/");
+			factory.addReplacement(OrccUtil.DIAGRAM_SUFFIX, "name=\""
+					+ originalBasename + "\"", "name=\"" + newBasename + "\"");
 		}
-		return null;
 	}
 
 	public Change getOtherNetworksContentChanges() {

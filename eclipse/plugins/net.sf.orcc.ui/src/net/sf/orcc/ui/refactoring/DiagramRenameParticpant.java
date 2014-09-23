@@ -109,15 +109,15 @@ public class DiagramRenameParticpant extends RenameParticipant {
 	public Change createPreChange(IProgressMonitor pm) throws CoreException,
 			OperationCanceledException {
 
-		if(networkRenameParticipant == null) {
+		if (networkRenameParticipant == null) {
 			return null;
 		}
-		
-		final CompositeChange changes = new CompositeChange("Pre-rename updates");
-		changes.add(networkRenameParticipant.getNetworkContentChanges());
-		changes.add(networkRenameParticipant.getDiagramContentChanges());
 
-		return changes.getChildren().length > 0 ? changes : null;
+		networkRenameParticipant.registerThisNetworkUpdate();
+		networkRenameParticipant.registerThisDiagramUpdate();
+
+		return networkRenameParticipant.getChangesFactory().getAllChanges(
+				originalDiagramFile.getProject(), "Pre-rename updates");
 	}
 
 	@Override
