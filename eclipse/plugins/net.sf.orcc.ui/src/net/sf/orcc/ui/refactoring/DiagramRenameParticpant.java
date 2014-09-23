@@ -32,7 +32,6 @@ import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -72,8 +71,7 @@ public class DiagramRenameParticpant extends RenameParticipant {
 
 			newDiagramFilename = getArguments().getNewName();
 
-			final IWorkspaceRoot wpRoot = ResourcesPlugin.getWorkspace()
-					.getRoot();
+			final IWorkspaceRoot wpRoot = OrccUtil.workspaceRoot();
 			if (wpRoot.exists(originalNetworkPath)) {
 				final IFile networkFile = wpRoot.getFile(originalNetworkPath);
 				networkRenameParticipant = new NetworkRenameParticipant();

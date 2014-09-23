@@ -31,8 +31,6 @@ package net.sf.orcc.ui.refactoring;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -124,8 +122,7 @@ public class NetworkRenameParticipant extends RenameParticipant {
 				.getAllChanges(originalNetworkFile.getProject(),
 						"Post-rename updates");
 
-		final IWorkspaceRoot wpRoot = ResourcesPlugin.getWorkspace().getRoot();
-		if (wpRoot.exists(originalDiagramPath)) {
+		if (OrccUtil.workspaceRoot().exists(originalDiagramPath)) {
 			changes.add(new RenameResourceChange(originalDiagramPath,
 					newBasename + '.' + OrccUtil.DIAGRAM_SUFFIX));
 		}
@@ -140,8 +137,7 @@ public class NetworkRenameParticipant extends RenameParticipant {
 
 	public void registerThisDiagramUpdate() {
 
-		final IWorkspaceRoot wpRoot = ResourcesPlugin.getWorkspace().getRoot();
-		if (wpRoot.exists(originalDiagramPath)) {
+		if (OrccUtil.workspaceRoot().exists(originalDiagramPath)) {
 			factory.addReplacement(OrccUtil.DIAGRAM_SUFFIX, originalFilename
 					+ "#/", newFilename + "#/");
 			factory.addReplacement(OrccUtil.DIAGRAM_SUFFIX, "name=\""
@@ -152,14 +148,14 @@ public class NetworkRenameParticipant extends RenameParticipant {
 	public void registerOtherNetworksUpdates() {
 		final IPath newFilePath = originalNetworkFile.getFullPath()
 				.removeLastSegments(1).append(newFilename);
-		final IWorkspaceRoot wpRoot = ResourcesPlugin.getWorkspace().getRoot();
 
 		final String oldQualifiedName = OrccUtil
 				.getQualifiedName(originalNetworkFile);
-		final String newQualifiedName = OrccUtil.getQualifiedName(wpRoot
-				.getFile(newFilePath));
-		factory.addReplacement(OrccUtil.NETWORK_SUFFIX, "<Class name=\"" + oldQualifiedName + "\"/>",
-				"<Class name=\"" + newQualifiedName + "\"/>");
+		final String newQualifiedName = OrccUtil.getQualifiedName(OrccUtil
+				.workspaceRoot().getFile(newFilePath));
+		factory.addReplacement(OrccUtil.NETWORK_SUFFIX, "<Class name=\""
+				+ oldQualifiedName + "\"/>", "<Class name=\""
+				+ newQualifiedName + "\"/>");
 	}
 
 	public void registerOtherDiagramsUpdates() {

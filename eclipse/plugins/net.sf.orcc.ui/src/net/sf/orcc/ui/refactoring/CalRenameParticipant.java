@@ -33,8 +33,6 @@ import java.util.regex.Pattern;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
@@ -72,10 +70,9 @@ public class CalRenameParticipant extends RenameParticipant {
 			newBasename = newFilename.substring(0,
 					newFilename.lastIndexOf("." + OrccUtil.CAL_SUFFIX));
 
-			final IWorkspaceRoot wpRoot = ResourcesPlugin.getWorkspace()
-					.getRoot();
-			newFile = wpRoot.getFile(originalFile.getFullPath()
-					.removeLastSegments(1).append(newFilename));
+			newFile = OrccUtil.workspaceRoot().getFile(
+					originalFile.getFullPath().removeLastSegments(1)
+							.append(newFilename));
 			return true;
 		}
 		return false;

@@ -138,7 +138,7 @@ public class OrccMoveParticipant extends MoveParticipant implements
 						+ origPackage + "(\\s*);");
 				final String replacement = "package$1" + newPackage + "$2;";
 
-				change.add(factory.getUniqueFileReplacement(file, pattern,
+				change.add(factory.getUniqueFileReplacement("Update package", file, pattern,
 						replacement));
 			} else if (OrccUtil.NETWORK_SUFFIX.equals(file.getFileExtension())) {
 				final IFile diagFile = file.getProject().getFile(

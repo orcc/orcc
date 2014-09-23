@@ -137,27 +137,12 @@ public class ChangesFactory {
 		}
 	}
 
-	final private Map<Pattern, String> regexpReplacements;
-	final private Map<String, String> simpleReplacements;
-
 	final private Multimap<String, Replacement> replacements;
 	final private Map<IFile, TextEdit> results;
 
 	public ChangesFactory() {
-		regexpReplacements = new HashMap<Pattern, String>();
-		simpleReplacements = new HashMap<String, String>();
 		replacements = HashMultimap.create();
 		results = new HashMap<IFile, TextEdit>();
-	}
-
-	@Deprecated
-	public void addReplacement(final Pattern pattern, final String replacement) {
-		regexpReplacements.put(pattern, replacement);
-	}
-
-	@Deprecated
-	public void addReplacement(final String search, final String replacement) {
-		simpleReplacements.put(search, replacement);
 	}
 
 	public void addReplacement(final String suffix, final Pattern pattern,
@@ -170,7 +155,8 @@ public class ChangesFactory {
 		replacements.put(suffix, new StandardReplacement(pattern, replacement));
 	}
 
-	public Change getUniqueFileReplacement(final IFile file, final Pattern pattern, final String repl) {
+	public Change getUniqueFileReplacement(final String title,
+			final IFile file, final Pattern pattern, final String repl) {
 		final Replacement replacement = new RegexpReplacement(pattern, repl);
 		final String content = FilesManager.readFile(file.getRawLocation().toString());
 		final MultiTextEdit edits = new MultiTextEdit();
@@ -180,15 +166,12 @@ public class ChangesFactory {
 			}
 		}
 
-		final TextFileChange result = new TextFileChange("qsd", file);
+		final TextFileChange result = new TextFileChange(title, file);
 		result.setEdit(edits);
 		return result;
 	}
 
 	private void clearReplacementMaps() {
-		regexpReplacements.clear();
-		simpleReplacements.clear();
-
 		replacements.clear();
 		results.clear();
 	}
@@ -209,110 +192,6 @@ public class ChangesFactory {
 			}
 		}
 		return false;
-	}
-
-	/**
-	 * Perform replacements in given subject
-	 * 
-	 * @param subject
-	 * @return
-	 */
-	private String performReplacement(final String subject) {
-		if (subject == null) {
-			return null;
-		}
-
-		String result = subject;
-		for (Map.Entry<Pattern, String> replacement : regexpReplacements
-				.entrySet()) {
-			result = replacement.getKey().matcher(result)
-					.replaceAll(replacement.getValue());
-		}
-
-		for (Map.Entry<String, String> replacement : simpleReplacements
-				.entrySet()) {
-			result = result.replace(replacement.getKey(),
-					replacement.getValue());
-		}
-
-		return result;
-	}
-
-	/**
-	 * Check if the given content contains text impacted by replacements
-	 * previously stored
-	 * 
-	 * @param content
-	 * @return
-	 */
-	private boolean contentNeedsUpdate(final String content) {
-
-		for (final Pattern pattern : regexpReplacements.keySet()) {
-			if (pattern.matcher(content).find()) {
-				return true;
-			}
-		}
-
-		for (final String searchString : simpleReplacements.keySet()) {
-			if (content.contains(searchString)) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	/**
-	 * Build a Change object for replacement on given file.
-	 * 
-	 * @param file
-	 * @param changeTitle
-	 *            The built Change label
-	 * @return A Change object, or null if no replacement can be applied
-	 */
-	@Deprecated
-	public Change getReplacementChange(final IFile file,
-			final String changeTitle) {
-		final String content = FilesManager.readFile(file.getRawLocation()
-				.toString());
-		if (contentNeedsUpdate(content)) {
-			final String newContent = performReplacement(content);
-			final TextFileChange textFileChange = new TextFileChange(
-					changeTitle, file);
-			textFileChange.setEdit(new ReplaceEdit(0, content.length(),
-					newContent));
-			return textFileChange;
-		}
-		return null;
-	}
-
-	/**
-	 * Build a Change object containing all replacements to perform in all files
-	 * with given suffix, contained in given project (and its referenced
-	 * projects).
-	 * 
-	 * @param project
-	 *            The base project to search files
-	 * @param suffix
-	 *            The suffix of files to apply changes
-	 * @param changeTitle
-	 *            The built Change label
-	 * @return A multi-files Change object, or null if no file have to be
-	 *         updated
-	 */
-	@Deprecated
-	public Change getReplacementChange(final IProject project,
-			final String suffix, final String changeTitle) {
-		final CompositeChange changes = new CompositeChange(changeTitle);
-
-		final List<IFile> files = OrccUtil.getAllFiles(suffix,
-				OrccUtil.getAllDependingSourceFolders(project));
-
-		for (final IFile file : files) {
-			changes.add(getReplacementChange(file, "replacement"));
-		}
-
-		return changes.getChildren().length > 0 ? changes : null;
 	}
 
 	public Change getAllChanges(final IProject project, final String title) {
