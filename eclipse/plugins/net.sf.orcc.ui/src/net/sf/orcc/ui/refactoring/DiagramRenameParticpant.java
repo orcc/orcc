@@ -129,13 +129,14 @@ public class DiagramRenameParticpant extends RenameParticipant {
 			return null;
 		}
 
-		final CompositeChange changes = new CompositeChange(
-				"Post-rename updates");
+		networkRenameParticipant.registerOtherNetworksUpdates();
+		networkRenameParticipant.registerOtherDiagramsUpdates();
+		final CompositeChange changes = (CompositeChange) networkRenameParticipant
+				.getChangesFactory()
+				.getAllChanges(originalDiagramFile.getProject(),
+						"Post-rename updates");
 		changes.add(new RenameResourceChange(originalNetworkPath,
 				newNetworkFilename));
-		changes.add(networkRenameParticipant.getOtherNetworksContentChanges());
-		changes.add(networkRenameParticipant.getOtherDiagramsContentChanges());
-
 		return changes;
 	}
 }

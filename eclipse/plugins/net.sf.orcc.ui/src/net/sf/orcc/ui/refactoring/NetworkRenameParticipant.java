@@ -118,18 +118,19 @@ public class NetworkRenameParticipant extends RenameParticipant {
 	public Change createChange(IProgressMonitor pm) throws CoreException,
 			OperationCanceledException {
 
-		final CompositeChange changes = new CompositeChange(
-				"Post-rename updates");
+		registerOtherNetworksUpdates();
+		registerOtherDiagramsUpdates();
+		final CompositeChange changes = (CompositeChange) factory
+				.getAllChanges(originalNetworkFile.getProject(),
+						"Post-rename updates");
 
 		final IWorkspaceRoot wpRoot = ResourcesPlugin.getWorkspace().getRoot();
 		if (wpRoot.exists(originalDiagramPath)) {
 			changes.add(new RenameResourceChange(originalDiagramPath,
 					newBasename + '.' + OrccUtil.DIAGRAM_SUFFIX));
 		}
-		changes.add(getOtherNetworksContentChanges());
-		changes.add(getOtherDiagramsContentChanges());
 
-		return changes.getChildren().length > 0 ? changes : null;
+		return changes;
 	}
 
 	public void registerThisNetworkUpdate() {
@@ -148,7 +149,7 @@ public class NetworkRenameParticipant extends RenameParticipant {
 		}
 	}
 
-	public Change getOtherNetworksContentChanges() {
+	public void registerOtherNetworksUpdates() {
 		final IPath newFilePath = originalNetworkFile.getFullPath()
 				.removeLastSegments(1).append(newFilename);
 		final IWorkspaceRoot wpRoot = ResourcesPlugin.getWorkspace().getRoot();
@@ -157,22 +158,16 @@ public class NetworkRenameParticipant extends RenameParticipant {
 				.getQualifiedName(originalNetworkFile);
 		final String newQualifiedName = OrccUtil.getQualifiedName(wpRoot
 				.getFile(newFilePath));
-		factory.addReplacement("<Class name=\"" + oldQualifiedName + "\"/>",
+		factory.addReplacement(OrccUtil.NETWORK_SUFFIX, "<Class name=\"" + oldQualifiedName + "\"/>",
 				"<Class name=\"" + newQualifiedName + "\"/>");
-
-		return factory.getReplacementChange(originalNetworkFile.getProject(),
-				OrccUtil.NETWORK_SUFFIX, "Update network files");
 	}
 
-	public Change getOtherDiagramsContentChanges() {
+	public void registerOtherDiagramsUpdates() {
 		final String originalRefinement = originalNetworkFile.getFullPath().toString();
 		final String newRefinement = originalNetworkFile.getFullPath().removeLastSegments(1)
 				.append(newFilename).toString();
 
-		factory.addReplacement("key=\"refinement\" value=\"" + originalRefinement + "\"",
+		factory.addReplacement(OrccUtil.DIAGRAM_SUFFIX, "key=\"refinement\" value=\"" + originalRefinement + "\"",
 				"key=\"refinement\" value=\"" + newRefinement + "\"");
-
-		return factory.getReplacementChange(originalNetworkFile.getProject(),
-				OrccUtil.DIAGRAM_SUFFIX, "Update diagram files");
 	}
 }
