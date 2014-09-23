@@ -222,16 +222,19 @@ public class ChangesFactory {
 						.getRawLocation().toString());
 				for (Replacement replaceInfo : replacements.get(suffix)) {
 					if (replaceInfo.isAffected(content)) {
-						TextEdit textEdit = results.get(file);
+						IFile fixedFile = file;
+						if (toFixAtChangeStep.contains(file)) {
+							// The file to update will be unreadable when the
+							// replacement will be performed, because it is in
+							// the list of files to move
+							fixedFile = destinationFolder.getFile(file
+									.getName());
+						}
+
+						TextEdit textEdit = results.get(fixedFile);
 						if (textEdit == null) {
 							textEdit = new MultiTextEdit();
-							if (toFixAtChangeStep.contains(file)) {
-								final IFile fixedFile = destinationFolder
-										.getFile(file.getName());
-								results.put(fixedFile, textEdit);
-							} else {
-								results.put(file, textEdit);
-							}
+							results.put(fixedFile, textEdit);
 						}
 						for (ReplaceEdit replaceEdit : replaceInfo
 								.getReplacements(content)) {
