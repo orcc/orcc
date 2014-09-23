@@ -29,6 +29,7 @@
 package net.sf.orcc.ui.refactoring;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -312,6 +313,10 @@ public class ChangesFactory {
 		}
 
 		return changes.getChildren().length > 0 ? changes : null;
+	}
+
+	public Change getAllChanges(final IProject project, final String title) {
+		return getAllChanges(project, title, Collections.<IFile>emptyList(), null);
 	}
 
 	/**
