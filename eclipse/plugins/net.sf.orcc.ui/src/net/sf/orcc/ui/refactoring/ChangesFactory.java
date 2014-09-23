@@ -60,8 +60,22 @@ import com.google.common.collect.Multimap;
 public class ChangesFactory {
 
 	interface Replacement {
-		boolean isConcerned(final String content);
+		/**
+		 * Check if the given text contains the pattern of this Replacement
+		 * instance.
+		 * 
+		 * @param content
+		 * @return
+		 */
+		boolean isAffected(final String content);
 
+		/**
+		 * Get the list of ReplaceEdit corresponding to the replacements
+		 * represented by this instance.
+		 * 
+		 * @param content
+		 * @return
+		 */
 		List<ReplaceEdit> getReplacements(final String content);
 	}
 
@@ -75,7 +89,7 @@ public class ChangesFactory {
 		}
 
 		@Override
-		public boolean isConcerned(final String content) {
+		public boolean isAffected(final String content) {
 			return content.contains(pattern);
 		}
 
@@ -102,7 +116,7 @@ public class ChangesFactory {
 		}
 
 		@Override
-		public boolean isConcerned(final String content) {
+		public boolean isAffected(final String content) {
 			return pattern.matcher(content).find();
 		}
 
@@ -159,7 +173,7 @@ public class ChangesFactory {
 		final Replacement replacement = new RegexpReplacement(pattern, repl);
 		final String content = FilesManager.readFile(file.getRawLocation().toString());
 		final MultiTextEdit edits = new MultiTextEdit();
-		if(replacement.isConcerned(content)) {
+		if(replacement.isAffected(content)) {
 			for(ReplaceEdit edit : replacement.getReplacements(content)) {
 				edits.addChild(edit);
 			}
@@ -176,6 +190,24 @@ public class ChangesFactory {
 
 		replacements.clear();
 		results.clear();
+	}
+
+	/**
+	 * Check if the given file will be affected by the current replacements configured.
+	 * 
+	 * @param file
+	 * @return
+	 */
+	public boolean isAffected(final IFile file) {
+		for (Entry<String, Replacement> entry : replacements.entries()) {
+			if(entry.getKey().equals(file.getFileExtension())) {
+				final Replacement replace = entry.getValue();
+				if(replace.isAffected(FilesManager.readFile(file.getRawLocation().toString()))) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -282,21 +314,40 @@ public class ChangesFactory {
 		return changes.getChildren().length > 0 ? changes : null;
 	}
 
-	public Change getAllChanges(final IProject project, final String title) {
+	/**
+	 * Create a CompositeChange containing all replace edits to apply in the
+	 * given folder and depending ones.
+	 * 
+	 * 
+	 * 
+	 * @param project
+	 * @param title
+	 * @param toFixAtChangeStep
+	 * @param destinationFolder
+	 * @return
+	 */
+	public Change getAllChanges(final IProject project, final String title,
+			final List<IFile> toFixAtChangeStep, final IFolder destinationFolder) {
 		final List<IFolder> folders = OrccUtil
 				.getAllDependingSourceFolders(project);
 		List<IFile> files;
 		for (String suffix : replacements.keySet()) {
 			files = OrccUtil.getAllFiles(suffix, folders);
 			for (IFile file : files) {
-				String content = FilesManager.readFile(file.getRawLocation()
-						.toString());
+				final String content = FilesManager.readFile(file
+						.getRawLocation().toString());
 				for (Replacement replaceInfo : replacements.get(suffix)) {
-					if (replaceInfo.isConcerned(content)) {
+					if (replaceInfo.isAffected(content)) {
 						TextEdit textEdit = results.get(file);
 						if (textEdit == null) {
 							textEdit = new MultiTextEdit();
-							results.put(file, textEdit);
+							if (toFixAtChangeStep.contains(file)) {
+								final IFile fixedFile = destinationFolder
+										.getFile(file.getName());
+								results.put(fixedFile, textEdit);
+							} else {
+								results.put(file, textEdit);
+							}
 						}
 						for (ReplaceEdit replaceEdit : replaceInfo
 								.getReplacements(content)) {

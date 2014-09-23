@@ -85,6 +85,7 @@ public class OrccMoveParticipant extends MoveParticipant implements
 			if (element instanceof IFile) {
 				originalProject = ((IFile) element).getProject();
 				files.add((IFile) element);
+				registerFile((IFile) element);
 				return true;
 			}
 		}
@@ -95,12 +96,24 @@ public class OrccMoveParticipant extends MoveParticipant implements
 	public void addElement(Object element, RefactoringArguments arguments) {
 		if (element instanceof IFile) {
 			files.add((IFile) element);
+			registerFile((IFile) element);
 		}
 	}
 
 	@Override
 	public String getName() {
 		return "Orcc Move participant";
+	}
+
+	private void registerFile(IFile file) {
+		final String suffix = file.getFileExtension();
+		if(suffix != null) {
+			if (OrccUtil.CAL_SUFFIX.equals(suffix)) {
+				registerCalUpdates(file);
+			} else if (OrccUtil.NETWORK_SUFFIX.equals(suffix)) {
+				registerNetworksUpdates(file);
+			}
+		}
 	}
 
 	@Override
@@ -150,17 +163,15 @@ public class OrccMoveParticipant extends MoveParticipant implements
 	@Override
 	public Change createChange(IProgressMonitor pm) throws CoreException,
 			OperationCanceledException {
+
+		final List<IFile> invalidPaths = new ArrayList<IFile>();
 		for (IFile file : files) {
-			final String suffix = file.getFileExtension();
-			if(suffix != null) {
-				if (OrccUtil.CAL_SUFFIX.equals(suffix)) {
-					registerCalUpdates(file);
-				} else if (OrccUtil.NETWORK_SUFFIX.equals(suffix)) {
-					registerNetworksUpdates(file);
-				}
+			if (factory.isAffected(file)) {
+				invalidPaths.add(file);
 			}
 		}
-		return factory.getAllChanges(originalProject, "Update depending files");
+		return factory.getAllChanges(originalProject, "Update depending files",
+				invalidPaths, destinationFolder);
 	}
 
 	private void registerCalUpdates(IFile file) {
