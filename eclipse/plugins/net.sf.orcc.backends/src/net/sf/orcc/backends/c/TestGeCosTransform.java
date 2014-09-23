@@ -283,7 +283,9 @@ public class TestGeCosTransform {
 			gecosProject.getSources().add(gecosSourceFile);
 			gecosSourceFile.setName("dummyProgram.c");
 			gecosSourceFile.setModel(procedureSet);
-			new XtendCGenerator(gecosProject, "/home/malle/src-regen/").compute();
+			String pathName = actor.getFile().getRawLocation().toOSString();
+			pathName = pathName.substring(0, pathName.lastIndexOf("/")+1);
+			new XtendCGenerator(gecosProject, pathName).compute();
 			/*String[] cmd = {"bash", "-c", "sed -i \"s/\\(\\* *[a-z,A-Z,_,0-9]\\+ *\\)\\++/][/g\" /home/mythri/src-regen/_dummyProgram.c"};
 			System.out.println(cmd);
 			try {
@@ -300,7 +302,7 @@ public class TestGeCosTransform {
 			}*/
 			CreateProject createProj = new CreateProject("compaGecosProj");
 			GecosProject newProject = createProj.compute();
-			AddSourceToGecosProject a = new AddSourceToGecosProject(newProject, "/home/malle/src-regen/dummyProgram.c");
+			AddSourceToGecosProject a = new AddSourceToGecosProject(newProject, pathName+"/dummyProgram.c");
 			a.compute();
 			CDTFrontEnd frontend = new CDTFrontEnd(newProject);
 			frontend.compute();
@@ -313,6 +315,10 @@ public class TestGeCosTransform {
 			
 			printActorNetwork(actorName, numActors, actor, action, newProject,	actorSplitTrans);
 			transformToActorModel();
+			
+			File f = new File(pathName+"/dummyProgram.c");
+			f.delete();
+			
 			OrccLogger.traceln("Transforming Procedure " + body.getName());
 		} 
 	}
