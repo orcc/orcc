@@ -100,6 +100,11 @@ public class DiagramRenameParticpant extends RenameParticipant {
 	@Override
 	public RefactoringStatus checkConditions(IProgressMonitor pm,
 			CheckConditionsContext context) throws OperationCanceledException {
+		if (!newDiagramFilename.endsWith('.' + OrccUtil.DIAGRAM_SUFFIX)) {
+			return RefactoringStatus
+					.createErrorStatus("The new name must have the suffix ."
+							+ OrccUtil.DIAGRAM_SUFFIX);
+		}
 		return new RefactoringStatus();
 	}
 

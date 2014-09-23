@@ -67,8 +67,12 @@ public class CalRenameParticipant extends RenameParticipant {
 			newFilename = getArguments().getNewName();
 			originalBasename = originalFilename.substring(0,
 					originalFilename.lastIndexOf("." + OrccUtil.CAL_SUFFIX));
-			newBasename = newFilename.substring(0,
-					newFilename.lastIndexOf("." + OrccUtil.CAL_SUFFIX));
+			int idx = newFilename.lastIndexOf("." + OrccUtil.CAL_SUFFIX);
+			if (idx == -1) {
+				newBasename = newFilename;
+			} else {
+				newBasename = newFilename.substring(0, idx);
+			}
 
 			newFile = OrccUtil.workspaceRoot().getFile(
 					originalFile.getFullPath().removeLastSegments(1)
@@ -86,6 +90,11 @@ public class CalRenameParticipant extends RenameParticipant {
 	@Override
 	public RefactoringStatus checkConditions(IProgressMonitor pm,
 			CheckConditionsContext context) throws OperationCanceledException {
+		if (!newFilename.endsWith('.' + OrccUtil.CAL_SUFFIX)) {
+			return RefactoringStatus
+					.createErrorStatus("The new name must have the suffix ."
+							+ OrccUtil.CAL_SUFFIX);
+		}
 		return new RefactoringStatus();
 	}
 

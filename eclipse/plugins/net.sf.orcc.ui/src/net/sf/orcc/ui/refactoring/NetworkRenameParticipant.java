@@ -79,9 +79,12 @@ public class NetworkRenameParticipant extends RenameParticipant {
 							originalFilename.lastIndexOf("."
 									+ OrccUtil.NETWORK_SUFFIX));
 			newFilename = getArguments().getNewName();
-			newBasename = newFilename.substring(0,
-					newFilename.lastIndexOf("." + OrccUtil.NETWORK_SUFFIX));
-
+			int idx = newFilename.lastIndexOf("." + OrccUtil.NETWORK_SUFFIX);
+			if(idx == -1) {
+				newBasename = newFilename;
+			} else {
+				newBasename = newFilename.substring(0, idx);
+			}
 			originalDiagramPath = originalNetworkFile.getFullPath()
 					.removeFileExtension()
 					.addFileExtension(OrccUtil.DIAGRAM_SUFFIX);
@@ -99,8 +102,12 @@ public class NetworkRenameParticipant extends RenameParticipant {
 	@Override
 	public RefactoringStatus checkConditions(IProgressMonitor pm,
 			CheckConditionsContext context) throws OperationCanceledException {
-		return new RefactoringStatus();
-	}
+		if (!newFilename.endsWith('.' + OrccUtil.NETWORK_SUFFIX)) {
+			return RefactoringStatus
+					.createErrorStatus("The new name must have the suffix ."
+							+ OrccUtil.NETWORK_SUFFIX);
+		}
+		return new RefactoringStatus();	}
 
 	@Override
 	public Change createPreChange(IProgressMonitor pm) throws CoreException,
