@@ -55,7 +55,7 @@ import org.eclipse.ltk.core.refactoring.resource.MoveResourceChange;
 
 /**
  * This sharable move participant perform all updates necessary when 1 or more
- * file are moved accross packages.
+ * files are moved across packages.
  * 
  * @author Antoine Lorence
  *
@@ -80,6 +80,7 @@ public class OrccMoveParticipant extends MoveParticipant implements
 	protected boolean initialize(Object element) {
 		files.clear();
 		factory.clearConfiguration();
+		factory.resetResults();
 		final Object dest = getArguments().getDestination();
 		if (dest instanceof IFolder) {
 			destinationFolder = (IFolder) dest;
@@ -139,8 +140,7 @@ public class OrccMoveParticipant extends MoveParticipant implements
 						+ origPackage + "(\\s*);");
 				final String replacement = "package$1" + newPackage + "$2;";
 
-				change.add(factory.getUniqueFileReplacement("Update package", file, pattern,
-						replacement));
+				factory.addSpecificFileReplacement(file, pattern, replacement);
 			} else if (OrccUtil.NETWORK_SUFFIX.equals(file.getFileExtension())) {
 				final IFile diagFile = file.getProject().getFile(
 						file.getProjectRelativePath().removeFileExtension()
@@ -158,6 +158,9 @@ public class OrccMoveParticipant extends MoveParticipant implements
 				}
 			}
 		}
+
+		change.add(factory.getAllChanges(files, "Pre-move updates"));
+		factory.resetResults();
 		return change.getChildren().length > 0 ? change : null;
 	}
 

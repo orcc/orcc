@@ -143,6 +143,9 @@ public class ChangesFactory {
 	 * whose can be affected by these replacements
 	 */
 	final private Multimap<String, Replacement> replacements;
+	/**
+	 * A map of TextEdit objects related to a file in the workspace.
+	 */
 	final private Map<IFile, TextEdit> results;
 
 	public ChangesFactory() {
@@ -160,24 +163,24 @@ public class ChangesFactory {
 		replacements.put(suffix, new StandardReplacement(pattern, replacement));
 	}
 
-	public Change getUniqueFileReplacement(final String title,
-			final IFile file, final Pattern pattern, final String repl) {
+	public void addSpecificFileReplacement(final IFile file,
+			final Pattern pattern, final String repl) {
 		final Replacement replacement = new RegexpReplacement(pattern, repl);
-		final String content = FilesManager.readFile(file.getRawLocation().toString());
-		final MultiTextEdit edits = new MultiTextEdit();
-		if(replacement.isAffected(content)) {
-			for(ReplaceEdit edit : replacement.getReplacements(content)) {
+		final String content = FilesManager.readFile(file.getRawLocation()
+				.toString());
+		final TextEdit edits = getTextEdit(file);
+		if (replacement.isAffected(content)) {
+			for (final ReplaceEdit edit : replacement.getReplacements(content)) {
 				edits.addChild(edit);
 			}
 		}
-
-		final TextFileChange result = new TextFileChange(title, file);
-		result.setEdit(edits);
-		return result;
 	}
 
 	public void clearConfiguration() {
 		replacements.clear();
+	}
+
+	public void resetResults() {
 		results.clear();
 	}
 
@@ -227,6 +230,15 @@ public class ChangesFactory {
 		return getFinalresult(title);
 	}
 
+	public Change getAllChanges(final Collection<IFile> files, final String title) {
+		for (IFile file : files) {
+			final String suffix = file.getFileExtension();
+			if(suffix != null) {
+				computeResults(file, replacements.get(suffix));
+			}
+		}
+		return getFinalresult(title);
+	}
 	/**
 	 * Return the existing TextEdit associated with the given file, creates it
 	 * if necessary.
@@ -252,7 +264,7 @@ public class ChangesFactory {
 				.toString());
 		for (Replacement replaceInfo : replacements) {
 			if (replaceInfo.isAffected(content)) {
-				TextEdit textEdit = getTextEdit(file);
+				final TextEdit textEdit = getTextEdit(file);
 				for (ReplaceEdit replaceEdit : replaceInfo
 						.getReplacements(content)) {
 					textEdit.addChild(replaceEdit);

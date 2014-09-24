@@ -60,6 +60,7 @@ public class CalRenameParticipant extends RenameParticipant {
 	@Override
 	protected boolean initialize(Object element) {
 		factory.clearConfiguration();
+		factory.resetResults();
 		if (element instanceof IFile) {
 
 			originalFile = (IFile) element;
