@@ -28,11 +28,12 @@
  */
 package net.sf.orcc.ui.refactoring;
 
+import java.util.Collections;
+
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -72,8 +73,7 @@ public class DiagramRenameParticpant extends RenameParticipant {
 
 			newDiagramFilename = getArguments().getNewName();
 
-			final IWorkspaceRoot wpRoot = ResourcesPlugin.getWorkspace()
-					.getRoot();
+			final IWorkspaceRoot wpRoot = OrccUtil.workspaceRoot();
 			if (wpRoot.exists(originalNetworkPath)) {
 				final IFile networkFile = wpRoot.getFile(originalNetworkPath);
 				networkRenameParticipant = new NetworkRenameParticipant();
@@ -102,6 +102,11 @@ public class DiagramRenameParticpant extends RenameParticipant {
 	@Override
 	public RefactoringStatus checkConditions(IProgressMonitor pm,
 			CheckConditionsContext context) throws OperationCanceledException {
+		if (!newDiagramFilename.endsWith('.' + OrccUtil.DIAGRAM_SUFFIX)) {
+			return RefactoringStatus
+					.createErrorStatus("The new name must have the suffix ."
+							+ OrccUtil.DIAGRAM_SUFFIX);
+		}
 		return new RefactoringStatus();
 	}
 
@@ -109,33 +114,41 @@ public class DiagramRenameParticpant extends RenameParticipant {
 	public Change createPreChange(IProgressMonitor pm) throws CoreException,
 			OperationCanceledException {
 
-		if(networkRenameParticipant == null) {
+		networkRenameParticipant.getChangesFactory().clearConfiguration();
+		networkRenameParticipant.getChangesFactory().resetResults();
+
+		if (networkRenameParticipant == null) {
 			return null;
 		}
-		
-		final CompositeChange changes = new CompositeChange("Pre-rename updates");
-		changes.add(networkRenameParticipant.getNetworkContentChanges());
-		changes.add(networkRenameParticipant.getDiagramContentChanges());
 
-		return changes.getChildren().length > 0 ? changes : null;
+		networkRenameParticipant.registerThisNetworkUpdate();
+		networkRenameParticipant.registerThisDiagramUpdate();
+
+		return networkRenameParticipant.getChangesFactory().getAllChanges(
+				Collections.singleton(originalDiagramFile),
+				"Pre-rename updates");
 	}
 
 	@Override
 	public Change createChange(IProgressMonitor pm) throws CoreException,
 			OperationCanceledException {
 
+		networkRenameParticipant.getChangesFactory().clearConfiguration();
+		networkRenameParticipant.getChangesFactory().resetResults();
+
 		// The corresponding XDF must be renamed
 		if (networkRenameParticipant == null) {
 			return null;
 		}
 
-		final CompositeChange changes = new CompositeChange(
-				"Post-rename updates");
+		networkRenameParticipant.registerOtherNetworksUpdates();
+		networkRenameParticipant.registerOtherDiagramsUpdates();
+		final CompositeChange changes = (CompositeChange) networkRenameParticipant
+				.getChangesFactory()
+				.getAllChanges(originalDiagramFile.getProject(),
+						"Post-rename updates");
 		changes.add(new RenameResourceChange(originalNetworkPath,
 				newNetworkFilename));
-		changes.add(networkRenameParticipant.getOtherNetworksContentChanges());
-		changes.add(networkRenameParticipant.getOtherDiagramsContentChanges());
-
 		return changes;
 	}
 }

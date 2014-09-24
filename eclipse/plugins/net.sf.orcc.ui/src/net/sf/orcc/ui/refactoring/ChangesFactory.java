@@ -28,22 +28,31 @@
  */
 package net.sf.orcc.ui.refactoring;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.orcc.util.FilesManager;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.CompositeChange;
 import org.eclipse.ltk.core.refactoring.TextFileChange;
+import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
+import org.eclipse.text.edits.TextEdit;
+
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 
 /**
  * 
@@ -52,133 +61,259 @@ import org.eclipse.text.edits.ReplaceEdit;
  */
 public class ChangesFactory {
 
-	final private ResourceSet resourceSet;
+	interface Replacement {
+		/**
+		 * Check if the given text contains the pattern of this Replacement
+		 * instance.
+		 * 
+		 * @param content
+		 * @return
+		 */
+		boolean isAffected(final String content);
 
-	final private Map<Pattern, String> regexpReplacements;
-	final private Map<String, String> simpleReplacements;
+		/**
+		 * Get the list of ReplaceEdit corresponding to the replacements
+		 * represented by this instance.
+		 * 
+		 * @param content
+		 * @return
+		 */
+		List<ReplaceEdit> getReplacements(final String content);
+	}
+
+	class StandardReplacement implements Replacement {
+		private String pattern;
+		private String replacement;
+
+		public StandardReplacement(String p, String r) {
+			pattern = p;
+			replacement = r;
+		}
+
+		@Override
+		public boolean isAffected(final String content) {
+			return content.contains(pattern);
+		}
+
+		@Override
+		public List<ReplaceEdit> getReplacements(final String content) {
+			final List<ReplaceEdit> replacements = new ArrayList<ReplaceEdit>();
+			int idx = 0;
+			while ((idx = content.indexOf(pattern, idx + 1)) != -1) {
+				replacements.add(new ReplaceEdit(idx, pattern.length(),
+						replacement));
+				idx += pattern.length();
+			}
+			return replacements;
+		}
+	}
+
+	class RegexpReplacement implements Replacement {
+		private Pattern pattern;
+		private String replacement;
+
+		public RegexpReplacement(Pattern p, String r) {
+			pattern = p;
+			replacement = r;
+		}
+
+		@Override
+		public boolean isAffected(final String content) {
+			return pattern.matcher(content).find();
+		}
+
+		@Override
+		public List<ReplaceEdit> getReplacements(final String content) {
+			final List<ReplaceEdit> replacements = new ArrayList<ReplaceEdit>();
+			final Matcher matcher = pattern.matcher(content);
+			while (matcher.find()) {
+				int s = matcher.start();
+				int e = matcher.end();
+				final String replaced = pattern
+						.matcher(content.substring(s, e)).replaceAll(
+								replacement);
+				replacements.add(new ReplaceEdit(s, e - s, replaced));
+			}
+			return replacements;
+		}
+	}
+
+	/**
+	 * The list of replacements to apply, indexed by the suffix of the files
+	 * whose can be affected by these replacements
+	 */
+	final private Multimap<String, Replacement> replacements;
+	/**
+	 * A map of TextEdit objects related to a file in the workspace.
+	 */
+	final private Map<IFile, TextEdit> results;
 
 	public ChangesFactory() {
-		resourceSet = new ResourceSetImpl();
-		regexpReplacements = new HashMap<Pattern, String>();
-		simpleReplacements = new HashMap<String, String>();
+		replacements = HashMultimap.create();
+		results = new HashMap<IFile, TextEdit>();
 	}
 
-	public ResourceSet getResourceSet() {
-		return resourceSet;
-	}
-
-	public void addReplacement(final Pattern pattern,
+	public void addReplacement(final String suffix, final Pattern pattern,
 			final String replacement) {
-		regexpReplacements.put(pattern, replacement);
+		replacements.put(suffix, new RegexpReplacement(pattern, replacement));
 	}
 
-	public void addReplacement(final String search,
+	public void addReplacement(final String suffix, final String pattern,
 			final String replacement) {
-		simpleReplacements.put(search, replacement);
+		replacements.put(suffix, new StandardReplacement(pattern, replacement));
 	}
 
-	public void clearReplacementMaps() {
-		regexpReplacements.clear();
-		simpleReplacements.clear();
-	}
-
-	/**
-	 * Perform replacements in given subject
-	 * 
-	 * @param subject
-	 * @return
-	 */
-	private String performReplacement(final String subject) {
-		if (subject == null) {
-			return null;
-		}
-		String result = subject;
-		for (Map.Entry<Pattern, String> replacement : regexpReplacements
-				.entrySet()) {
-			result = replacement.getKey().matcher(result)
-					.replaceAll(replacement.getValue());
-		}
-
-		for (Map.Entry<String, String> replacement : simpleReplacements
-				.entrySet()) {
-			result = result.replace(replacement.getKey(),
-					replacement.getValue());
-		}
-
-		return result;
-	}
-
-	/**
-	 * Check if the given content contains text impacted by replacements
-	 * previously stored
-	 * 
-	 * @param content
-	 * @return
-	 */
-	private boolean contentNeedsUpdate(final String content) {
-
-		for (final Pattern pattern : regexpReplacements.keySet()) {
-			if (pattern.matcher(content).find()) {
-				return true;
+	public void addSpecificFileReplacement(final IFile file,
+			final Pattern pattern, final String repl) {
+		final Replacement replacement = new RegexpReplacement(pattern, repl);
+		final String content = FilesManager.readFile(file.getRawLocation()
+				.toString());
+		final TextEdit edits = getTextEdit(file);
+		if (replacement.isAffected(content)) {
+			for (final ReplaceEdit edit : replacement.getReplacements(content)) {
+				edits.addChild(edit);
 			}
 		}
+	}
 
-		for (final String searchString : simpleReplacements.keySet()) {
-			if (content.contains(searchString)) {
-				return true;
+	public void addSpecificFileReplacement(final IFile file,
+			final String pattern, final String repl) {
+		final Replacement replacement = new StandardReplacement(pattern, repl);
+		final String content = FilesManager.readFile(file.getRawLocation()
+				.toString());
+		final TextEdit edits = getTextEdit(file);
+		if (replacement.isAffected(content)) {
+			for (final ReplaceEdit edit : replacement.getReplacements(content)) {
+				edits.addChild(edit);
 			}
 		}
+	}
 
-		return false;
+	public void clearConfiguration() {
+		replacements.clear();
+	}
+
+	public void resetResults() {
+		results.clear();
+	}
+
+	public Change getAllChanges(final IProject project, final String title) {
+		return getAllChanges(project, title, Collections.<IFile>emptyList());
 	}
 
 	/**
-	 * Build a Change object for replacement on given file.
+	 * Generates a Change object with the following rules:
+	 * <ol>
+	 * <li>Computes the list of all files in the given project and the projects
+	 * depending on it.</li>
+	 * <li>Removes from this list all files in the given ignoreList.</li>
+	 * <li>Apply to each file the previously stored replacements</li>
+	 * <li>Compute the results in a CompositeChange instance containing a list
+	 * of TextFileChanges instances (1 per file)</li>
+	 * </ol>
 	 * 
-	 * @param file
-	 * @param changeTitle
-	 *            The built Change label
-	 * @return A Change object, or null if no replacement can be applied
-	 */
-	public Change getReplacementChange(final IFile file,
-			final String changeTitle) {
-		final String content = FilesManager.readFile(file.getRawLocation().toString());
-		if (contentNeedsUpdate(content)) {
-			final String newContent = performReplacement(content);
-			final TextFileChange textFileChange = new TextFileChange(
-					changeTitle, file);
-			textFileChange.setEdit(new ReplaceEdit(0, content.length(),
-					newContent));
-			return textFileChange;
-		}
-		return null;
-	}
-
-	/**
-	 * Build a Change object containing all replacements to perform in all files
-	 * with given suffix, contained in given project (and its referenced
-	 * projects).
+	 * The given title is used to set a name to the created Change
 	 * 
 	 * @param project
-	 *            The base project to search files
-	 * @param suffix
-	 *            The suffix of files to apply changes
-	 * @param changeTitle
-	 *            The built Change label
-	 * @return A multi-files Change object, or null if no file have to be
-	 *         updated
+	 * @param title
+	 * @param ignoreList
+	 * @return
 	 */
-	public Change getReplacementChange(final IProject project,
-			final String suffix, final String changeTitle) {
-		final CompositeChange changes = new CompositeChange(changeTitle);
-
-		final List<IFile> files = OrccUtil.getAllFiles(suffix,
-				OrccUtil.getAllDependingSourceFolders(project));
-
-		for (final IFile file : files) {
-			changes.add(getReplacementChange(file, "replacement"));
+	public Change getAllChanges(final IProject project, final String title,
+			final Collection<IFile> ignoreList) {
+		final List<IFolder> folders = OrccUtil
+				.getAllDependingSourceFolders(project);
+		List<IFile> files;
+		for (String suffix : replacements.keySet()) {
+			files = OrccUtil.getAllFiles(suffix, folders);
+			files.removeAll(ignoreList);
+			for (IFile file : files) {
+				computeResults(file, replacements.get(suffix));
+			}
 		}
+		return getFinalresult(title);
+	}
 
-		return changes.getChildren().length > 0 ? changes : null;
+	/**
+	 * Generates a Change object with the following rules:
+	 * <ol>
+	 * <li>Apply to each file in the given list the transformations stored in
+	 * the internal replacements map</li>
+	 * <li>Compute the results in a CompositeChange instance containing a list
+	 * of TextFileChanges instances (1 per file)</li>
+	 * </ol>
+	 * 
+	 * @param files
+	 * @param title
+	 * @return
+	 */
+	public Change getAllChanges(final Collection<IFile> files, final String title) {
+		for (IFile file : files) {
+			final String suffix = file.getFileExtension();
+			if(suffix != null) {
+				computeResults(file, replacements.get(suffix));
+			}
+		}
+		return getFinalresult(title);
+	}
+	/**
+	 * Return the existing TextEdit associated with the given file, creates it
+	 * if necessary.
+	 * 
+	 * @param file
+	 * @return
+	 */
+	private TextEdit getTextEdit(final IFile file) {
+		TextEdit textEdit = results.get(file);
+		if (textEdit == null) {
+			textEdit = new MultiTextEdit();
+			results.put(file, textEdit);
+		}
+		return textEdit;
+	}
+
+	/**
+	 * Check if the given file is affected by at least 1 of the given
+	 * replacements, and fill the internal result map entry with the
+	 * corresponding ReplaceEdit instances
+	 * 
+	 * @param file
+	 * @param replacements
+	 */
+	private void computeResults(final IFile file,
+			final Collection<Replacement> replacements) {
+		if (!file.exists()) {
+			return;
+		}
+		final String content = FilesManager.readFile(file.getRawLocation()
+				.toString());
+		for (Replacement replaceInfo : replacements) {
+			if (replaceInfo.isAffected(content)) {
+				final TextEdit textEdit = getTextEdit(file);
+				for (ReplaceEdit replaceEdit : replaceInfo
+						.getReplacements(content)) {
+					textEdit.addChild(replaceEdit);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Compute a CompositeChange object from the previously computed TextEdit
+	 * instances encapsulated in new TextFileChange instances.
+	 * 
+	 * @param title The title set to the resulting Change object
+	 * @return
+	 */
+	private Change getFinalresult(final String title) {
+		final CompositeChange result = new CompositeChange(title);
+		for (Entry<IFile, TextEdit> entry : results.entrySet()) {
+			final IFile file = entry.getKey();
+			final TextFileChange fileChange = new TextFileChange("Changes to "
+					+ file.getName(), file);
+			fileChange.setEdit(entry.getValue());
+			result.add(fileChange);
+		}
+		return result.getChildren().length > 0 ? result : null;
 	}
 }

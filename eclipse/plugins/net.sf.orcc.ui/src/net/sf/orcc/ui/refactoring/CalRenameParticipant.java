@@ -28,18 +28,16 @@
  */
 package net.sf.orcc.ui.refactoring;
 
+import java.util.Collections;
 import java.util.regex.Pattern;
 
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.ltk.core.refactoring.Change;
-import org.eclipse.ltk.core.refactoring.CompositeChange;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.core.refactoring.participants.CheckConditionsContext;
 import org.eclipse.ltk.core.refactoring.participants.RenameParticipant;
@@ -62,6 +60,8 @@ public class CalRenameParticipant extends RenameParticipant {
 
 	@Override
 	protected boolean initialize(Object element) {
+		factory.clearConfiguration();
+		factory.resetResults();
 		if (element instanceof IFile) {
 
 			originalFile = (IFile) element;
@@ -70,13 +70,16 @@ public class CalRenameParticipant extends RenameParticipant {
 			newFilename = getArguments().getNewName();
 			originalBasename = originalFilename.substring(0,
 					originalFilename.lastIndexOf("." + OrccUtil.CAL_SUFFIX));
-			newBasename = newFilename.substring(0,
-					newFilename.lastIndexOf("." + OrccUtil.CAL_SUFFIX));
+			int idx = newFilename.lastIndexOf("." + OrccUtil.CAL_SUFFIX);
+			if (idx == -1) {
+				newBasename = newFilename;
+			} else {
+				newBasename = newFilename.substring(0, idx);
+			}
 
-			final IWorkspaceRoot wpRoot = ResourcesPlugin.getWorkspace()
-					.getRoot();
-			newFile = wpRoot.getFile(originalFile.getFullPath()
-					.removeLastSegments(1).append(newFilename));
+			newFile = OrccUtil.workspaceRoot().getFile(
+					originalFile.getFullPath().removeLastSegments(1)
+							.append(newFilename));
 			return true;
 		}
 		return false;
@@ -90,81 +93,65 @@ public class CalRenameParticipant extends RenameParticipant {
 	@Override
 	public RefactoringStatus checkConditions(IProgressMonitor pm,
 			CheckConditionsContext context) throws OperationCanceledException {
+		if (!newFilename.endsWith('.' + OrccUtil.CAL_SUFFIX)) {
+			return RefactoringStatus
+					.createErrorStatus("The new name must have the suffix ."
+							+ OrccUtil.CAL_SUFFIX);
+		}
 		return new RefactoringStatus();
 	}
 
 	@Override
 	public Change createPreChange(IProgressMonitor pm) throws CoreException,
 			OperationCanceledException {
-		final CompositeChange changes = new CompositeChange(
+		factory.clearConfiguration();
+		factory.resetResults();
+
+		final Pattern actor = Pattern.compile("actor(\\s+)" + originalBasename
+				+ "(\\s*)\\(");
+		factory.addSpecificFileReplacement(originalFile, actor, "actor$1"
+				+ newBasename + "$2" + '(');
+		final Pattern unit = Pattern.compile("unit(\\s+)" + originalBasename
+				+ "(\\s*):");
+		factory.addSpecificFileReplacement(originalFile, unit, "unit$1"
+				+ newBasename + "$2" + ':');
+		return factory.getAllChanges(Collections.singleton(originalFile),
 				"Pre-rename updates");
-		changes.add(getFileContentUpdatesChange());
-		return changes.getChildren().length > 0 ? changes : null;
 	}
 
 	@Override
 	public Change createChange(IProgressMonitor pm) throws CoreException,
 			OperationCanceledException {
-		final CompositeChange changes = new CompositeChange(
-				"Post-rename updates");
-		changes.add(getNetworksContentUpdatesChanges());
-		changes.add(getDiagramsContentUpdatesChanges());
-		changes.add(getOtherCalContentUpdatesChanges());
-		return changes.getChildren().length > 0 ? changes : null;
+		factory.clearConfiguration();
+		factory.resetResults();
+		registerNetworkUpdates();
+		registerDiagramUpdates();
+		registerOtherCalUpdates();
+		return factory.getAllChanges(originalFile.getProject(), "Post-rename updates");
 	}
 
-	private Change getFileContentUpdatesChange() {
-		factory.clearReplacementMaps();
-
-		final Pattern actor = Pattern.compile("actor(\\s+)" + originalBasename
-				+ "(\\s*)\\(");
-		factory.addReplacement(actor, "actor$1" + newBasename + "$2" + '(');
-
-		final Pattern unit = Pattern.compile("unit(\\s+)" + originalBasename
-				+ "(\\s*):");
-		factory.addReplacement(unit, "unit$1" + newBasename + "$2" + ':');
-
-		return factory
-				.getReplacementChange(originalFile, "Update file content");
-	}
-
-	private Change getNetworksContentUpdatesChanges() {
-		factory.clearReplacementMaps();
-
+	private void registerNetworkUpdates() {
 		final String oldQualifiedName = OrccUtil.getQualifiedName(originalFile);
 		final String newQualifiedName = OrccUtil.getQualifiedName(newFile);
-		factory.addReplacement("<Class name=\"" + oldQualifiedName + "\"/>",
-				"<Class name=\"" + newQualifiedName + "\"/>");
-
-		final String title = "Update network files";
-		return factory.getReplacementChange(originalFile.getProject(),
-				OrccUtil.NETWORK_SUFFIX, title);
-
+		factory.addReplacement(OrccUtil.NETWORK_SUFFIX, "<Class name=\""
+				+ oldQualifiedName + "\"/>", "<Class name=\""
+				+ newQualifiedName + "\"/>");
 	}
 
-	private Change getDiagramsContentUpdatesChanges() {
-		factory.clearReplacementMaps();
-
+	private void registerDiagramUpdates() {
 		final IFile irFile = OrccUtil.getFile(originalFile.getProject(),
 				OrccUtil.getQualifiedName(originalFile), OrccUtil.IR_SUFFIX);
 
-		final String originalRefinement = irFile.getFullPath()
-				.toString();
+		final String originalRefinement = irFile.getFullPath().toString();
 		final String newRefinement = originalRefinement.replace(
 				originalBasename, newBasename);
 
-		factory.addReplacement("key=\"refinement\" value=\""
-				+ originalRefinement + "\"", "key=\"refinement\" value=\""
-				+ newRefinement + "\"");
-
-		final String title = "Update diagram files";
-		return factory.getReplacementChange(originalFile.getProject(),
-				OrccUtil.DIAGRAM_SUFFIX, title);
+		factory.addReplacement(OrccUtil.DIAGRAM_SUFFIX,
+				"key=\"refinement\" value=\"" + originalRefinement + "\"",
+				"key=\"refinement\" value=\"" + newRefinement + "\"");
 	}
 
-	private Change getOtherCalContentUpdatesChanges() {
-		factory.clearReplacementMaps();
-
+	private void registerOtherCalUpdates() {
 		final String originalQualifiedName = OrccUtil
 				.getQualifiedName(originalFile);
 		final Pattern importPattern = Pattern.compile("import(\\s+)"
@@ -173,9 +160,6 @@ public class CalRenameParticipant extends RenameParticipant {
 		final String targetQualifiedName = OrccUtil.getQualifiedName(newFile);
 		final String replacement = "import$1" + targetQualifiedName + "$2$4;";
 
-		factory.addReplacement(importPattern, replacement);
-
-		return factory.getReplacementChange(originalFile.getProject(),
-				OrccUtil.CAL_SUFFIX, "Update actors referencing this unit.");
+		factory.addReplacement(OrccUtil.CAL_SUFFIX, importPattern, replacement);
 	}
 }
