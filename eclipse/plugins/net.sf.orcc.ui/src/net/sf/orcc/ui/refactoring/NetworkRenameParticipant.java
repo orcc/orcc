@@ -170,7 +170,8 @@ public class NetworkRenameParticipant extends RenameParticipant {
 		final String newRefinement = originalNetworkFile.getFullPath().removeLastSegments(1)
 				.append(newFilename).toString();
 
-		factory.addReplacement(OrccUtil.DIAGRAM_SUFFIX, "key=\"refinement\" value=\"" + originalRefinement + "\"",
+		factory.addReplacement(OrccUtil.DIAGRAM_SUFFIX,
+				"key=\"refinement\" value=\"" + originalRefinement + "\"",
 				"key=\"refinement\" value=\"" + newRefinement + "\"");
 	}
 }

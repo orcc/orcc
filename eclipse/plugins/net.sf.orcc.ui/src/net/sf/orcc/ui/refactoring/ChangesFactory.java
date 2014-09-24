@@ -202,16 +202,14 @@ public class ChangesFactory {
 	 * Create a CompositeChange containing all replace edits to apply in the
 	 * given folder and depending ones.
 	 * 
-	 * 
-	 * 
 	 * @param project
 	 * @param title
-	 * @param toFixAtChangeStep
+	 * @param pathsToUpdate
 	 * @param destinationFolder
 	 * @return
 	 */
 	public Change getAllChanges(final IProject project, final String title,
-			final List<IFile> toFixAtChangeStep, final IFolder destinationFolder) {
+			final List<IFile> pathsToUpdate, final IFolder destinationFolder) {
 		final List<IFolder> folders = OrccUtil
 				.getAllDependingSourceFolders(project);
 		List<IFile> files;
@@ -223,7 +221,7 @@ public class ChangesFactory {
 				for (Replacement replaceInfo : replacements.get(suffix)) {
 					if (replaceInfo.isAffected(content)) {
 						IFile fixedFile = file;
-						if (toFixAtChangeStep.contains(file)) {
+						if (pathsToUpdate.contains(file)) {
 							// The file to update will be unreadable when the
 							// replacement will be performed, because it is in
 							// the list of files to move
