@@ -76,6 +76,14 @@ public class OrccMoveParticipant extends MoveParticipant implements
 		files = new ArrayList<IFile>();
 	}
 
+	/**
+	 * Main initialization. Called once per move action, with the first file to
+	 * move as argument.
+	 * 
+	 * We use this method to perform some cleans (if this instance is reused
+	 * from a previous move), initialize the target folder and register the
+	 * first file to store.
+	 */
 	@Override
 	protected boolean initialize(Object element) {
 		files.clear();
@@ -86,7 +94,6 @@ public class OrccMoveParticipant extends MoveParticipant implements
 			destinationFolder = (IFolder) dest;
 			if (element instanceof IFile) {
 				originalProject = ((IFile) element).getProject();
-				files.add((IFile) element);
 				registerFile((IFile) element);
 				return true;
 			}
@@ -94,10 +101,13 @@ public class OrccMoveParticipant extends MoveParticipant implements
 		return false;
 	}
 
+	/**
+	 * Add another file in the list of files to move. At this point, we are sure
+	 * that all the files added are originally contained in the same package.
+	 */
 	@Override
 	public void addElement(Object element, RefactoringArguments arguments) {
 		if (element instanceof IFile) {
-			files.add((IFile) element);
 			registerFile((IFile) element);
 		}
 	}
@@ -107,7 +117,15 @@ public class OrccMoveParticipant extends MoveParticipant implements
 		return "Orcc Move participant";
 	}
 
+	/**
+	 * Store the given file to the list of files to move, and register
+	 * replacements to apply on other files specific to its type, its name, its
+	 * qualified name, etc.
+	 * 
+	 * @param file
+	 */
 	private void registerFile(IFile file) {
+		files.add(file);
 		final String suffix = file.getFileExtension();
 		if(suffix != null) {
 			if (OrccUtil.CAL_SUFFIX.equals(suffix)) {
@@ -124,11 +142,30 @@ public class OrccMoveParticipant extends MoveParticipant implements
 		return new RefactoringStatus();
 	}
 
+	/**
+	 * <p>
+	 * Generates the Change instance whose update all the files that will be
+	 * moved in this action. These changes will be applied before really moving
+	 * the file.
+	 * </p>
+	 * 
+	 * <p>
+	 * For CAL files (actor & units), the package information have to be
+	 * updated. For diagrams and network, we must ensure if only 1 file is
+	 * moved, the other is also.
+	 * </p>
+	 * 
+	 * <p>
+	 * Note: In some specific case, if a file to move references another file to
+	 * move, the updates have to be applied now (before moving files) to avoid
+	 * issues in the resulting file
+	 * </p>
+	 */
 	@Override
 	public Change createPreChange(IProgressMonitor pm) throws CoreException,
 			OperationCanceledException {
-		CompositeChange change = new CompositeChange("Pre-move updates");
-		for (IFile file : files) {
+		final CompositeChange change = new CompositeChange("Pre-move updates");
+		for (final IFile file : files) {
 			if (OrccUtil.CAL_SUFFIX.equals(file.getFileExtension())) {
 
 				final String origPackage = OrccUtil.getQualifiedPackage(file);
@@ -159,25 +196,29 @@ public class OrccMoveParticipant extends MoveParticipant implements
 			}
 		}
 
+		// Specific case, we get the changes for the list of moved files.
 		change.add(factory.getAllChanges(files, "Pre-move updates"));
 		factory.resetResults();
 		return change.getChildren().length > 0 ? change : null;
 	}
 
+	/**
+	 * Create the change object which will manage changes for all files but the
+	 * moved ones.
+	 */
 	@Override
 	public Change createChange(IProgressMonitor pm) throws CoreException,
 			OperationCanceledException {
-
-		final List<IFile> invalidPaths = new ArrayList<IFile>();
-		for (IFile file : files) {
-			if (factory.isAffected(file)) {
-				invalidPaths.add(file);
-			}
-		}
 		return factory.getAllChanges(originalProject, "Update depending files",
-				invalidPaths);
+				files);
 	}
 
+	/**
+	 * Register updates to perform in files (actors, units, networks and
+	 * diagrams) when a CAL file is moved.
+	 * 
+	 * @param file
+	 */
 	private void registerCalUpdates(IFile file) {
 		final IFile destinationFile = destinationFolder.getFile(file.getName());
 
@@ -212,6 +253,12 @@ public class OrccMoveParticipant extends MoveParticipant implements
 				"key=\"refinement\" value=\"" + newRefinement + "\"");
 	}
 
+	/**
+	 * Register updates to perform in files (networks and diagrams) when a
+	 * network file is moved.
+	 * 
+	 * @param file
+	 */
 	private void registerNetworksUpdates(IFile file) {
 
 		final IFile destinationFile = destinationFolder.getFile(file.getName());

@@ -184,31 +184,22 @@ public class ChangesFactory {
 		results.clear();
 	}
 
-	/**
-	 * Check if the given file will be affected by the current replacements configured.
-	 * 
-	 * @param file
-	 * @return
-	 */
-	public boolean isAffected(final IFile file) {
-		for (Entry<String, Replacement> entry : replacements.entries()) {
-			if(entry.getKey().equals(file.getFileExtension())) {
-				final Replacement replace = entry.getValue();
-				if(replace.isAffected(FilesManager.readFile(file.getRawLocation().toString()))) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
 	public Change getAllChanges(final IProject project, final String title) {
 		return getAllChanges(project, title, Collections.<IFile>emptyList());
 	}
 
 	/**
-	 * Create a CompositeChange containing all replace edits to apply in the
-	 * given folder and depending ones.
+	 * Generates a Change object with the following rules:
+	 * <ol>
+	 * <li>Computes the list of all files in the given project and the projects
+	 * depending on it.</li>
+	 * <li>Removes from this list all files in the given ignoreList.</li>
+	 * <li>Apply to each file the previously stored replacements</li>
+	 * <li>Compute the results in a CompositeChange instance containing a list
+	 * of TextFileChanges instances (1 per file)</li>
+	 * </ol>
+	 * 
+	 * The given title is used to set a name to the created Change
 	 * 
 	 * @param project
 	 * @param title
@@ -230,6 +221,19 @@ public class ChangesFactory {
 		return getFinalresult(title);
 	}
 
+	/**
+	 * Generates a Change object with the following rules:
+	 * <ol>
+	 * <li>Apply to each file in the given list the transformations stored in
+	 * the internal replacements map</li>
+	 * <li>Compute the results in a CompositeChange instance containing a list
+	 * of TextFileChanges instances (1 per file)</li>
+	 * </ol>
+	 * 
+	 * @param files
+	 * @param title
+	 * @return
+	 */
 	public Change getAllChanges(final Collection<IFile> files, final String title) {
 		for (IFile file : files) {
 			final String suffix = file.getFileExtension();
@@ -255,6 +259,14 @@ public class ChangesFactory {
 		return textEdit;
 	}
 
+	/**
+	 * Check if the given file is affected by at least 1 of the given
+	 * replacements, and fill the internal result map entry with the
+	 * corresponding ReplaceEdit instances
+	 * 
+	 * @param file
+	 * @param replacements
+	 */
 	private void computeResults(final IFile file,
 			final Collection<Replacement> replacements) {
 		if (!file.exists()) {
@@ -273,6 +285,13 @@ public class ChangesFactory {
 		}
 	}
 
+	/**
+	 * Compute a CompositeChange object from the previously computed TextEdit
+	 * instances encapsulated in new TextFileChange instances.
+	 * 
+	 * @param title The title set to the resulting Change object
+	 * @return
+	 */
 	private Change getFinalresult(final String title) {
 		final CompositeChange result = new CompositeChange(title);
 		for (Entry<IFile, TextEdit> entry : results.entrySet()) {
