@@ -161,6 +161,8 @@ public class HLSBackend extends CBackend {
 		networkTransfos.add(new BroadcastAdder());
 		networkTransfos.add(new ArgumentEvaluator());
 		networkTransfos.add(new DisconnectedOutputPortRemoval());
+		networkTransfos.add(new UnitImporter());
+		networkTransfos.add(new RenameTransformation(renameMap));
 		networkTransfos.add(new TypeResizer(true, true, true, false));
 
 		// -----------------------------------------------------
@@ -172,8 +174,6 @@ public class HLSBackend extends CBackend {
 		if (convertMulti2Mono) {
 			childrenTransfos.add(new Multi2MonoToken());
 		}
-		childrenTransfos.add(new UnitImporter());
-		childrenTransfos.add(new RenameTransformation(renameMap));
 		childrenTransfos.add(new DfVisitor<Void>(new CastArgFuncCall()));
 	}
 
