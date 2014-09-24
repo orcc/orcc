@@ -103,6 +103,8 @@ public class CalRenameParticipant extends RenameParticipant {
 	@Override
 	public Change createPreChange(IProgressMonitor pm) throws CoreException,
 			OperationCanceledException {
+		factory.clearConfiguration();
+		factory.resetResults();
 
 		final Pattern actor = Pattern.compile("actor(\\s+)" + originalBasename
 				+ "(\\s*)\\(");
@@ -121,6 +123,8 @@ public class CalRenameParticipant extends RenameParticipant {
 	@Override
 	public Change createChange(IProgressMonitor pm) throws CoreException,
 			OperationCanceledException {
+		factory.clearConfiguration();
+		factory.resetResults();
 		registerNetworkUpdates();
 		registerDiagramUpdates();
 		registerOtherCalUpdates();

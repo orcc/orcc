@@ -114,6 +114,8 @@ public class NetworkRenameParticipant extends RenameParticipant {
 	@Override
 	public Change createPreChange(IProgressMonitor pm) throws CoreException,
 			OperationCanceledException {
+		factory.clearConfiguration();
+		factory.resetResults();
 
 		registerThisNetworkUpdate();
 		registerThisDiagramUpdate();
@@ -124,6 +126,8 @@ public class NetworkRenameParticipant extends RenameParticipant {
 	@Override
 	public Change createChange(IProgressMonitor pm) throws CoreException,
 			OperationCanceledException {
+		factory.clearConfiguration();
+		factory.resetResults();
 
 		registerOtherNetworksUpdates();
 		registerOtherDiagramsUpdates();

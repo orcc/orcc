@@ -112,6 +112,9 @@ public class DiagramRenameParticpant extends RenameParticipant {
 	public Change createPreChange(IProgressMonitor pm) throws CoreException,
 			OperationCanceledException {
 
+		networkRenameParticipant.getChangesFactory().clearConfiguration();
+		networkRenameParticipant.getChangesFactory().resetResults();
+
 		if (networkRenameParticipant == null) {
 			return null;
 		}
@@ -126,6 +129,9 @@ public class DiagramRenameParticpant extends RenameParticipant {
 	@Override
 	public Change createChange(IProgressMonitor pm) throws CoreException,
 			OperationCanceledException {
+
+		networkRenameParticipant.getChangesFactory().clearConfiguration();
+		networkRenameParticipant.getChangesFactory().resetResults();
 
 		// The corresponding XDF must be renamed
 		if (networkRenameParticipant == null) {
