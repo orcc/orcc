@@ -1,10 +1,18 @@
-# Next release
+# 2.2.0 September 30, 2014
 ### Notable changes and features
 - Network editor
     + Specific size on connections are now managed correctly when group / ungroup features are used.
 
 ### Bugfixes
+- Orcc IDE
+    + Moving many files at a time works correctly [#112]
+- Orcc library
+    + [MSVC] All variables are declared at the beginning of a block, avoiding compile errors vith Visual Studio compiler
+
 ### Known issues
+- [#79] Using sub-list as procedure argument produces wrong code.
+- [#108] [C] Modifying output port variables both in action body and in procedure produces wrong code.
+
 ### Miscellaneous
 
 # 2.1.2 September 2, 2014
