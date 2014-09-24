@@ -161,6 +161,7 @@ public class HLSBackend extends CBackend {
 		networkTransfos.add(new BroadcastAdder());
 		networkTransfos.add(new ArgumentEvaluator());
 		networkTransfos.add(new DisconnectedOutputPortRemoval());
+		networkTransfos.add(new TypeResizer(true, true, true, false));
 
 		// -----------------------------------------------------
 		// Transformations that will be applied on Instances
@@ -172,7 +173,6 @@ public class HLSBackend extends CBackend {
 			childrenTransfos.add(new Multi2MonoToken());
 		}
 		childrenTransfos.add(new UnitImporter());
-		childrenTransfos.add(new TypeResizer(true, true, true, false));
 		childrenTransfos.add(new RenameTransformation(renameMap));
 		childrenTransfos.add(new DfVisitor<Void>(new CastArgFuncCall()));
 	}
