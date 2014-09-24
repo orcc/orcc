@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.ui.refactoring;
 
+import java.util.Collections;
+
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
@@ -123,7 +125,8 @@ public class DiagramRenameParticpant extends RenameParticipant {
 		networkRenameParticipant.registerThisDiagramUpdate();
 
 		return networkRenameParticipant.getChangesFactory().getAllChanges(
-				originalDiagramFile.getProject(), "Pre-rename updates");
+				Collections.singleton(originalDiagramFile),
+				"Pre-rename updates");
 	}
 
 	@Override

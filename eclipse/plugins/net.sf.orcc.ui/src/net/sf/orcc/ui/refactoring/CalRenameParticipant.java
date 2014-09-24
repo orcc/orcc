@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.ui.refactoring;
 
+import java.util.Collections;
 import java.util.regex.Pattern;
 
 import net.sf.orcc.util.OrccUtil;
@@ -108,15 +109,13 @@ public class CalRenameParticipant extends RenameParticipant {
 
 		final Pattern actor = Pattern.compile("actor(\\s+)" + originalBasename
 				+ "(\\s*)\\(");
-		factory.addReplacement(OrccUtil.CAL_SUFFIX, actor, "actor$1"
+		factory.addSpecificFileReplacement(originalFile, actor, "actor$1"
 				+ newBasename + "$2" + '(');
-
 		final Pattern unit = Pattern.compile("unit(\\s+)" + originalBasename
 				+ "(\\s*):");
-		factory.addReplacement(OrccUtil.CAL_SUFFIX, unit, "unit$1"
+		factory.addSpecificFileReplacement(originalFile, unit, "unit$1"
 				+ newBasename + "$2" + ':');
-
-		return factory.getAllChanges(originalFile.getProject(),
+		return factory.getAllChanges(Collections.singleton(originalFile),
 				"Pre-rename updates");
 	}
 

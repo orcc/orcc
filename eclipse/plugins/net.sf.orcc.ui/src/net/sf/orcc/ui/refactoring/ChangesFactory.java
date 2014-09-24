@@ -176,6 +176,19 @@ public class ChangesFactory {
 		}
 	}
 
+	public void addSpecificFileReplacement(final IFile file,
+			final String pattern, final String repl) {
+		final Replacement replacement = new StandardReplacement(pattern, repl);
+		final String content = FilesManager.readFile(file.getRawLocation()
+				.toString());
+		final TextEdit edits = getTextEdit(file);
+		if (replacement.isAffected(content)) {
+			for (final ReplaceEdit edit : replacement.getReplacements(content)) {
+				edits.addChild(edit);
+			}
+		}
+	}
+
 	public void clearConfiguration() {
 		replacements.clear();
 	}

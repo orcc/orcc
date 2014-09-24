@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.ui.refactoring;
 
+import java.util.Collections;
+
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
@@ -54,7 +56,7 @@ public class NetworkRenameParticipant extends RenameParticipant {
 	private final ChangesFactory factory;
 
 	private IFile originalNetworkFile;
-	private IPath originalDiagramPath;
+	private IFile originalDiagramFile;
 	private String originalFilename;
 	private String originalBasename;
 	private String newFilename;
@@ -87,10 +89,10 @@ public class NetworkRenameParticipant extends RenameParticipant {
 			} else {
 				newBasename = newFilename.substring(0, idx);
 			}
-			originalDiagramPath = originalNetworkFile.getFullPath()
+			final IPath diagPath = originalNetworkFile.getFullPath()
 					.removeFileExtension()
 					.addFileExtension(OrccUtil.DIAGRAM_SUFFIX);
-
+			originalDiagramFile = OrccUtil.workspaceRoot().getFile(diagPath);
 			return true;
 		}
 		return false;
@@ -120,7 +122,9 @@ public class NetworkRenameParticipant extends RenameParticipant {
 		registerThisNetworkUpdate();
 		registerThisDiagramUpdate();
 
-		return factory.getAllChanges(originalNetworkFile.getProject(), "Pre-rename updates");
+		return factory.getAllChanges(
+				Collections.singleton(originalNetworkFile),
+				"Pre-rename updates");
 	}
 
 	@Override
@@ -135,25 +139,25 @@ public class NetworkRenameParticipant extends RenameParticipant {
 				.getAllChanges(originalNetworkFile.getProject(),
 						"Post-rename updates");
 
-		if (OrccUtil.workspaceRoot().exists(originalDiagramPath)) {
-			changes.add(new RenameResourceChange(originalDiagramPath,
-					newBasename + '.' + OrccUtil.DIAGRAM_SUFFIX));
+		if (originalDiagramFile.exists()) {
+			changes.add(new RenameResourceChange(originalDiagramFile
+					.getFullPath(), newBasename + '.' + OrccUtil.DIAGRAM_SUFFIX));
 		}
 
 		return changes;
 	}
 
 	public void registerThisNetworkUpdate() {
-		factory.addReplacement(OrccUtil.NETWORK_SUFFIX, "<XDF name=\"" + originalBasename + "\">",
+		factory.addSpecificFileReplacement(originalNetworkFile, "<XDF name=\"" + originalBasename + "\">",
 				"<XDF name=\"" + newBasename + "\">");
 	}
 
 	public void registerThisDiagramUpdate() {
 
-		if (OrccUtil.workspaceRoot().exists(originalDiagramPath)) {
-			factory.addReplacement(OrccUtil.DIAGRAM_SUFFIX, originalFilename
+		if (originalDiagramFile.exists()) {
+			factory.addSpecificFileReplacement(originalDiagramFile, originalFilename
 					+ "#/", newFilename + "#/");
-			factory.addReplacement(OrccUtil.DIAGRAM_SUFFIX, "name=\""
+			factory.addSpecificFileReplacement(originalDiagramFile, "name=\""
 					+ originalBasename + "\"", "name=\"" + newBasename + "\"");
 		}
 	}
