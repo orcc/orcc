@@ -79,6 +79,7 @@ public class OrccMoveParticipant extends MoveParticipant implements
 	@Override
 	protected boolean initialize(Object element) {
 		files.clear();
+		factory.clearConfiguration();
 		final Object dest = getArguments().getDestination();
 		if (dest instanceof IFolder) {
 			destinationFolder = (IFolder) dest;
@@ -171,7 +172,7 @@ public class OrccMoveParticipant extends MoveParticipant implements
 			}
 		}
 		return factory.getAllChanges(originalProject, "Update depending files",
-				invalidPaths, destinationFolder);
+				invalidPaths);
 	}
 
 	private void registerCalUpdates(IFile file) {

@@ -71,6 +71,7 @@ public class NetworkRenameParticipant extends RenameParticipant {
 
 	@Override
 	protected boolean initialize(Object element) {
+		factory.clearConfiguration();
 		if (element instanceof IFile) {
 			originalNetworkFile = (IFile) element;
 			originalFilename = originalNetworkFile.getFullPath().toFile()

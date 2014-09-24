@@ -29,6 +29,7 @@
 package net.sf.orcc.ui.refactoring;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -137,6 +138,10 @@ public class ChangesFactory {
 		}
 	}
 
+	/**
+	 * The list of replacements to apply, indexed by the suffix of the files
+	 * whose can be affected by these replacements
+	 */
 	final private Multimap<String, Replacement> replacements;
 	final private Map<IFile, TextEdit> results;
 
@@ -171,7 +176,7 @@ public class ChangesFactory {
 		return result;
 	}
 
-	private void clearReplacementMaps() {
+	public void clearConfiguration() {
 		replacements.clear();
 		results.clear();
 	}
@@ -195,7 +200,7 @@ public class ChangesFactory {
 	}
 
 	public Change getAllChanges(final IProject project, final String title) {
-		return getAllChanges(project, title, Collections.<IFile>emptyList(), null);
+		return getAllChanges(project, title, Collections.<IFile>emptyList());
 	}
 
 	/**
@@ -204,44 +209,59 @@ public class ChangesFactory {
 	 * 
 	 * @param project
 	 * @param title
-	 * @param pathsToUpdate
-	 * @param destinationFolder
+	 * @param ignoreList
 	 * @return
 	 */
 	public Change getAllChanges(final IProject project, final String title,
-			final List<IFile> pathsToUpdate, final IFolder destinationFolder) {
+			final Collection<IFile> ignoreList) {
 		final List<IFolder> folders = OrccUtil
 				.getAllDependingSourceFolders(project);
 		List<IFile> files;
 		for (String suffix : replacements.keySet()) {
 			files = OrccUtil.getAllFiles(suffix, folders);
+			files.removeAll(ignoreList);
 			for (IFile file : files) {
-				final String content = FilesManager.readFile(file
-						.getRawLocation().toString());
-				for (Replacement replaceInfo : replacements.get(suffix)) {
-					if (replaceInfo.isAffected(content)) {
-						IFile fixedFile = file;
-						if (pathsToUpdate.contains(file)) {
-							// The file to update will be unreadable when the
-							// replacement will be performed, because it is in
-							// the list of files to move
-							fixedFile = destinationFolder.getFile(file
-									.getName());
-						}
+				computeResults(file, replacements.get(suffix));
+			}
+		}
+		return getFinalresult(title);
+	}
 
-						TextEdit textEdit = results.get(fixedFile);
-						if (textEdit == null) {
-							textEdit = new MultiTextEdit();
-							results.put(fixedFile, textEdit);
-						}
-						for (ReplaceEdit replaceEdit : replaceInfo
-								.getReplacements(content)) {
-							textEdit.addChild(replaceEdit);
-						}
-					}
+	/**
+	 * Return the existing TextEdit associated with the given file, creates it
+	 * if necessary.
+	 * 
+	 * @param file
+	 * @return
+	 */
+	private TextEdit getTextEdit(final IFile file) {
+		TextEdit textEdit = results.get(file);
+		if (textEdit == null) {
+			textEdit = new MultiTextEdit();
+			results.put(file, textEdit);
+		}
+		return textEdit;
+	}
+
+	private void computeResults(final IFile file,
+			final Collection<Replacement> replacements) {
+		if (!file.exists()) {
+			return;
+		}
+		final String content = FilesManager.readFile(file.getRawLocation()
+				.toString());
+		for (Replacement replaceInfo : replacements) {
+			if (replaceInfo.isAffected(content)) {
+				TextEdit textEdit = getTextEdit(file);
+				for (ReplaceEdit replaceEdit : replaceInfo
+						.getReplacements(content)) {
+					textEdit.addChild(replaceEdit);
 				}
 			}
 		}
+	}
+
+	private Change getFinalresult(final String title) {
 		final CompositeChange result = new CompositeChange(title);
 		for (Entry<IFile, TextEdit> entry : results.entrySet()) {
 			final IFile file = entry.getKey();
@@ -250,7 +270,6 @@ public class ChangesFactory {
 			fileChange.setEdit(entry.getValue());
 			result.add(fileChange);
 		}
-		clearReplacementMaps();
 		return result.getChildren().length > 0 ? result : null;
 	}
 }
