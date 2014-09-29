@@ -85,14 +85,15 @@ class ActorTemplate  {
 	
 	def printActorSymbols(List<Symbol> symList) {
 		'''
-		«symList.join("",[sym|sym.generateSymbol+";\n"])»
+		«symList.filter[sym|sym.name != "state"].join("",[sym|sym.generateSymbol+";\n"])»
 		int done := 0;
+		int state := 0;
 		'''		
 	}
 	
 	
 	def printAction(String name, Procedure proc, GScopFSM scopFSM, List<ActorPortInfo> ipportList, 
-		List<ActorPortInfo> opportList, Instruction gaurd, Instruction stateChange, boolean scatterInit ) {
+		List<ActorPortInfo> opportList, Instruction gaurd, Instruction stateChange, boolean scatterInit, int doneStateId ) {
 		'''
 			«name»: action  «ipportList.join(",",[p|p.generateActionPort])» ==>
 						«opportList.join(",",[p|p.generateActionPort])»
@@ -114,23 +115,28 @@ class ActorTemplate  {
 					«IF stateChange != null»
 						«ActorInstructionTemplate::eInstance.generate(stateChange)»;
 					«ENDIF»
+					«IF !scatterInit»
+					if ( done = 1 ) then
+						state := «doneStateId»;
+					end 
+					«ENDIF»
 				end
 				
 		'''
 	}
 	
-	def printScatterOut(List<ActorPortInfo> opportList, int actorId ) {
+	def printScatterOut(List<ActorPortInfo> opportList, int actorId, int doneStateId ) {
 		'''
 			send_out: action   ==>
 						«opportList.join(",",[p|p.generateActionPort])»
 				guard
-					done = 1
+					state = «doneStateId»
 				var
 					«opportList.join(",",[p|p.baseType+"  "+p.varName+"["+p.size+"]"])»
 				do
 					«opportList.join("",[p|p.varName+" := "+p.portName+";\n"])»
 					done := 0;
-					state_«actorId» := 0;
+					state := 0;
 				end
 				
 		'''

@@ -316,9 +316,9 @@ public class TestGeCosTransform {
 			printActorNetwork(actorName, numActors, actor, action, newProject,	actorSplitTrans);
 			transformToActorModel();
 			
-			File f = new File(pathName+"/dummyProgram.c");
-			f.delete();
-			
+//			File f = new File(pathName+"/dummyProgram.c");
+//			f.delete();
+//			
 			OrccLogger.traceln("Transforming Procedure " + body.getName());
 		} 
 	}
@@ -394,6 +394,7 @@ public class TestGeCosTransform {
 			//list.remove(0);
 			int actionId = 0;
 			int first = 0;
+			int doneStateId = list.size() + 1;
 			for ( GecosToCALInfo info : list ) {
 				if ( first == 0 ) {
 					first = 1;
@@ -414,7 +415,7 @@ public class TestGeCosTransform {
 				}
 				if ( fsms.size() != 0 ) {
 					c = actorGen.printAction("action_"+actionId,info.proc, fsms.get(0), ipportList, 
-										opportList, info.guard, info.stateChange, scatterInit);
+										opportList, info.guard, info.stateChange, scatterInit, doneStateId);
 				} else {
 					c = actorGen.printAction("action_"+actionId,info.proc, roots.get(0), ipportList, 
 							opportList, info.guard, info.stateChange, scatterInit);
@@ -424,7 +425,7 @@ public class TestGeCosTransform {
 			}
 			opportList = getPortListFromCALPorts(action, action.getOutputPattern().getPorts(), false);
 			if ( i == numActors ) {
-				c = actorGen.printScatterOut(opportList, i);
+				c = actorGen.printScatterOut(opportList, i, doneStateId);
 				content = content + c.toString();
 			}
 			c = actorGen.printActorEnd();
