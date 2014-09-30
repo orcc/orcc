@@ -47,6 +47,7 @@ import net.sf.orcc.backends.promela.transform.PromelaSchedulingModel;
 import net.sf.orcc.backends.promela.transform.ScheduleBalanceEq;
 import net.sf.orcc.backends.promela.transform.Scheduler;
 import net.sf.orcc.backends.transform.Inliner;
+import net.sf.orcc.backends.util.Validator;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Network;
@@ -55,6 +56,7 @@ import net.sf.orcc.df.transform.Instantiator;
 import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.df.transform.UnitImporter;
 import net.sf.orcc.df.util.DfVisitor;
+import net.sf.orcc.df.util.NetworkValidator;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.transform.DeadCodeElimination;
@@ -140,6 +142,14 @@ public class PromelaBackend extends AbstractBackend {
 	protected Result doLibrariesExtraction() {
 		return FilesManager.extract("/runtime/Promela/pylibs", outputPath);
 	}
+
+	@Override
+	protected void doValidate(Network network) {
+		Validator.checkTopLevel(network);
+		// We don't have to print Warnings for 'potential deadlocks'
+		// Validator.checkMinimalFifoSize(network, fifoSize);
+
+		new NetworkValidator().doSwitch(network);	}
 
 	@Override
 	protected void beforeGeneration(Network network) {
