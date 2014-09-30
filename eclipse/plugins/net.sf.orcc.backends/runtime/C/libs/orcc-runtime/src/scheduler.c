@@ -269,13 +269,15 @@ void *scheduler_routine(void *data) {
 
             my_actor->sched_func(&si);
 
-            tick_out = getticks();
-            diff_tick = elapsed(tick_out, tick_in);
-            my_actor->ticks += diff_tick;
-            my_actor->switches++;
-            if (si.num_firings == 0) {
+            if (si.num_firings != 0) {
+                tick_out = getticks();
+                diff_tick = elapsed(tick_out, tick_in);
+                my_actor->ticks += diff_tick;
+            } else {
                 my_actor->misses++;
             }
+            my_actor->switches++;
+
             if(opt->print_firings) {
                 printf("%2i  %5i\t%s\t%s\n", sched->id, si.num_firings, si.reason == starved ? "starved" : "full", my_actor->name);
             }
