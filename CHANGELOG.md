@@ -1,3 +1,9 @@
+# Next release
+### Notable changes and features
+### Bugfixes
+### Known issues
+### Miscellaneous
+
 # 2.2.0 September 30, 2014
 ### Notable changes and features
 - Network editor

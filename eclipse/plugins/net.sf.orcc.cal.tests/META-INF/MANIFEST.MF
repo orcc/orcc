@@ -2,12 +2,12 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: net.sf.orcc.cal.tests
 Bundle-SymbolicName: net.sf.orcc.cal.tests
-Bundle-Version: 2.2.0.qualifier
+Bundle-Version: 2.2.1.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Require-Bundle: net.sf.orcc.backends;bundle-version="2.2.0",
- net.sf.orcc.cal;bundle-version="2.2.0",
- net.sf.orcc.cal.ui;bundle-version="2.2.0",
- net.sf.orcc.core;bundle-version="2.2.0",
+Require-Bundle: net.sf.orcc.backends;bundle-version="2.2.1",
+ net.sf.orcc.cal;bundle-version="2.2.1",
+ net.sf.orcc.cal.ui;bundle-version="2.2.1",
+ net.sf.orcc.core;bundle-version="2.2.1",
  org.eclipse.xtext;bundle-version="2.0.0",
  org.eclipse.xtext.junit4;bundle-version="2.0.0",
  org.junit;bundle-version="4.8.0",
