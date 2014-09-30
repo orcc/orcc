@@ -30,6 +30,7 @@ package net.sf.orcc.ui.launching.tabs;
 
 import static net.sf.orcc.OrccLaunchConstants.PARAMETERS;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -107,19 +108,18 @@ public class ParametersTab extends AbstractLaunchConfigurationTab {
 		public void dispose() {
 		}
 
-		@SuppressWarnings("unchecked")
 		@Override
 		public Object[] getElements(Object inputElement) {
 			Variable[] elements = new Variable[0];
 			ILaunchConfiguration config = (ILaunchConfiguration) inputElement;
 			Map<String, String> m;
 			try {
-				m = config.getAttribute(PARAMETERS, (Map<String, String>) null);
+				m = config.getAttribute(PARAMETERS, Collections.<String, String>emptyMap());
 			} catch (CoreException e) {
 				return elements;
 			}
 
-			if (m != null && !m.isEmpty()) {
+			if (!m.isEmpty()) {
 				elements = new Variable[m.size()];
 				String[] varNames = new String[m.size()];
 				m.keySet().toArray(varNames);

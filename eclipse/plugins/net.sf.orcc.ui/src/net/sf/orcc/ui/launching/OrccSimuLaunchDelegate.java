@@ -65,7 +65,6 @@ public class OrccSimuLaunchDelegate implements ILaunchConfigurationDelegate {
 
 			Simulator currentSimulator;
 
-			@SuppressWarnings("unchecked")
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				String simulatorName = "unknown";

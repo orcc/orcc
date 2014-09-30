@@ -66,7 +66,6 @@ public class OrccRunLaunchDelegate implements ILaunchConfigurationDelegate {
 
 		Job job = new Job("Compile job") {
 
-			@SuppressWarnings("unchecked")
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 
