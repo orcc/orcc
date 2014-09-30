@@ -2,12 +2,20 @@
 ### Notable changes and features
 - Network editor
     + Specific size on connections are now managed correctly when group / ungroup features are used.
+- Back-ends
+    + [C] Allow linking to user library through the variable `$USR_LIB_DIR`.
+    + [C] Add experimental support of OpenCV API through native functions. This allows the streaming from a camera.
+    + [C] Add support "@schedule_outputs" annotation on action signature to consider the state of output FIFOs in action schedulability.
+    + New debugging features:
+        - [HLS] Add initial support of "@DEBUG" annotation.
+        - [C] Add experimental ruby script that help to graphically trace the state of FIFOs when the execution is stucked. 
 
 ### Bugfixes
 - Orcc IDE
-    + Moving many files at a time works correctly [#112]
-- Orcc library
-    + [MSVC] All variables are declared at the beginning of a block, avoiding compile errors vith Visual Studio compiler
+    + [#112] Moving many files at a time works correctly.
+- Back-ends
+    + [#117] [#126] [C] All variables are declared at the beginning of a block, avoiding compile errors with Visual Studio compiler.
+    + [#81] [LLVM] Fix typing of binary expression.
 
 ### Known issues
 - [#79] Using sub-list as procedure argument produces wrong code.
