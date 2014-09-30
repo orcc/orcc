@@ -3,15 +3,19 @@
 - Network editor
     + Specific size on connections are now managed correctly when group / ungroup features are used.
 - Back-ends
+    + The back-end procedure has been rewritten, to modernize and unify the code generation process:
+        * Unified transformations lists are applied at fixed moments.
+        * New class to handle the extraction of library files, generation of source files, caching of up-to-date files, etc.
+        * Improved console outputs.
     + [C] Allow linking to user library through the variable `$USR_LIB_DIR`.
     + [C] Add experimental support of OpenCV API through native functions. This allows the streaming from a camera.
     + [C] Add support "@schedule_outputs" annotation on action signature to consider the state of output FIFOs in action schedulability.
     + New debugging features:
         - [HLS] Add initial support of "@DEBUG" annotation.
-        - [C] Add experimental ruby script that help to graphically trace the state of FIFOs when the execution is stucked. 
+        - [C] Add experimental ruby script that helps to graphically trace the state of FIFOs when the execution is stucked.
 
 ### Bugfixes
-- Orcc IDE
+- Development environment
     + [#112] Moving many files at a time works correctly.
 - Back-ends
     + [#117] [#126] [C] All variables are declared at the beginning of a block, avoiding compile errors with Visual Studio compiler.
@@ -20,8 +24,6 @@
 ### Known issues
 - [#79] Using sub-list as procedure argument produces wrong code.
 - [#108] [C] Modifying output port variables both in action body and in procedure produces wrong code.
-
-### Miscellaneous
 
 # 2.1.2 September 2, 2014
 ### Notable changes and features
