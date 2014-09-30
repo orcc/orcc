@@ -3,9 +3,9 @@
 - Network editor
     + Specific size on connections are now managed correctly when group / ungroup features are used.
 - Back-ends
-    + The back-end procedure has been rewritten, to modernize and unify the code generation process:
+    + The back-end infrastructure has been rewritten in order to modernize and unify the code generation process:
         * Unified transformations lists are applied at fixed moments.
-        * New class to handle the extraction of library files, generation of source files, caching of up-to-date files, etc.
+        * New class to handle the extraction of library files, the generation of source files, the caching of up-to-date files, etc.
         * Improved console outputs.
     + [C] Allow linking to user library through the variable `$USR_LIB_DIR`.
     + [C] Add experimental support of OpenCV API through native functions. This allows the streaming from a camera.
@@ -13,6 +13,7 @@
     + New debugging features:
         - [HLS] Add initial support of "@DEBUG" annotation.
         - [C] Add experimental ruby script that helps to graphically trace the state of FIFOs when the execution is stucked.
+    + [Compa] Update of the back-end to specifically target MicroBlaze-based MPSoCs.
 
 ### Bugfixes
 - Development environment
