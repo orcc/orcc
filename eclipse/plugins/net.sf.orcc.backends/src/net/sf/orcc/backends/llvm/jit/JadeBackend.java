@@ -57,6 +57,7 @@ import net.sf.orcc.df.transform.TypeResizer;
 import net.sf.orcc.df.transform.UnitImporter;
 import net.sf.orcc.df.util.DfUtil;
 import net.sf.orcc.df.util.DfVisitor;
+import net.sf.orcc.df.util.NetworkValidator;
 import net.sf.orcc.ir.CfgNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.transform.BlockCombine;
@@ -164,7 +165,8 @@ public class JadeBackend extends AbstractBackend {
 	@Override
 	protected void doValidate(Network network) {
 		Validator.checkTopLevel(network);
-		Validator.checkMinimalFifoSize(network, fifoSize, false);
+
+		new NetworkValidator().doSwitch(network);
 	}
 
 	@Override

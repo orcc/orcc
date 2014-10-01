@@ -65,19 +65,6 @@ class Validator {
 
 	/**
 	 * Check if the given network does not contain repeat bigger than the size of the associated connection.
-	 * In the contrary case, a warning is displayed.
-	 *
-	 * @param network
-	 *            the given network
-	 * @param size
-	 *            default connection size
-	 */
-	def static void checkMinimalFifoSize(Network network, int size) {
-		checkMinimalFifoSize(network, size, true)
-	}
-
-	/**
-	 * Check if the given network does not contain repeat bigger than the size of the associated connection.
 	 * In the contrary case, a message is displayed.
 	 *
 	 * @param network
@@ -87,52 +74,49 @@ class Validator {
 	 * @param displayWarning
 	 *            If true, displayed message is a warning. If false, it will be a notice
 	 */
-	def static void checkMinimalFifoSize(Network network, int size, boolean displayWarning) {
+	def static void checkMinimalFifoSize(Network network, int size) {
 		for (actor : network.children.filter(typeof(Actor))) {
 			for (action : actor.actions + actor.initializes) {
-				checkInputRepeat(action.inputPattern, actor, size, displayWarning)
-				checkOutputRepeat(action.outputPattern, actor, size, displayWarning)
+				checkInputRepeat(action.inputPattern, actor, size)
+				checkOutputRepeat(action.outputPattern, actor, size)
 			}
 		}
 		for (instance : network.children.filter(typeof(Instance)).filter[isActor]) {
 			val actor = instance.getActor
 			for (action : actor.actions + actor.initializes) {
-				checkInputRepeat(action.inputPattern, instance, size, displayWarning)
-				checkOutputRepeat(action.outputPattern, instance, size, displayWarning)
+				checkInputRepeat(action.inputPattern, instance, size)
+				checkOutputRepeat(action.outputPattern, instance, size)
 			}
 		}
 		for (subnetwork : network.allNetworks) {
-			checkMinimalFifoSize(subnetwork, size, displayWarning)
+			checkMinimalFifoSize(subnetwork, size)
 		}
 	}
 
-	def private static void checkInputRepeat(Pattern pattern, Vertex vertex, int size, boolean displayWarning) {
+	def private static void checkInputRepeat(Pattern pattern, Vertex vertex, int size) {
 		val incomingPortMap = vertex.getAdapter(typeof(Entity)).incomingPortMap
 		for (port : pattern.ports) {
 			if(incomingPortMap.containsKey(port)) {
-				checkConnectionSize(incomingPortMap.get(port), pattern.getNumTokens(port), size, displayWarning)
+				checkConnectionSize(incomingPortMap.get(port), pattern.getNumTokens(port), size)
 			}
 		}
 	}
 
-	def private static void checkOutputRepeat(Pattern pattern, Vertex vertex, int size, boolean displayWarning) {
+	def private static void checkOutputRepeat(Pattern pattern, Vertex vertex, int size) {
 		val outgoingPortMap = vertex.getAdapter(typeof(Entity)).outgoingPortMap
 		for (port : pattern.ports) {
 			if(outgoingPortMap.containsKey(port)) {
 				for (outgoing : outgoingPortMap.get(port)) {
-					checkConnectionSize(outgoing, pattern.getNumTokens(port), size, displayWarning)
+					checkConnectionSize(outgoing, pattern.getNumTokens(port), size)
 				}
 			}
 		}
 	}
 
-	def private static void checkConnectionSize(Connection connection, int numTokens, int size, boolean displayWarning) {
+	def private static void checkConnectionSize(Connection connection, int numTokens, int size) {
 		if (connection != null && numTokens >= connection.size ?: size) {
 			val msg = "Potential deadlock due to the size of (" + connection + ")."
-			if(displayWarning)
-				OrccLogger::warnln(msg)
-			else
-				OrccLogger::noticeln(msg)				
+			OrccLogger::warnln(msg)		
 		}
 	}
 
