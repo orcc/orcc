@@ -69,7 +69,7 @@ void ffmpeg_closeSource() {
     }
 }
 
-void ffmpeg_readFrame(u8 data[16][100000], int size[1], int index) {
+void ffmpeg_readFrame(u8 data[MAX_FRAME_DELAY][MAX_FRAME_SIZE], int size[1], int index) {
     int n = av_read_frame(pFormatCtx, pPacket);
 
     if(n == AVERROR_EOF) {
