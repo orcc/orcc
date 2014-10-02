@@ -197,6 +197,24 @@ public class ChangesFactory {
 		results.clear();
 	}
 
+	/**
+	 * Generates a Change object with the following rules:
+	 * <ol>
+	 * <li>Computes the list of all files in the given project and the projects
+	 * depending on it.</li>
+	 * <li>Apply to each file the previously stored replacements</li>
+	 * <li>Compute the results in a CompositeChange instance containing a list
+	 * of TextFileChanges instances (1 per file)</li>
+	 * </ol>
+	 * 
+	 * The given title is used to set a name to the created Change. <b>Please
+	 * note: </b> This method will returns null if the current configuration
+	 * doesn't imply any Change in the given project's files.
+	 *
+	 * @param project
+	 * @param title
+	 * @return a Change instance, or null
+	 */
 	public Change getAllChanges(final IProject project, final String title) {
 		return getAllChanges(project, title, Collections.<IFile>emptyList());
 	}
@@ -212,12 +230,14 @@ public class ChangesFactory {
 	 * of TextFileChanges instances (1 per file)</li>
 	 * </ol>
 	 * 
-	 * The given title is used to set a name to the created Change
+	 * The given title is used to set a name to the created Change. <b>Please
+	 * note: </b> This method will returns null if the current configuration
+	 * doesn't imply any Change in the given project's files.
 	 * 
 	 * @param project
 	 * @param title
 	 * @param ignoreList
-	 * @return
+	 * @return a Change instance, or null
 	 */
 	public Change getAllChanges(final IProject project, final String title,
 			final Collection<IFile> ignoreList) {

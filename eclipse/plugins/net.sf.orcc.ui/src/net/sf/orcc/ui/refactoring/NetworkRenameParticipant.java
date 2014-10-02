@@ -135,10 +135,12 @@ public class NetworkRenameParticipant extends RenameParticipant {
 
 		registerOtherNetworksUpdates();
 		registerOtherDiagramsUpdates();
-		final CompositeChange changes = (CompositeChange) factory
-				.getAllChanges(originalNetworkFile.getProject(),
-						"Post-rename updates");
-
+		CompositeChange changes = (CompositeChange) factory.getAllChanges(
+				originalNetworkFile.getProject(), "Post-rename updates");
+		if (changes == null) {
+			changes = new CompositeChange("Post-rename updates");
+		}
+		
 		if (originalDiagramFile.exists()) {
 			changes.add(new RenameResourceChange(originalDiagramFile
 					.getFullPath(), newBasename + '.' + OrccUtil.DIAGRAM_SUFFIX));
