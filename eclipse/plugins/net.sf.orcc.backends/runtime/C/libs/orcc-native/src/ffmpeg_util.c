@@ -84,6 +84,10 @@ void ffmpeg_readFrame(u8 data[MAX_FRAME_DELAY][MAX_FRAME_SIZE], int size[1], int
         fprintf(stderr,"Problem when reading input file.\n");
         exit(-4);
     }
+    if(pPacket->size > MAX_FRAME_SIZE) {
+        fprintf(stderr,"Frame size exceeds the maximum value.\n");
+        exit(-4);
+    }
 
     memcpy(data[index], pPacket->data, pPacket->size);
     size[0] = pPacket->size;
