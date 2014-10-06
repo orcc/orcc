@@ -1,3 +1,8 @@
+# find papi library
+find_library(papi_LIBRARY papi)
+
+# set papi include directory
+set(PAPI_INCLUDE_DIR /usr/local/include)
 
 # Orcc library files
 set(orcc_native_sources
@@ -8,11 +13,13 @@ set(orcc_native_sources
     src/compareyuv.c
     src/native.c
     src/native_util.c
+    src/eventLib.c	
 )
 
 set(orcc_native_headers
     include/native.h
     include/native_util.h
+    include/eventLib.h
 )
 
 if(THREADS_FOUND)
@@ -117,12 +124,12 @@ if(USE_SSE)
 endif()
 
 
-include_directories(${extra_includes})
+include_directories(${extra_includes} ${PAPI_INCLUDE_DIR})
 add_definitions(${extra_definitions})
 # Compile libraries
 add_library(orcc-native STATIC ${orcc_native_sources} ${orcc_native_headers})
 # Do the linking
-target_link_libraries(orcc-native orcc-runtime ${extra_libraries})
+target_link_libraries(orcc-native orcc-runtime ${extra_libraries} ${papi_LIBRARY})
 
 install(TARGETS orcc-native
     ARCHIVE DESTINATION lib
