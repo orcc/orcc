@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.cal;
 
+import java.math.BigInteger;
+
 import net.sf.orcc.cal.conversion.BOOLValueConverter;
 import net.sf.orcc.cal.conversion.DECIMALValueConverter;
 import net.sf.orcc.cal.conversion.HEXValueConverter;
@@ -70,17 +72,17 @@ public class CalValueConverter extends DefaultTerminalConverters {
 	}
 
 	@ValueConverter(rule = "DECIMAL")
-	public IValueConverter<Long> DECIMAL() {
+	public IValueConverter<BigInteger> DECIMAL() {
 		return decimalValueConverter;
 	}
 
 	@ValueConverter(rule = "HEX")
-	public IValueConverter<Long> HEX() {
+	public IValueConverter<BigInteger> HEX() {
 		return hexValueConverter;
 	}
 
 	@ValueConverter(rule = "OCTAL")
-	public IValueConverter<Long> OCTAL() {
+	public IValueConverter<BigInteger> OCTAL() {
 		return octalValueConverter;
 	}
 
