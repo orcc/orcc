@@ -28,7 +28,7 @@ public class DECIMALValueConverter extends AbstractLexerBasedConverter<BigIntege
 	@Override
 	protected void assertValidValue(BigInteger value) {
 		super.assertValidValue(value);
-		if(value.compareTo(BigInteger.ZERO) <0)
+		if (value.compareTo(BigInteger.ZERO) < 0)
 			throw new ValueConverterException(getRuleName()
 					+ "-value may not be negative (value:" + value + ").",
 					null, null);
