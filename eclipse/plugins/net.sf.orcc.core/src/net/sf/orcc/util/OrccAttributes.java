@@ -48,4 +48,6 @@ public interface OrccAttributes {
 	public static final String ALIGNED_ALWAYS = "ALIGNED_ALWAYS";
 	
 	public static final String OUTPUT_SCHEDULABLE = "schedule_outputs";
+	
+	public static final String PAPIFY_ATTRIBUTE = "papify";
 }
