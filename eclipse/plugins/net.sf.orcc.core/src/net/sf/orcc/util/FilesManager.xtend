@@ -359,13 +359,14 @@ class FilesManager {
 	/**
 	 * Write the <em>content</em> into the <em>targetFile</em> only if necessary.
 	 */
-	private static def writeFile(CharSequence content, File targetFile) {
+	static def writeFile(CharSequence content, File targetFile) {
 		if (content.isContentEqual(targetFile)) {
 			return newCachedInstance
 		}
 
-		if (!targetFile.parentFile.exists) {
+		if (!targetFile.exists) {
 			targetFile.parentFile.mkdirs
+			targetFile.createNewFile
 		}
 		val ps = new PrintStream(new FileOutputStream(targetFile))
 		ps.print(content)

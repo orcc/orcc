@@ -205,10 +205,16 @@ public class SmtSolver {
 		output = OrccUtil.getOutputFolder(file.getProject());
 
 		String solverPath = getDefault().getPreference(P_SOLVER, "");
+		solverPath = FilesManager.sanitize(solverPath);
 		if (!solverPath.isEmpty()) {
 			File solverFile = new File(solverPath);
 			if (solverFile.exists()) {
-				solver = solverPath;
+				if(solverFile.canExecute()) {
+					solver = solverPath;
+				} else {
+					throw new OrccRuntimeException("solver " + solverPath
+							+ " is not executable");
+				}
 			} else {
 				throw new OrccRuntimeException("solver executable not found!");
 			}
@@ -275,10 +281,9 @@ public class SmtSolver {
 			}
 			ps.close();
 
-			IFile file = output.getFile(actor.getSimpleName() + "_"
+			File file = new File(output.getLocation().toOSString(), actor.getSimpleName() + "_"
 					+ System.currentTimeMillis() + ".smt2");
-			FilesManager.writeFile(bos.toString(), file.getFullPath().toString());
-
+			FilesManager.writeFile(bos.toString(), file);
 			launchSolver(file);
 		} catch (Exception e) {
 			throw new OrccRuntimeException("could not execute solver", e);
@@ -303,11 +308,11 @@ public class SmtSolver {
 	 *            a file
 	 * @throws IOException
 	 */
-	private void launchSolver(IFile file) throws IOException {
+	private void launchSolver(File file) throws IOException {
 		List<String> allOptions = new ArrayList<String>(options.size() + 2);
 		allOptions.add(solver);
 		allOptions.addAll(options);
-		allOptions.add(file.getLocation().toOSString());
+		allOptions.add(file.getCanonicalPath());
 
 		ProcessBuilder pb = new ProcessBuilder(allOptions);
 		final Process process = pb.start();
@@ -323,7 +328,7 @@ public class SmtSolver {
 				try {
 					String line = reader.readLine();
 					while (line != null) {
-						OrccLogger.severeln(line);
+						OrccLogger.traceln(line);
 						line = reader.readLine();
 					}
 				} catch (IOException e) {
