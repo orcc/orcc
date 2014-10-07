@@ -37,6 +37,8 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.core.runtime.Platform;
+
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.c.transform.CBroadcastAdder;
 import net.sf.orcc.backends.transform.CastAdder;
@@ -221,7 +223,7 @@ public class CBackend extends AbstractBackend {
 		final Result result = FilesManager.extract("/runtime/C/README.txt", outputPath);
 
 		// Copy specific windows batch file
-		if (FilesManager.getCurrentOS() == FilesManager.OS_WINDOWS) {
+		if (Platform.OS_WIN32.equals(Platform.getOS())) {
 			result.merge(FilesManager.extract(
 					"/runtime/C/run_cmake_with_VS_env.bat", outputPath));
 		}

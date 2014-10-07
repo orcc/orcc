@@ -440,26 +440,6 @@ class FilesManager {
 	}
 
 	/**
-	 * <p>Detect the current user operating system, and return one of the constants
-	 * <em>OS_WINDOWS, OS_LINUX, OS_MACOS, OS_UNKNOWN</em> to indicate which system
-	 * has been detected.</p>
-	 * 
-	 * <p>TODO: this method should be tested and fixed on Mac OS</p>
-	 */
-	static def getCurrentOS() {
-		val systemname = System.getProperty("os.name").toLowerCase()
-		if (systemname.startsWith("win")) {
-			OS_WINDOWS
-		} else if (systemname.equals("linux")) {
-			OS_LINUX
-		} else if (systemname.contains("mac")) {
-			OS_MACOS
-		} else {
-			OS_UNKNOWN
-		}
-	}
-
-	/**
 	 * Delete the given d directory and all its content
 	 */
 	static def void recursiveDelete(File d) {

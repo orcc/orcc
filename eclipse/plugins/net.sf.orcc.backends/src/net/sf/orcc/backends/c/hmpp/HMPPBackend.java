@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.backends.c.hmpp;
 
+import org.eclipse.core.runtime.Platform;
+
 import net.sf.orcc.backends.BackendsConstants;
 import net.sf.orcc.backends.c.CBackend;
 import net.sf.orcc.backends.c.CMakePrinter;
@@ -133,7 +135,7 @@ public class HMPPBackend extends CBackend {
 		result.merge(FilesManager.extract("/runtime/C/README.txt", outputPath));
 
 		// Copy specific windows batch file
-		if (FilesManager.getCurrentOS() == FilesManager.OS_WINDOWS) {
+		if (Platform.OS_WIN32.equals(Platform.getOS())) {
 			result.merge(FilesManager.extract(
 					"/runtime/C/run_cmake_with_VS_env.bat", outputPath));
 		}

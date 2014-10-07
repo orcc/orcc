@@ -75,20 +75,6 @@ class FilesManagerTests extends Assert {
 	}
 
 	@Test
-	def operatingSystemDetection() {
-		val os = FilesManager.getCurrentOS
-		if (os == FilesManager.OS_WINDOWS) {
-			new File("C:/Windows").directory.assertTrue
-		} else if (os == FilesManager.OS_LINUX) {
-			new File("/home").directory.assertTrue
-		} else if (os == FilesManager.OS_MACOS) {
-			new File("/Library").directory.assertTrue
-		} else {
-			fail("Unable to detect System")
-		}
-	}
-
-	@Test
 	def pathSanitization() {
 		standardFolder.startsWith("~").assertTrue
 		val result = FilesManager.sanitize(standardFolder)
