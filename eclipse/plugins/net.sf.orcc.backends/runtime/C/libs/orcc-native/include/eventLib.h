@@ -21,8 +21,6 @@
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/time.h>
-//#include <math.h>
-
 #include <pthread.h>
 #include "papiStdEventDefs.h"
 #include <papi.h>
@@ -35,16 +33,7 @@
 
 #define OVER_FMT    "handler(%d ) Overflow at %p! bit=0x%llx \n"
 
-
-/*  Variable to hold reporting status
-	if TRUE, output is suppressed
-	if FALSE output is sent to stdout
-	initialized to FALSE
-	declared here so it can be available globally
-*/
-//int TESTS_QUIET = 0;
 static int TESTS_COLOR = 0;
-//static int TEST_WARN = 0;
 
 //STRUCTURES
 typedef struct papi_action_s {

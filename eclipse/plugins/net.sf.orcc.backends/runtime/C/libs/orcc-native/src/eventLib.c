@@ -6,8 +6,6 @@ int eventSet1 = PAPI_NULL;
 int * eventSet;
 
 
-//int total1 = 0;						   /* total overflows */
-//int total2 = 0;						   /* total overflows */
 int total = 0;
 
 void structure_test(papi_action_s *someAction){
@@ -23,10 +21,6 @@ void structure_test(papi_action_s *someAction){
 void handler( int EventSet, void *address, long long overflow_vector, void *context)
 {
 	( void ) context;
-
-	/*if ( !TESTS_QUIET ) {
-		fprintf( stderr, OVER_FMT, EventSet, address, overflow_vector );
-	}*/
 
 	/* it should be more elaborated to automate the process.
 	if (threadID == 0)
@@ -140,7 +134,6 @@ void event_init(void) {
 
 }
 
-//void event_create_eventList(int eventCodeSetSize, int *eventCodeSet, int threadID, long long *times_ini) {
 void event_create_eventList(int *eventSet, int eventCodeSetSize, int *eventCodeSet, int threadID) { //done?
 
 	int retval, i, maxNumberHwCounters, eventCodeSetMaxSize;
@@ -158,12 +151,6 @@ void event_create_eventList(int *eventSet, int eventCodeSetSize, int *eventCodeS
     retval = PAPI_register_thread();
 	if ( retval != PAPI_OK )
 		test_fail( __FILE__, __LINE__, "PAPI_register_thread", retval );
-
-	// it should be more elaborated to automate the process.
-/*	if (threadID == 0)
-		eventSet = &eventSet0;
-	else
-		eventSet = &eventSet1;*/
 
 	retval = PAPI_create_eventset( eventSet );
 	if ( retval != PAPI_OK )
@@ -189,8 +176,6 @@ void event_create_eventList(int *eventSet, int eventCodeSetSize, int *eventCodeS
 			printf("Adding %s \n", info.symbol);
 
 	}
-    //times_ini[0] = PAPI_get_real_usec();
-    //times_ini[1] = PAPI_get_real_cyc();
 
     printf("event_create_eventList done \n");
 }
@@ -198,21 +183,13 @@ void event_create_eventList(int *eventSet, int eventCodeSetSize, int *eventCodeS
 void event_start(int *eventSet, int threadID){ //done?
 
 	int retval;
-//	int *EventSet;
-	// it should be more elaborated to automate the process.
-/*	if (threadID == 0){
-		eventSet = &eventSet0;
-	}
-	else{
-		eventSet = &eventSet1;
-	}*/
 
 	retval = PAPI_start( *eventSet );
 	if ( retval != PAPI_OK )
 		test_fail( __FILE__, __LINE__, "PAPI_start",retval );
 
-    //printf("event_start done \n");
 }
+
 void overflows_start(int threadID){
 
 	int retval;
@@ -238,28 +215,11 @@ void overflows_start(int threadID){
 void event_stop(int *eventSet, int eventCodeSetSize, long long *PMC, int threadID) { //done?
 
 	int i, retval;
-//	FILE *eventFile;
-
-	// it should be more elaborated to automate the process.
-	/*if (threadID == 0)
-		eventSet = &eventSet0;
-	else
-		eventSet = &eventSet1;*/
 
 	retval = PAPI_stop( *eventSet, PMC );
 	if ( retval != PAPI_OK )
 		test_fail( __FILE__, __LINE__, "PAPI_stop", retval );
 
-/*	eventFile = fopen("event.txt","a+");
-	if(!eventFile)
-		printf("Cannot open the file 'event.txt'!\n");*/
-
-/*	for(i=0; i < eventCodeSetSize; i++)
-		fprintf(eventFile, "%lld \t",PMC[i]);*/
-
-//    fclose(eventFile);
-
-    //printf("event_stop done \n");
 }
 
 void event_destroy_eventList(int threadID, long long *times_fin) {
@@ -296,8 +256,6 @@ void overflows_stop(int threadID){
 	if ( retval != PAPI_OK )
 		test_fail( __FILE__, __LINE__, "PAPI_destroy_eventset", retval );
 
-    //printf("El hilo 0 se ha desbordado %d veces \nEl hilo 1 se ha desbordado %d veces", total1,total2);
-    //printf("There has been %d overflows at the end of the application in thread\n",total, threadID);
     printf("There has been %d overflows at the end of the thread\n",total, threadID);
 }
 
