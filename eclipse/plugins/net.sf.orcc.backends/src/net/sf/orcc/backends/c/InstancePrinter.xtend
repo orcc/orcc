@@ -206,13 +206,6 @@ class InstancePrinter extends CTemplate {
 		#include "dataflow.h"
 		#include "cycle.h"
 		«IF actor.hasAttribute(PAPIFY_ATTRIBUTE) && papify»
-			/* Papify tests
-			Events:
-			«FOR event : actor.getAttribute(PAPIFY_ATTRIBUTE).attributes»
-					«event.name»		
-			«ENDFOR»
-			Number of events: «actor.getAttribute(PAPIFY_ATTRIBUTE).attributes.size»
-			end of tests */
 			#include "eventLib.h"
 			FILE* papi_output_«actor.name»;
 			papi_action_s *Papi_actions_«actor.name»;
@@ -807,7 +800,7 @@ class InstancePrinter extends CTemplate {
 			«IF action.hasAttribute(PAPIFY_ATTRIBUTE) && papify»
 				event_stop(&(Papi_actions_«actor.name»[«papifyActionIndex»].eventSet), Papi_actions_«actor.name»[«papifyActionIndex»].eventCodeSetSize, Papi_actions_«actor.name»[«papifyActionIndex»].counterValues, -1);
 				papi_output_«actor.name» = fopen("papi-output/papi_output_«actor.name».csv","a+");
-				fprintf(papi_output_«actor.name»,"\"%s\";\"%s\";«FOR event : actor.getAttribute(PAPIFY_ATTRIBUTE).attributes» \"%lu\";«ENDFOR»\n",
+				fprintf(papi_output_«actor.name»,"\"%s\";\"%s\";«FOR j : 0..actor.getAttribute(PAPIFY_ATTRIBUTE).attributes.size-1»\"%lu\"«IF j!=actor.getAttribute(PAPIFY_ATTRIBUTE).attributes.size-1»;«ENDIF»«ENDFOR»\n",
 					"«actor.name»", Papi_actions_«actor.name»[«papifyActionIndex»].action_id,
 					«FOR i : 0..actor.getAttribute(PAPIFY_ATTRIBUTE).attributes.size-1»
 						Papi_actions_«actor.name»[«papifyActionIndex»].counterValues[«i»]«IF i!=actor.getAttribute(PAPIFY_ATTRIBUTE).attributes.size-1»,«ELSE»);«ENDIF»
