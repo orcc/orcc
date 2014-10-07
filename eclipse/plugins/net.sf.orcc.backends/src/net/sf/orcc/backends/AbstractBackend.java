@@ -403,7 +403,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				} else if (actor != null) {
 					beforeGeneration(actor);
 					result.merge(doGenerateActor(actor));
-					result.merge(doAdditionalGeneration(instance));
+					result.merge(doAdditionalGeneration(actor));
 				}
 			}
 
