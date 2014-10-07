@@ -15,11 +15,7 @@
 *.txt text
 *.xdf text
 *.xdfdiag text
-
-# Specific configuration
-# Some eclipse plugins set CRLF to MANIFEST.MF files when quickfix is used. To avoid
-# changes in whole files, we set these files to always have CRLF line endings
-MANIFEST.MF text eol=crlf
+MANIFEST.MF text
 
 # Denote all files that are truly binary and should not be modified.
 *.png binary
