@@ -95,6 +95,16 @@ class CalParserTests extends CalTestsHelper {
 	}
 
 	@Test
+	def testBigIntegers() {
+		val entity = '''
+			actor TypeInt() ==> :
+				uint(size=64) bigint := 9223372036854775808;
+			end
+		'''.parse
+		entity.assertNoErrors
+	}
+
+	@Test
 	def testGenerator() {
 		val entity = '''
 			actor Generator() ==> :

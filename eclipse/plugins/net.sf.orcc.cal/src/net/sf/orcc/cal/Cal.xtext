@@ -345,11 +345,11 @@ terminal REAL returns ecore::EFloat :
 
 ExpressionInteger: value=(DECIMAL | OCTAL | HEX);
 
-terminal DECIMAL returns ecore::ELong : ('1'..'9') ('0'..'9')*;
+terminal DECIMAL returns ecore::EBigInteger : ('1'..'9') ('0'..'9')*;
 
-terminal OCTAL returns ecore::ELong : '0' ('0'..'7')*;
+terminal OCTAL returns ecore::EBigInteger : '0' ('0'..'7')*;
 
-terminal HEX returns ecore::ELong : '0' ('x'|'X') ('0'..'9' | 'a'..'f' | 'A'..'F')+ ;
+terminal HEX returns ecore::EBigInteger : '0' ('x'|'X') ('0'..'9' | 'a'..'f' | 'A'..'F')+ ;
 
 ExpressionString: value=STRING;
 

@@ -252,7 +252,7 @@ public class Typer extends CalSwitch<Type> {
 
 	@Override
 	public Type caseExpressionInteger(ExpressionInteger expression) {
-		BigInteger value = BigInteger.valueOf(expression.getValue());
+		BigInteger value = expression.getValue();
 		return IrFactory.eINSTANCE.createTypeIntOrUint(value);
 	}
 
