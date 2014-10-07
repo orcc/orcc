@@ -47,6 +47,8 @@ import static net.sf.orcc.OrccLaunchConstants.TRACES_FOLDER;
 import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
 import static net.sf.orcc.backends.BackendsConstants.ADDITIONAL_TRANSFOS;
 import static net.sf.orcc.backends.BackendsConstants.CONVERT_MULTI2MONO;
+import static net.sf.orcc.backends.BackendsConstants.LLVM_TARGET_DATALAYOUT;
+import static net.sf.orcc.backends.BackendsConstants.LLVM_TARGET_TRIPLE;
 import static net.sf.orcc.backends.BackendsConstants.NEW_SCHEDULER;
 import static net.sf.orcc.backends.BackendsConstants.PROFILE;
 import static net.sf.orcc.backends.BackendsConstants.TTA_PROCESSORS_CONFIGURATION;
@@ -803,6 +805,9 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				true,
 				"(TTA) Predefined configurations for the processors (Standard|Custom|Fast|Huge)");
 
+		options.addOption("dt", "data-layout", true, "(LLVM) Configure the DataLayout printed in generated files");
+		options.addOption("tt", "target-triple", true, "(LLVM) Configure the target triple printed in generated files");
+
 		// FIXME: choose independently the transformation to apply
 		options.addOption("t", "transfo_add", false,
 				"Execute additional transformations before generate code");
@@ -885,6 +890,13 @@ public abstract class AbstractBackend implements Backend, IApplication {
 					OrccLogger
 							.warnln("Unknown processors configuration for TTA. Standard configuration will be apply.");
 				}
+			}
+
+			if (line.hasOption("dl")) {
+				optionMap.put(LLVM_TARGET_DATALAYOUT, line.getOptionValue("dl"));
+			}
+			if (line.hasOption("tt")) {
+				optionMap.put(LLVM_TARGET_TRIPLE, line.getOptionValue("tt"));
 			}
 
 			optionMap.put(NEW_SCHEDULER, line.hasOption("as"));
