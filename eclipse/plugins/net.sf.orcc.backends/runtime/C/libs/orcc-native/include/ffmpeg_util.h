@@ -33,10 +33,10 @@
 #include "types.h"
 
 int MAX_FRAME_SIZE = 500000;
-int MAX_FRAME_DELAY = 16;
+int MAX_FRAME_DELAY = 8;
 
 void ffmpeg_initSource();
 void ffmpeg_closeSource();
-void ffmpeg_readFrame(u8 data[MAX_FRAME_DELAY][MAX_FRAME_SIZE], int size[1], int index);
+void ffmpeg_readFrame(u8 data[MAX_FRAME_DELAY][MAX_FRAME_SIZE], int size[MAX_FRAME_DELAY], int index);
 
 #endif  /* _ORCC_FFMPEG_UTIL_H_ */

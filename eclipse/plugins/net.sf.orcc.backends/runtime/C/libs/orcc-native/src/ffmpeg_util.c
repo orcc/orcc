@@ -69,7 +69,7 @@ void ffmpeg_closeSource() {
     }
 }
 
-void ffmpeg_readFrame(u8 data[MAX_FRAME_DELAY][MAX_FRAME_SIZE], int size[1], int index) {
+void ffmpeg_readFrame(u8 data[MAX_FRAME_DELAY][MAX_FRAME_SIZE], int size[MAX_FRAME_DELAY], int index) {
     int n = av_read_frame(pFormatCtx, pPacket);
 
     if(n == AVERROR_EOF) {
@@ -90,5 +90,5 @@ void ffmpeg_readFrame(u8 data[MAX_FRAME_DELAY][MAX_FRAME_SIZE], int size[1], int
     }
 
     memcpy(data[index], pPacket->data, pPacket->size);
-    size[0] = pPacket->size;
+    size[index] = pPacket->size;
 }
