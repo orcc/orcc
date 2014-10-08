@@ -108,8 +108,6 @@ class InstancePrinter extends CTemplate {
 	var Iterable<Action> papifyActions
 	// List of papi events to register
 	var Iterable<String> papiEvents
-	// Index for actions. This is temporal, until a better alternative is found
-	var int papifyActionIndex = 0;
 
 	protected val Pattern inputPattern = DfFactory::eINSTANCE.createPattern
 	protected val Map<State, Pattern> transitionPattern = new HashMap<State, Pattern>
@@ -603,7 +601,7 @@ class InstancePrinter extends CTemplate {
 				papi_output_«actor.name» = fopen("papi-output/papi_output_«actor.name».csv","w");
 
 				«FOR action : papifyActions»
-					«val papiStructI = '''Papi_actions_«actor.name»[«papifyActions.toList.indexOf(action)»]'''»
+					«val papiStructI = action.papifyStruct»
 					«papiStructI».action_id = malloc(strlen("«action.name»")+1);
 					«papiStructI».action_id = "«action.name»";
 					«papiStructI».eventCodeSetSize = «actor.getAttribute(PAPIFY_ATTRIBUTE).attributes.size»;
@@ -621,11 +619,10 @@ class InstancePrinter extends CTemplate {
 				event_init();
 
 				«FOR action : papifyActions»
-					«val papiStructI = '''Papi_actions_«actor.name»[«papifyActions.toList.indexOf(action)»]'''»
+					«val papiStructI = action.papifyStruct»
 					printf("Creating eventlist for action «action.name» in actor «actor.name»\n");
 					event_create_eventList(&(«papiStructI».eventSet), «papiStructI».eventCodeSetSize, «papiStructI».eventCodeSet, -1);
 				«ENDFOR»
-				«{papifyActionIndex = 0 '' /* because value is stored in between compilations.. */}» 
 				/* End of Papify initialization */
 
 			«ENDIF»
@@ -765,7 +762,7 @@ class InstancePrinter extends CTemplate {
 
 			«IF action.hasAttribute(PAPIFY_ATTRIBUTE) && papify»
 				/* Here goes PAPI init action code */
-				event_start(&(Papi_actions_«actor.name»[«papifyActionIndex»].eventSet), -1);
+				event_start(&(«action.papifyStruct».eventSet), -1);
 			«ENDIF»
 			«FOR variable : action.body.locals»
 				«variable.declare»;
@@ -802,15 +799,15 @@ class InstancePrinter extends CTemplate {
 				«ENDIF»
 			«ENDFOR»
 			«IF action.hasAttribute(PAPIFY_ATTRIBUTE) && papify»
-				event_stop(&(Papi_actions_«actor.name»[«papifyActionIndex»].eventSet), Papi_actions_«actor.name»[«papifyActionIndex»].eventCodeSetSize, Papi_actions_«actor.name»[«papifyActionIndex»].counterValues, -1);
+				«val papiStructI = action.papifyStruct»
+				event_stop(&(«papiStructI».eventSet), «papiStructI».eventCodeSetSize, «papiStructI».counterValues, -1);
 				papi_output_«actor.name» = fopen("papi-output/papi_output_«actor.name».csv","a+");
 				fprintf(papi_output_«actor.name»,"\"%s\";\"%s\";«FOR j : 0..actor.getAttribute(PAPIFY_ATTRIBUTE).attributes.size-1»\"%lu\"«IF j!=actor.getAttribute(PAPIFY_ATTRIBUTE).attributes.size-1»;«ENDIF»«ENDFOR»\n",
-					"«actor.name»", Papi_actions_«actor.name»[«papifyActionIndex»].action_id,
+					"«actor.name»", «papiStructI».action_id,
 					«FOR i : 0..actor.getAttribute(PAPIFY_ATTRIBUTE).attributes.size-1»
-						Papi_actions_«actor.name»[«papifyActionIndex»].counterValues[«i»]«IF i!=actor.getAttribute(PAPIFY_ATTRIBUTE).attributes.size-1»,«ELSE»);«ENDIF»
+						«papiStructI».counterValues[«i»]«IF i!=actor.getAttribute(PAPIFY_ATTRIBUTE).attributes.size-1»,«ELSE»);«ENDIF»
 					«ENDFOR»
 				fclose(papi_output_«actor.name»);
-				«{papifyActionIndex++ ''}»
 			«ENDIF»
 
 			«action.profileEnd»
@@ -878,6 +875,9 @@ class InstancePrinter extends CTemplate {
 			action_«action.name».firings++;
 		«ENDIF»
 	'''
+
+	private def papifyStruct(Action action)
+		'''Papi_actions_«actor.name»[«papifyActions.toList.indexOf(action)»]'''
 
 	def protected print(Action action) {
 		currentAction = action
