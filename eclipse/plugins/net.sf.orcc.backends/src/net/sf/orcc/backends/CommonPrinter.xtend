@@ -58,16 +58,6 @@ abstract class CommonPrinter extends AbstractIrVisitor<CharSequence> {
 		// Force the method return type to void
 		return
 	}
-
-	/**
-	 * Print extra code for array inbounds checking (ex : C assert) at each usage (load/store)
-	 * If exprList is empty, return an empty string.
-	 */
-	def checkArrayInbounds(List<Expression> exprList, List<Integer> dims) {
-		OrccLogger::warnln("This application contains array inbounds check, which is not yet supported. "+
-		"Please override checkArrayInbounds() method in the backend you are using.");
-		return ''''''
-	}
 		
 	/**
 	 * Print indexes list when accessing to an array (ex : <code>[INDEX][2][i + 1]</code>)

@@ -950,15 +950,17 @@ class InstancePrinter extends CTemplate {
 		«inst.target.variable.name» = «inst.value.doSwitch»;
 	'''
 
-	override checkArrayInbounds(List<Expression> exprList, List<Integer> dims) {
-		'''
-			«IF !exprList.empty»
-				«FOR i : 0 .. exprList.size - 1»
-					assert((«exprList.get(i).doSwitch») < «dims.get(i)»);
-				«ENDFOR»
-			«ENDIF»
-		'''
-	}
+	/**
+	 * Print extra code for array inbounds checking (ex: C assert) at each usage (load/store)
+	 * If exprList is empty, return an empty string.
+	 */
+	private def checkArrayInbounds(List<Expression> exprList, List<Integer> dims) '''
+		«IF !exprList.empty»
+			«FOR i : 0 .. exprList.size - 1»
+				assert((«exprList.get(i).doSwitch») < «dims.get(i)»);
+			«ENDFOR»
+		«ENDIF»
+	'''
 
 	override caseInstLoad(InstLoad load) {
 		val target = load.target.variable
@@ -987,12 +989,10 @@ class InstancePrinter extends CTemplate {
 		«IF port != null» ««« Storing data to output FIFO
 			«IF port.native»
 				printf("«port.name» = %i\n", «store.value.doSwitch»);
+			«ELSEIF (isActionAligned && port.hasAttribute(currentAction.name + "_" + ALIGNABLE)) || port.hasAttribute(ALIGNED_ALWAYS)»
+				tokens_«port.name»[(index_«port.name» % SIZE_«port.name») + («store.indexes.head.doSwitch»)] = «store.value.doSwitch»;
 			«ELSE»
-				«IF (isActionAligned && port.hasAttribute(currentAction.name + "_" + ALIGNABLE)) || port.hasAttribute(ALIGNED_ALWAYS)»
-					tokens_«port.name»[(index_«port.name» % SIZE_«port.name») + («store.indexes.head.doSwitch»)] = «store.value.doSwitch»;
-				«ELSE»
-					tokens_«port.name»[(index_«port.name» + («store.indexes.head.doSwitch»)) % SIZE_«port.name»] = «store.value.doSwitch»;
-				«ENDIF»
+				tokens_«port.name»[(index_«port.name» + («store.indexes.head.doSwitch»)) % SIZE_«port.name»] = «store.value.doSwitch»;
 			«ENDIF»
 		«ELSE» ««« Storing data to classical variable
 			«IF checkArrayInbounds»
