@@ -106,6 +106,8 @@ class InstancePrinter extends CTemplate {
 
 	// List of actions annotated with @papify
 	var Iterable<Action> papifyActions
+	// List of papi events to register
+	var Iterable<String> papiEvents
 	// Index for actions. This is temporal, until a better alternative is found
 	var int papifyActionIndex = 0;
 
@@ -194,6 +196,8 @@ class InstancePrinter extends CTemplate {
 	private def initializePapifyOptions() {
 		if(papify) {
 			papifyActions = actor.actions.filter[hasAttribute(PAPIFY_ATTRIBUTE)]
+			// ?. operator ensure no Exception will be thrown if the current actor doesn't have PAPIFY_ATTRIBUTE
+			papiEvents = actor.getAttribute(PAPIFY_ATTRIBUTE)?.attributes?.map[name]
 		}
 	}
 
@@ -604,15 +608,15 @@ class InstancePrinter extends CTemplate {
 					«papiStructI».action_id = "«action.name»";
 					«papiStructI».eventCodeSetSize = «actor.getAttribute(PAPIFY_ATTRIBUTE).attributes.size»;
 					«papiStructI».eventCodeSet = malloc(sizeof(unsigned long) * «papiStructI».eventCodeSetSize);
-					«FOR i : 0 .. actor.getAttribute(PAPIFY_ATTRIBUTE).attributes.size - 1»
-						«papiStructI».eventCodeSet[«i»] = «actor.getAttribute(PAPIFY_ATTRIBUTE).attributes.get(i).name»;
+					«FOR i : 0 .. papiEvents.size - 1»
+						«papiStructI».eventCodeSet[«i»] = «papiEvents.get(i)»;
 					«ENDFOR»
 					«papiStructI».eventSet = malloc(sizeof(int) * «papiStructI».eventCodeSetSize);
 					«papiStructI».eventSet = PAPI_NULL;
 					«papiStructI».counterValues = malloc(sizeof(unsigned long) * «papiStructI».eventCodeSetSize);
 				«ENDFOR»
 
-				fprintf(papi_output_«actor.name»,"Actor; Action; «FOR event : actor.getAttribute(PAPIFY_ATTRIBUTE).attributes» «event.name»;«ENDFOR»\n");
+				fprintf(papi_output_«actor.name»,"Actor; Action; «papiEvents.join('; ')»\n");
 				fclose(papi_output_«actor.name»);
 				event_init();
 
