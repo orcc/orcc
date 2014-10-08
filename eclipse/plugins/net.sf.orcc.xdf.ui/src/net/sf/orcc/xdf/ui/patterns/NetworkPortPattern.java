@@ -285,10 +285,6 @@ abstract public class NetworkPortPattern extends AbstractPattern implements IPat
 		directEditingInfo.setMainPictogramElement(topLevelShape);
 
 		link(topLevelShape, addedDomainObject);
-		// TODO: port Type was linked here, but it is a bad idea since the type
-		// is contained by the port. Instead we should store port type as string
-		// in a property of the shape. Must be implemented when properties tabs
-		// will be available on the graph editor.
 
 		gaService.setLocation(topLevelInvisibleRect, context.getX(), context.getY());
 		layoutPictogramElement(topLevelShape);
