@@ -802,11 +802,10 @@ class InstancePrinter extends CTemplate {
 				«val papiStructI = action.papifyStruct»
 				event_stop(&(«papiStructI».eventSet), «papiStructI».eventCodeSetSize, «papiStructI».counterValues, -1);
 				papi_output_«actor.name» = fopen("papi-output/papi_output_«actor.name».csv","a+");
-				fprintf(papi_output_«actor.name»,"\"%s\";\"%s\";«FOR j : 0..actor.getAttribute(PAPIFY_ATTRIBUTE).attributes.size-1»\"%lu\"«IF j!=actor.getAttribute(PAPIFY_ATTRIBUTE).attributes.size-1»;«ENDIF»«ENDFOR»\n",
+				fprintf(papi_output_«actor.name»,
+					"\"%s\";\"%s\";«(0..papiEvents.size-1).join(';')['''\"%lu\"''']»\n",
 					"«actor.name»", «papiStructI».action_id,
-					«FOR i : 0..actor.getAttribute(PAPIFY_ATTRIBUTE).attributes.size-1»
-						«papiStructI».counterValues[«i»]«IF i!=actor.getAttribute(PAPIFY_ATTRIBUTE).attributes.size-1»,«ELSE»);«ENDIF»
-					«ENDFOR»
+					«(0..papiEvents.size-1).join(', ')['''«papiStructI».counterValues[«it»]''']»);
 				fclose(papi_output_«actor.name»);
 			«ENDIF»
 
