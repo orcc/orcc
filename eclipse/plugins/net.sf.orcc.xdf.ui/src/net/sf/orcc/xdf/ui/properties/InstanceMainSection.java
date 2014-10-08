@@ -48,7 +48,6 @@ public class InstanceMainSection extends AbstractGridBasedSection {
 
 	private Text instanceName;
 	private Text refinementValue;
-	private Text part_name;
 
 	@Override
 	protected String getFormText() {
@@ -68,12 +67,6 @@ public class InstanceMainSection extends AbstractGridBasedSection {
 		refinementValue.setEditable(false);
 		refinementValue.setBackground(disabledFieldBGColor);
 		refinementValue.setLayoutData(fillHorizontalData);
-
-		widgetFactory.createCLabel(formBody, "Part. name:");
-		part_name = widgetFactory.createText(formBody, "", SWT.BORDER);
-		part_name.setLayoutData(fillHorizontalData);
-		part_name.setEditable(false);
-		part_name.setBackground(disabledFieldBGColor);
 	}
 
 	@Override
@@ -92,8 +85,6 @@ public class InstanceMainSection extends AbstractGridBasedSection {
 		} else {
 			refinementValue.setText("");
 		}
-
-		// TODO: get the "part name" value in the instance, and display it
 	}
 
 	@Override
@@ -122,8 +113,6 @@ public class InstanceMainSection extends AbstractGridBasedSection {
 			getFeatureProvider().updateIfPossible(context);
 		} else if (widget == refinementValue) {
 
-		} else if (widget == part_name) {
-			// TODO: write the "part name" in the model
 		}
 	}
 }
