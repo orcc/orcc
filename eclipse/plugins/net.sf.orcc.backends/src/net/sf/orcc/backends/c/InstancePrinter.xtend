@@ -103,8 +103,9 @@ class InstancePrinter extends CTemplate {
 	var boolean debugAction = false
 	
 	var boolean papify = false
-	// Number of actions that will be papified:
-	var int papifyActionsNb = 0;
+
+	// List of actions annotated with @papify
+	var Iterable<Action> papifyActions
 	// Index for actions. This is temporal, until a better alternative is found
 	var int papifyActionIndex = 0;
 
@@ -143,7 +144,7 @@ class InstancePrinter extends CTemplate {
 				inlineActions = !options.get(INLINE_NOTACTIONS) as Boolean
 			}
 		}
-		
+
 		if(options.containsKey(PAPIFY)){
 			papify = options.get(PAPIFY) as Boolean;
 		}
@@ -174,6 +175,7 @@ class InstancePrinter extends CTemplate {
 		setDebug
 		buildInputPattern
 		buildTransitionPattern
+		initializePapifyOptions
 	}
 
 	def setActor(Actor actor) {
@@ -186,6 +188,13 @@ class InstancePrinter extends CTemplate {
 		setDebug
 		buildInputPattern
 		buildTransitionPattern
+		initializePapifyOptions
+	}
+
+	private def initializePapifyOptions() {
+		if(papify) {
+			papifyActions = actor.actions.filter[hasAttribute(PAPIFY_ATTRIBUTE)]
+		}
 	}
 
 	def protected getFileContent() '''
@@ -375,9 +384,6 @@ class InstancePrinter extends CTemplate {
 		////////////////////////////////////////////////////////////////////////////////
 		// Actions
 		«FOR action : actor.actions»
-			«IF (action.hasAttribute(PAPIFY_ATTRIBUTE) && papify)»
-				«{papifyActionsNb++ ''}»
-			«ENDIF»
 			«action.print()»
 		«ENDFOR»
 
@@ -592,7 +598,7 @@ class InstancePrinter extends CTemplate {
 			«IF actor.hasAttribute(PAPIFY_ATTRIBUTE) && papify»
 				/* Papify initialization */
 				mkdir("papi-output", 0777);
-				Papi_actions_«actor.name» = malloc(sizeof(papi_action_s) * «papifyActionsNb»);
+				Papi_actions_«actor.name» = malloc(sizeof(papi_action_s) * «papifyActions.size»);
 				papi_output_«actor.name» = fopen("papi-output/papi_output_«actor.name».csv","w");
 				«FOR action : actor.actions»
 					«IF (action.hasAttribute(PAPIFY_ATTRIBUTE))»
