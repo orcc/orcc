@@ -585,10 +585,7 @@ class InstancePrinter extends CTemplate {
 		«ENDFOR»
 	'''
 
-	def protected printInitialize() {
-		var i = 0; // used for indexing actions
-		var k = 0; // used for indexing events
-	'''
+	def protected printInitialize() '''
 		«FOR init : actor.initializes»
 			«init.print()»
 		«ENDFOR»
@@ -600,32 +597,33 @@ class InstancePrinter extends CTemplate {
 				mkdir("papi-output", 0777);
 				Papi_actions_«actor.name» = malloc(sizeof(papi_action_s) * «papifyActions.size»);
 				papi_output_«actor.name» = fopen("papi-output/papi_output_«actor.name».csv","w");
+
 				«FOR action : papifyActions»
-					Papi_actions_«actor.name»[«i»].action_id = malloc(strlen("«action.name»")+1);
-					Papi_actions_«actor.name»[«i»].action_id = "«action.name»";
-					Papi_actions_«actor.name»[«i»].eventCodeSetSize = «actor.getAttribute(PAPIFY_ATTRIBUTE).attributes.size»;
-					Papi_actions_«actor.name»[«i»].eventCodeSet = malloc(sizeof(unsigned long)*Papi_actions_«actor.name»[«i»].eventCodeSetSize);
-					«{k = 0 ''}»
-					«FOR event : actor.getAttribute(PAPIFY_ATTRIBUTE).attributes»
-						Papi_actions_«actor.name»[«i»].eventCodeSet[«k++»] = «event.name»;
+					«val papiStructI = '''Papi_actions_«actor.name»[«papifyActions.toList.indexOf(action)»]'''»
+					«papiStructI».action_id = malloc(strlen("«action.name»")+1);
+					«papiStructI».action_id = "«action.name»";
+					«papiStructI».eventCodeSetSize = «actor.getAttribute(PAPIFY_ATTRIBUTE).attributes.size»;
+					«papiStructI».eventCodeSet = malloc(sizeof(unsigned long) * «papiStructI».eventCodeSetSize);
+					«FOR i : 0 .. actor.getAttribute(PAPIFY_ATTRIBUTE).attributes.size - 1»
+						«papiStructI».eventCodeSet[«i»] = «actor.getAttribute(PAPIFY_ATTRIBUTE).attributes.get(i).name»;
 					«ENDFOR»
-					Papi_actions_«actor.name»[«i»].eventSet = malloc(sizeof(int) * Papi_actions_«actor.name»[«i»].eventCodeSetSize);
-					Papi_actions_«actor.name»[«i»].eventSet = PAPI_NULL;
-					Papi_actions_«actor.name»[«i»].counterValues = malloc(sizeof(unsigned long) * Papi_actions_«actor.name»[«i»].eventCodeSetSize);
-					«{i++ ''}»
+					«papiStructI».eventSet = malloc(sizeof(int) * «papiStructI».eventCodeSetSize);
+					«papiStructI».eventSet = PAPI_NULL;
+					«papiStructI».counterValues = malloc(sizeof(unsigned long) * «papiStructI».eventCodeSetSize);
 				«ENDFOR»
+
 				fprintf(papi_output_«actor.name»,"Actor; Action; «FOR event : actor.getAttribute(PAPIFY_ATTRIBUTE).attributes» «event.name»;«ENDFOR»\n");
 				fclose(papi_output_«actor.name»);
 				event_init();
 
-				«{i = 0 ''}»
 				«FOR action : papifyActions»
+					«val papiStructI = '''Papi_actions_«actor.name»[«papifyActions.toList.indexOf(action)»]'''»
 					printf("Creating eventlist for action «action.name» in actor «actor.name»\n");
-					event_create_eventList(&(Papi_actions_«actor.name»[«i»].eventSet), Papi_actions_«actor.name»[«i»].eventCodeSetSize, Papi_actions_«actor.name»[«i»].eventCodeSet, -1);
-					«{i++ ''}»
+					event_create_eventList(&(«papiStructI».eventSet), «papiStructI».eventCodeSetSize, «papiStructI».eventCodeSet, -1);
 				«ENDFOR»
 				«{papifyActionIndex = 0 '' /* because value is stored in between compilations.. */}» 
 				/* End of Papify initialization */
+
 			«ENDIF»
 			«additionalInitializes»
 			«FOR port : actor.outputs.notNative»
@@ -647,7 +645,6 @@ class InstancePrinter extends CTemplate {
 			return;
 		}
 	'''
-	}
 
 	def protected checkConnectivy() {
 		for(port : actor.inputs.filter[incomingPortMap.get(it) == null]) {
