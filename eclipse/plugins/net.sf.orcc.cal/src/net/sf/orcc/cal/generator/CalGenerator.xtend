@@ -119,7 +119,7 @@ class CalGenerator implements IGenerator {
 
 		val irSubPath = calResource.irRelativePath
 
-		if(loadedResources.contains(calResource)) {
+		if (loadedResources.contains(calResource)) {
 			return
 		}
 
@@ -127,10 +127,11 @@ class CalGenerator implements IGenerator {
 		// before doing the serialization
 		val toImport = calResource.entity.importedResource.filter[!loadedResources.contains(it)]
 
-		for(importedResource : toImport) {
+		for (importedResource : toImport) {
+
 			// The imported resource is in the same project. We need to transform
 			// and serialize it BEFORE the calResource
-			if(importedResource.isInSameProject(calResource)) {
+			if (importedResource.isInSameProject(calResource)) {
 				importedResource.doGenerate(fsa)
 			}
 			// The imported resource is in another project. If Xtext did its job correctly,
@@ -153,9 +154,9 @@ class CalGenerator implements IGenerator {
 	 */
 	private def serialize(Resource calResource) {
 		val astEntity = calResource.entity
+
 		// Transform the AstEntity into an Actor or a Unit
-		val entity =
-			if (astEntity.unit != null) {
+		val entity = if (astEntity.unit != null) {
 				unitTransformer.doSwitch(astEntity.unit)
 			} else if (astEntity.actor != null) {
 				actorTransformer.doSwitch(astEntity.actor)
@@ -170,6 +171,7 @@ class CalGenerator implements IGenerator {
 		}
 
 		val irResource = irResourceSet.createResource(OrccUtil::getIrUri(calResource.URI))
+
 		// Associate the current entity to its resource
 		irResource.contents.add(entity)
 
@@ -189,17 +191,17 @@ class CalGenerator implements IGenerator {
 		val unit = irResource.contents.head as Unit
 		val astUnit = calResource.entity.unit
 
-		for(astConstant : astUnit.variables) {
+		for (astConstant : astUnit.variables) {
 			val irConstant = unit.getConstant(astConstant.name)
 			Frontend::instance.putMapping(astConstant, irConstant)
 		}
 
-		for(function : astUnit.functions) {
+		for (function : astUnit.functions) {
 			val procedure = unit.getProcedure(function.name)
 			Frontend::instance.putMapping(function, procedure)
 		}
 
-		for(astProcedure : astUnit.procedures) {
+		for (astProcedure : astUnit.procedures) {
 			val procedure = unit.getProcedure(astProcedure.name)
 			Frontend::instance.putMapping(astProcedure, procedure)
 		}
@@ -231,9 +233,9 @@ class CalGenerator implements IGenerator {
 		val path = new Path(calResource.URI.toPlatformString(true))
 		val file = ResourcesPlugin.workspace.root.getFile(path)
 		file.projectRelativePath.removeFirstSegments(1) // Remove folder (src) part
-			.removeFileExtension						// Remove suffix (cal)
-			.addFileExtension(OrccUtil.IR_SUFFIX) 		// Add the new suffix (ir)
-			.toString									// Returns the string representation of the path
+		.removeFileExtension							// Remove suffix (cal)
+		.addFileExtension(OrccUtil.IR_SUFFIX) 			// Add the new suffix (ir)
+		.toString // Returns the string representation of the path
 	}
 
 	/**
@@ -241,9 +243,9 @@ class CalGenerator implements IGenerator {
 	 */
 	private def getImportedResource(AstEntity astEntity) {
 		val dependingResource = newHashSet
-		for(imp : astEntity.imports) {
+		for (imp : astEntity.imports) {
 			val calFile = imp.getExistingCalFile
-			if(calFile != null) {
+			if (calFile != null) {
 				dependingResource.add(
 					calResourceSet.getResource(URI.createPlatformResourceURI(calFile.fullPath.toString, true), true)
 				)
@@ -259,11 +261,11 @@ class CalGenerator implements IGenerator {
 	private def getExistingCalFile(Import imported) {
 		val lastDotIndex = imported.importedNamespace.lastIndexOf('.')
 		val unitQualifiedName = imported.importedNamespace.substring(0, lastDotIndex)
-		val unitPath = new Path(unitQualifiedName.replace('.','/')).addFileExtension(OrccUtil::CAL_SUFFIX)
+		val unitPath = new Path(unitQualifiedName.replace('.', '/')).addFileExtension(OrccUtil::CAL_SUFFIX)
 
 		for (folder : OrccUtil::getAllSourceFolders(currentProject)) {
 			val ifile = folder.getFile(unitPath)
-			if(ifile.exists) {
+			if (ifile.exists) {
 				return ifile
 			}
 		}
@@ -274,8 +276,10 @@ class CalGenerator implements IGenerator {
 	 * Perform cleans needed by the end of a session.
 	 */
 	def afterBuild() {
+
 		// We need to flush all Caches, because it can explode the memory consumption...
 		CacheManager.instance.unloadAllCaches();
+
 		// The current build session ends, reset the sets
 		loadedResources.clear
 	}
