@@ -124,7 +124,7 @@ if(USE_SSE)
 endif()
 
 
-include_directories(${extra_includes} ${PAPI_INCLUDE_DIR})
+include_directories(${extra_includes})
 add_definitions(${extra_definitions})
 # Compile libraries
 add_library(orcc-native STATIC ${orcc_native_sources} ${orcc_native_headers})
