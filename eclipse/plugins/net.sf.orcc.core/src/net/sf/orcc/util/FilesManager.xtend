@@ -55,13 +55,6 @@ import static net.sf.orcc.util.Result.*
  */
 class FilesManager {
 
-	// TODO: In a future version, a classical java enum could be
-	// used here. This is possible only with Xtend 2.4
-	public static val OS_WINDOWS = 1
-	public static val OS_LINUX = 2
-	public static val OS_MACOS = 3
-	public static val OS_UNKNOWN = 4
-
 	private static val BUFFER_SIZE = 1024
 
 	/**
