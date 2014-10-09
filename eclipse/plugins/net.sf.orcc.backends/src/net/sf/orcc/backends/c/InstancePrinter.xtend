@@ -1040,7 +1040,8 @@ class InstancePrinter extends CTemplate {
 				«ELSE»
 					«target.name» = tokens_«port.name»[(index_«port.name» + («load.indexes.head.doSwitch»)) % SIZE_«port.name»];
 				«ENDIF»
-			«ELSE» ««« Loading data from classical variable
+			«ELSE»
+				««« Loading data from classical variable
 				«IF checkArrayInbounds»
 					«load.indexes.checkArrayInbounds(source.type.dimensions)»
 				«ENDIF»
@@ -1053,20 +1054,21 @@ class InstancePrinter extends CTemplate {
 		val target = store.target.variable
 		val port = target.port
 		'''
-		«IF port != null» ««« Storing data to output FIFO
-			«IF port.native»
-				printf("«port.name» = %i\n", «store.value.doSwitch»);
-			«ELSEIF (isActionAligned && port.hasAttribute(currentAction.name + "_" + ALIGNABLE)) || port.hasAttribute(ALIGNED_ALWAYS)»
-				tokens_«port.name»[(index_«port.name» % SIZE_«port.name») + («store.indexes.head.doSwitch»)] = «store.value.doSwitch»;
+			«IF port != null» ««« Storing data to output FIFO
+				«IF port.native»
+					printf("«port.name» = %i\n", «store.value.doSwitch»);
+				«ELSEIF (isActionAligned && port.hasAttribute(currentAction.name + "_" + ALIGNABLE)) || port.hasAttribute(ALIGNED_ALWAYS)»
+					tokens_«port.name»[(index_«port.name» % SIZE_«port.name») + («store.indexes.head.doSwitch»)] = «store.value.doSwitch»;
+				«ELSE»
+					tokens_«port.name»[(index_«port.name» + («store.indexes.head.doSwitch»)) % SIZE_«port.name»] = «store.value.doSwitch»;
+				«ENDIF»
 			«ELSE»
-				tokens_«port.name»[(index_«port.name» + («store.indexes.head.doSwitch»)) % SIZE_«port.name»] = «store.value.doSwitch»;
+				««« Storing data to classical variable
+				«IF checkArrayInbounds»
+					«store.indexes.checkArrayInbounds(target.type.dimensions)»
+				«ENDIF»
+				«target.name»«store.indexes.printArrayIndexes» = «store.value.doSwitch»;
 			«ENDIF»
-		«ELSE» ««« Storing data to classical variable
-			«IF checkArrayInbounds»
-				«store.indexes.checkArrayInbounds(target.type.dimensions)»
-			«ENDIF»
-			«target.name»«store.indexes.printArrayIndexes» = «store.value.doSwitch»;
-		«ENDIF»
 		'''
 	}
 
