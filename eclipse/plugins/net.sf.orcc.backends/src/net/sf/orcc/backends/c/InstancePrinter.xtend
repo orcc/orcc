@@ -114,14 +114,6 @@ class InstancePrinter extends CTemplate {
 
 	protected var Action currentAction;
 
-	/**
-	 * Default constructor, used only by another backend (when subclass) which
-	 * not print instances but actors
-	 */
-	protected new() {
-		instance = null
-	}
-
 	override setOptions(Map<String, Object> options) {
 		super.setOptions(options)
 		if(options.containsKey(PROFILE)){

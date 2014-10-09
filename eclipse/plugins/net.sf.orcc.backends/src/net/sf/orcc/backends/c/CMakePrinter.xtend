@@ -38,7 +38,7 @@ import net.sf.orcc.df.Network
  * @author Antoine Lorence
  */
 class CMakePrinter extends CommonPrinter {
-	
+
 	protected var Network network
 
 	def setNetwork(Network network) {
