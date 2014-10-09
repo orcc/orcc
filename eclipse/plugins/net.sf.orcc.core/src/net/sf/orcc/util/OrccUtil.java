@@ -31,6 +31,7 @@ package net.sf.orcc.util;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -54,10 +55,10 @@ import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.Diagnostician;
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.core.JavaModelException;
+
+import com.google.common.base.Joiner;
 
 /**
  * This class contains utility methods for dealing with resources.
@@ -379,76 +380,28 @@ public class OrccUtil {
 	 *         source folder
 	 */
 	public static String getQualifiedName(IFile file) {
-		IProject project = file.getProject();
-
-		IJavaProject javaProject = JavaCore.create(project);
-		if (!javaProject.exists()) {
-			return null;
-		}
-
-		try {
-			IPath path = file.getParent().getFullPath();
-			IPackageFragment fragment = null;
-			if (javaProject.getOutputLocation().isPrefixOf(path)) {
-				// create relative path
-				int count = path.matchingFirstSegments(javaProject
-						.getOutputLocation());
-				IPath relPath = path.removeFirstSegments(count);
-
-				// creates full path to source
-				for (IFolder folder : getSourceFolders(project)) {
-					path = folder.getFullPath().append(relPath);
-					fragment = javaProject.findPackageFragment(path);
-					if (fragment != null) {
-						break;
-					}
-				}
-			} else {
-				fragment = javaProject.findPackageFragment(path);
-			}
-
-			if (fragment == null) {
-				return null;
-			}
-
-			String name = file.getFullPath().removeFileExtension()
-					.lastSegment();
-			if (fragment.isDefaultPackage()) {
-				// handles the default package case
-				return name;
-			}
-			return fragment.getElementName() + "." + name;
-		} catch (JavaModelException e) {
-			e.printStackTrace();
-			return null;
-		}
+		final String name = file.getFullPath().removeFileExtension().lastSegment();
+		return getQualifiedPackage(file) + '.' + name;
 	}
 
 	/**
 	 * Returns the qualified package of the given file, i.e. qualified.name.of
 	 * for <code>/project/sourceFolder/qualified/name/of/File.fileExt</code>
+	 * even if the file doesn't exists.
 	 * 
 	 * @param file
 	 *            a file
-	 * @return a qualified name, or <code>null</code> if the file is not in a
-	 *         source folder
+	 * @return a qualified name, or an empty String
 	 */
 	public static String getQualifiedPackage(IFile file) {
-		IProject project = file.getProject();
-
-		IJavaProject javaProject = JavaCore.create(project);
-		if (!javaProject.exists()) {
-			return null;
-		}
-
-		try {
-			IPath path = file.getParent().getFullPath();
-			IPackageFragment fragment = javaProject.findPackageFragment(path);
-			return fragment.getElementName();
-		} catch (JavaModelException e) {
-			e.printStackTrace();
-			return null;
-		}
+		// Get all segments in the file's container's project-relative path
+		final String[] segments = file.getParent().getProjectRelativePath()
+				.segments();
+		// Remove the first part of these segments (the source folder)
+		final String[] segmentsTail = Arrays.copyOfRange(segments, 1,
+				segments.length);
+		// Join the result with '.', this is the package of the file.
+		return Joiner.on('.').join(segmentsTail);
 	}
 
 	/**
