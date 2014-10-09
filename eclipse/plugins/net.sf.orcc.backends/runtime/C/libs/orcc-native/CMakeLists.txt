@@ -31,7 +31,6 @@ else()
     message(STATUS "Cannot find OpenCV")
 endif()
 
-
 # Helps CMake to find SDL libraries (Windows only)
 if(WIN32)
     # Detect current architecture. Depending on CMAKE_LIBRARY_ARCHITECTURE value,
@@ -95,6 +94,14 @@ if(FFMPEG_FOUND)
     message(STATUS "Find FFmpeg: ${FFMPEG_LIBRARIES}")
 else()
     message(STATUS "Cannot find FFmpeg")
+endif()
+
+find_library(papi_LIBRARY papi)
+if(papi_LIBRARY)
+    list(APPEND orcc_native_sources src/eventLib.c)
+    list(APPEND orcc_native_headers include/eventLib.h)
+    list(APPEND extra_libraries ${papi_LIBRARY})
+    list(APPEND extra_includes /usr/local/include)
 endif()
 
 option(USE_SSE "Use SSE native functions if available" 0)

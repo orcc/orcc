@@ -71,5 +71,7 @@ public class BackendsConstants {
 
 	public static final String JIT_BIT_ACCURATE = "net.sf.orcc.backends.llvm.jit.bitaccurate";
 	public static final boolean JIT_BIT_ACCURATE_DEFAULT = false;
+	
+	public static final String PAPIFY = "net.sf.orcc.backends.papify";
 
 }

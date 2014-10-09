@@ -101,6 +101,13 @@ class InstancePrinter extends CTemplate {
 	
 	var boolean debugActor = false
 	var boolean debugAction = false
+	
+	var boolean papify = false
+
+	// List of actions annotated with @papify
+	var Iterable<Action> papifyActions
+	// List of papi events to register
+	var Iterable<String> papiEvents
 
 	protected val Pattern inputPattern = DfFactory::eINSTANCE.createPattern
 	protected val Map<State, Pattern> transitionPattern = new HashMap<State, Pattern>
@@ -137,6 +144,10 @@ class InstancePrinter extends CTemplate {
 				inlineActions = !options.get(INLINE_NOTACTIONS) as Boolean
 			}
 		}
+
+		if(options.containsKey(PAPIFY)){
+			papify = options.get(PAPIFY) as Boolean;
+		}
 	}
 
 	def getInstanceContent(Instance instance) {
@@ -164,6 +175,7 @@ class InstancePrinter extends CTemplate {
 		setDebug
 		buildInputPattern
 		buildTransitionPattern
+		initializePapifyOptions
 	}
 
 	def setActor(Actor actor) {
@@ -176,6 +188,15 @@ class InstancePrinter extends CTemplate {
 		setDebug
 		buildInputPattern
 		buildTransitionPattern
+		initializePapifyOptions
+	}
+
+	private def initializePapifyOptions() {
+		if(papify) {
+			papifyActions = actor.actions.filter[hasAttribute(PAPIFY_ATTRIBUTE)]
+			// ?. operator ensure no Exception will be thrown if the current actor doesn't have PAPIFY_ATTRIBUTE
+			papiEvents = actor.getAttribute(PAPIFY_ATTRIBUTE)?.attributes?.map[name]
+		}
 	}
 
 	def protected getFileContent() '''
@@ -195,6 +216,11 @@ class InstancePrinter extends CTemplate {
 		#include "scheduler.h"
 		#include "dataflow.h"
 		#include "cycle.h"
+		«IF actor.hasAttribute(PAPIFY_ATTRIBUTE) && papify»
+			#include "eventLib.h"
+			FILE* papi_output_«actor.name»;
+			papi_action_s *Papi_actions_«actor.name»;
+		«ENDIF»
 		«IF profile»
 			#include "profiling.h"
 		«ENDIF»
@@ -568,6 +594,38 @@ class InstancePrinter extends CTemplate {
 
 		«inline»void «entityName»_initialize(schedinfo_t *si) {
 			int i = 0;
+			«IF actor.hasAttribute(PAPIFY_ATTRIBUTE) && papify»
+				/* Papify initialization */
+				mkdir("papi-output", 0777);
+				Papi_actions_«actor.name» = malloc(sizeof(papi_action_s) * «papifyActions.size»);
+				papi_output_«actor.name» = fopen("papi-output/papi_output_«actor.name».csv","w");
+
+				«FOR action : papifyActions»
+					«val papiStructI = action.papifyStruct»
+					«papiStructI».action_id = malloc(strlen("«action.name»")+1);
+					«papiStructI».action_id = "«action.name»";
+					«papiStructI».eventCodeSetSize = «actor.getAttribute(PAPIFY_ATTRIBUTE).attributes.size»;
+					«papiStructI».eventCodeSet = malloc(sizeof(unsigned long) * «papiStructI».eventCodeSetSize);
+					«FOR i : 0 .. papiEvents.size - 1»
+						«papiStructI».eventCodeSet[«i»] = «papiEvents.get(i)»;
+					«ENDFOR»
+					«papiStructI».eventSet = malloc(sizeof(int) * «papiStructI».eventCodeSetSize);
+					«papiStructI».eventSet = PAPI_NULL;
+					«papiStructI».counterValues = malloc(sizeof(unsigned long) * «papiStructI».eventCodeSetSize);
+				«ENDFOR»
+
+				fprintf(papi_output_«actor.name»,"Actor; Action; «papiEvents.join('; ')»\n");
+				fclose(papi_output_«actor.name»);
+				event_init();
+
+				«FOR action : papifyActions»
+					«val papiStructI = action.papifyStruct»
+					printf("Creating eventlist for action «action.name» in actor «actor.name»\n");
+					event_create_eventList(&(«papiStructI».eventSet), «papiStructI».eventCodeSetSize, «papiStructI».eventCodeSet, -1);
+				«ENDFOR»
+				/* End of Papify initialization */
+
+			«ENDIF»
 			«additionalInitializes»
 			«FOR port : actor.outputs.notNative»
 				write_«port.name»();
@@ -702,6 +760,10 @@ class InstancePrinter extends CTemplate {
 		static «IF inlineActions»«inline»«ELSE»«noInline»«ENDIF»void «action.body.name»«IF isAligned»_aligned«ENDIF»() {
 			«action.profileStart»
 
+			«IF action.hasAttribute(PAPIFY_ATTRIBUTE) && papify»
+				/* Here goes PAPI init action code */
+				event_start(&(«action.papifyStruct».eventSet), -1);
+			«ENDIF»
 			«FOR variable : action.body.locals»
 				«variable.declare»;
 			«ENDFOR»
@@ -736,6 +798,16 @@ class InstancePrinter extends CTemplate {
 					write_end_«port.name»();
 				«ENDIF»
 			«ENDFOR»
+			«IF action.hasAttribute(PAPIFY_ATTRIBUTE) && papify»
+				«val papiStructI = action.papifyStruct»
+				event_stop(&(«papiStructI».eventSet), «papiStructI».eventCodeSetSize, «papiStructI».counterValues, -1);
+				papi_output_«actor.name» = fopen("papi-output/papi_output_«actor.name».csv","a+");
+				fprintf(papi_output_«actor.name»,
+					"\"%s\";\"%s\";«(0..papiEvents.size-1).join(';')['''\"%lu\"''']»\n",
+					"«actor.name»", «papiStructI».action_id,
+					«(0..papiEvents.size-1).join(', ')['''«papiStructI».counterValues[«it»]''']»);
+				fclose(papi_output_«actor.name»);
+			«ENDIF»
 
 			«action.profileEnd»
 		}
@@ -802,6 +874,9 @@ class InstancePrinter extends CTemplate {
 			action_«action.name».firings++;
 		«ENDIF»
 	'''
+
+	private def papifyStruct(Action action)
+		'''Papi_actions_«actor.name»[«papifyActions.toList.indexOf(action)»]'''
 
 	def protected print(Action action) {
 		currentAction = action

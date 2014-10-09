@@ -50,6 +50,7 @@ import static net.sf.orcc.backends.BackendsConstants.CONVERT_MULTI2MONO;
 import static net.sf.orcc.backends.BackendsConstants.LLVM_TARGET_DATALAYOUT;
 import static net.sf.orcc.backends.BackendsConstants.LLVM_TARGET_TRIPLE;
 import static net.sf.orcc.backends.BackendsConstants.NEW_SCHEDULER;
+import static net.sf.orcc.backends.BackendsConstants.PAPIFY;
 import static net.sf.orcc.backends.BackendsConstants.PROFILE;
 import static net.sf.orcc.backends.BackendsConstants.TTA_PROCESSORS_CONFIGURATION;
 import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER;
@@ -797,6 +798,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				"Transform high-level actors with multi-tokens actions"
 						+ " in low-level actors with mono-token actions");
 		options.addOption("prof", "profile", false, "(C) Enable profiling");
+		options.addOption("papify", false, "(C) Enable papi performance tool analyzer code printing.");
 		options.addOption("et", "enable-traces", true,
 				"(C) Enable tracing of the FIFOs in the given directory");
 		options.addOption(
@@ -903,6 +905,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			optionMap.put(CONVERT_MULTI2MONO, line.hasOption("m2m"));
 			optionMap.put(ADDITIONAL_TRANSFOS, line.hasOption('t'));
 			optionMap.put(PROFILE, line.hasOption("prof"));
+			optionMap.put(PAPIFY, line.hasOption("papify"));
 
 			// Set back-end name in options map
 			String backend = this.getClass().getName();
