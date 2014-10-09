@@ -257,6 +257,17 @@ public class CBackend extends AbstractBackend {
 			File f = new File(getOption(BXDF_FILE, ""));
 			new XmlBufferSizeConfiguration().load(f, network);
 		}
+
+		if(network.getVertex(network.getSimpleName()) != null) {
+			final StringBuilder warnMsg = new StringBuilder();
+			warnMsg.append('"').append(network.getSimpleName()).append('"');
+			warnMsg.append(" is the name of both the network you want to generate");
+			warnMsg.append(" and a vertex in this network.").append('\n');
+			warnMsg.append("The 2 entities will be generated");
+			warnMsg.append(" in the same file. Please rename one of these elements to prevent");
+			warnMsg.append(" unwanted overwriting.");
+			OrccLogger.warnln(warnMsg.toString());
+		}
 	}
 
 	@Override
