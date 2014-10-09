@@ -32,8 +32,8 @@ static void test_fail( char *file, int line, char *call, int retval ) {
     }
 
     if (retval == PAPI_ESYS) {
-        sprintf(buf, "System error in %s", call);
-        perror(buf);
+	    sprintf(buf, "System error in %s", call);
+	    perror(buf);
     } else if (retval > 0) {
         fprintf(stdout, "Error: %s\n", call);
     } else if (retval == 0) {
