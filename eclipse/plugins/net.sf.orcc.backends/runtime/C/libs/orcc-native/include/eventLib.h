@@ -30,11 +30,8 @@
 #define GREEN  "\033[1;32m"
 #define NORMAL "\033[0m"
 
-#define OVER_FMT    "handler(%d ) Overflow at %p! bit=0x%llx \n"
-
 static int TESTS_COLOR = 0;
 
-//STRUCTURES
 typedef struct papi_action_s {
     char *action_id;
     int eventCodeSetSize;
