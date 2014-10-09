@@ -73,6 +73,3 @@ void set_realtime_priority() {
     print_orcc_trace(ORCC_VL_VERBOSE_2, "Thread priority is %d", params.sched_priority);
     #endif
 }
-
-
-

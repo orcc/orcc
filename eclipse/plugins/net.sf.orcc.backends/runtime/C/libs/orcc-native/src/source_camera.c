@@ -56,42 +56,42 @@ int width, height;
  * used by an RVC-CAL actor compiled with Orcc */
 void readCameraFrame(uchar *rArr, uchar *gArr, uchar *bArr){
 
-  /* for loop initalisation variables */
-  int h, w;
+    /* for loop initalisation variables */
+    int h, w;
 
-  /* try and grab the next frame */
-  if(!cvGrabFrame(capture)){
-    printf("Could not grab a camera frame\n");
-    exit(0);
-  }
-  img=cvRetrieveFrame(capture,0);
-  int nchannels = img->nChannels;
-  int step      = img->widthStep;
-  uchar *frame = ( uchar* )img->imageData;
-
-  /* loop over all pixels, writing the R G and B channel uchar values
-   * to its corresponding array */
-  const int R = 2;
-  const int G = 1;
-  const int B = 0;
-  int pixelCount=0;
-  for (h=0; h < height; h++){
-    for (w = 0; w < width; w++){
-      char* rgb = frame + step * h + w * 3;
-      bArr[pixelCount] = rgb[B];
-      gArr[pixelCount] = rgb[G];
-      rArr[pixelCount] = rgb[R];
-      pixelCount++;
+    /* try and grab the next frame */
+    if(!cvGrabFrame(capture)){
+        printf("Could not grab a camera frame\n");
+        exit(0);
     }
-  }
+    img=cvRetrieveFrame(capture,0);
+    int nchannels = img->nChannels;
+    int step      = img->widthStep;
+    uchar *frame = ( uchar* )img->imageData;
+
+    /* loop over all pixels, writing the R G and B channel uchar values
+    * to its corresponding array */
+    const int R = 2;
+    const int G = 1;
+    const int B = 0;
+    int pixelCount=0;
+    for (h=0; h < height; h++){
+        for (w = 0; w < width; w++){
+            char* rgb = frame + step * h + w * 3;
+            bArr[pixelCount] = rgb[B];
+            gArr[pixelCount] = rgb[G];
+            rArr[pixelCount] = rgb[R];
+            pixelCount++;
+        }
+    }
 }
 
 /* must be called before `readCameraFrame` to initalise the camera */
 void source_camera_init(int local_width, int local_height){
-  capture = cvCaptureFromCAM(0);
-  img = 0;
-  width=local_width;
-  height=local_height;
+    capture = cvCaptureFromCAM(0);
+    img = 0;
+    width=local_width;
+    height=local_height;
 }
 
 
@@ -112,19 +112,18 @@ void source_camera_init(int local_width, int local_height){
 
 int main()
 {
-  source_camera_init(WIDTH,HEIGHT);
-  static uchar rArr[PIXELS];
-  static uchar gArr[PIXELS];
-  static uchar bArr[PIXELS];
+    source_camera_init(WIDTH,HEIGHT);
+    static uchar rArr[PIXELS];
+    static uchar gArr[PIXELS];
+    static uchar bArr[PIXELS];
 
-  cvNamedWindow("image", CV_WINDOW_AUTOSIZE);
+    cvNamedWindow("image", CV_WINDOW_AUTOSIZE);
 
-  for (;;){
-    readCameraFrame(rArr,gArr,bArr);
-    cvShowImage("image", img);
-    if(cvWaitKey(30) >= 0) break;
-  }
-
-  cvDestroyWindow("image");
+    for (;;){
+        readCameraFrame(rArr,gArr,bArr);
+        cvShowImage("image", img);
+        if(cvWaitKey(30) >= 0) break;
+    }
+    cvDestroyWindow("image");
 }
 */

@@ -1,5 +1,5 @@
 /* Standard headers for PAPI test applications.
-	This file is customized to hide Windows / Unix differences.
+    This file is customized to hide Windows / Unix differences.
 */
 
 #include <stdlib.h>
@@ -30,16 +30,15 @@
 #define GREEN  "\033[1;32m"
 #define NORMAL "\033[0m"
 
-
 #define OVER_FMT    "handler(%d ) Overflow at %p! bit=0x%llx \n"
 
 static int TESTS_COLOR = 0;
 
 //STRUCTURES
 typedef struct papi_action_s {
-	char *action_id;
-	int eventCodeSetSize;
-	int *eventCodeSet; //size = eventCodeSetSize
-	unsigned long *eventSet; //size = eventCodeSetSize
-	unsigned long *counterValues; //size = eventCodeSetSize
+    char *action_id;
+    int eventCodeSetSize;
+    int *eventCodeSet; //size = eventCodeSetSize
+    unsigned long *eventSet; //size = eventCodeSetSize
+    unsigned long *counterValues; //size = eventCodeSetSize
 } papi_action_s;
