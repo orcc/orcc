@@ -413,7 +413,7 @@
                defaultValue="false"
                description="Include PAPI code for profiling"
                id="net.sf.orcc.backends.papify"
-               name="Include PAPI code for profiling">
+               name="Papify: profile actors using PAPI">
             <checkBox></checkBox>
          </option>
    </extension>
