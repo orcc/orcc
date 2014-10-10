@@ -111,19 +111,6 @@ class InstancePrinter extends LLVMTemplate {
 		}
 	}
 
-	/**
-	 * Print file content from a given instance
-	 *
-	 * @param targetFolder folder to print the instance file
-	 * @param instance the given instance
-	 * @return 1 if file was cached, 0 if file was printed
-	 */
-	@Deprecated
-	def print(String targetFolder, Instance instance) {
-		setInstance(instance)
-		print(targetFolder)
-	}
-
 	def setInstance(Instance instance) {
 		if (!instance.isActor) {
 			throw new OrccRuntimeException("Instance " + instance.name + " is not an Actor's instance")
