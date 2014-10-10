@@ -166,12 +166,14 @@ public class Classifier extends DfVisitor<Void> {
 	 */
 	private void classify() {
 		try {
-			IMarker[] markers = actor.getFile().findMarkers(IMarker.PROBLEM,
-					true, IResource.DEPTH_INFINITE);
-			for (IMarker marker : markers) {
-				if (marker.getAttribute(IMarker.SEVERITY,
-						IMarker.SEVERITY_ERROR) == IMarker.SEVERITY_INFO) {
-					marker.delete();
+			if (actor.getFile() != null) {
+				IMarker[] markers = actor.getFile().findMarkers(
+						IMarker.PROBLEM, true, IResource.DEPTH_INFINITE);
+				for (IMarker marker : markers) {
+					if (marker.getAttribute(IMarker.SEVERITY,
+							IMarker.SEVERITY_ERROR) == IMarker.SEVERITY_INFO) {
+						marker.delete();
+					}
 				}
 			}
 		} catch (CoreException e) {
