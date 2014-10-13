@@ -2034,7 +2034,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 
 		initEClass(typeIntEClass, TypeInt.class, "TypeInt", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getTypeInt_Size(), ecorePackage.getEInt(), "size", null,
+		initEAttribute(getTypeInt_Size(), ecorePackage.getEInt(), "size", "32",
 				0, 1, TypeInt.class, !IS_TRANSIENT, !IS_VOLATILE,
 				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
 				IS_ORDERED);
@@ -2060,7 +2060,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		initEClass(typeUintEClass, TypeUint.class, "TypeUint", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getTypeUint_Size(), ecorePackage.getEInt(), "size",
-				null, 0, 1, TypeUint.class, !IS_TRANSIENT, !IS_VOLATILE,
+				"32", 0, 1, TypeUint.class, !IS_TRANSIENT, !IS_VOLATILE,
 				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
 				IS_ORDERED);
 

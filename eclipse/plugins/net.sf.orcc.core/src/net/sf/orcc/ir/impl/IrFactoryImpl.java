@@ -897,7 +897,6 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	 */
 	public TypeInt createTypeInt() {
 		TypeIntImpl typeInt = new TypeIntImpl();
-		typeInt.setSize(32);
 		return typeInt;
 	}
 
@@ -957,7 +956,6 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	 */
 	public TypeUint createTypeUint() {
 		TypeUintImpl typeUint = new TypeUintImpl();
-		typeUint.setSize(32);
 		return typeUint;
 	}
 
