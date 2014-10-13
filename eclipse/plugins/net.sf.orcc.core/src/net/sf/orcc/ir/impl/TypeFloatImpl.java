@@ -51,7 +51,7 @@ public class TypeFloatImpl extends TypeImpl implements TypeFloat {
 	 * @generated
 	 * @ordered
 	 */
-	protected static final int SIZE_EDEFAULT = 0;
+	protected static final int SIZE_EDEFAULT = 32;
 	/**
 	 * The cached value of the '{@link #getSize() <em>Size</em>}' attribute.
 	 * <!-- begin-user-doc -->
@@ -100,7 +100,8 @@ public class TypeFloatImpl extends TypeImpl implements TypeFloat {
 
 	@Override
 	public boolean equals(Object obj) {
-		return (obj instanceof TypeFloat);
+		return (obj instanceof TypeFloat)
+				&& ((TypeFloat) obj).getSize() == getSize();
 	}
 
 	/**
@@ -186,7 +187,7 @@ public class TypeFloatImpl extends TypeImpl implements TypeFloat {
 
 	@Override
 	public String toString() {
-		return "float";
+		return "float(size=" + size + ")";
 	}
 
 }

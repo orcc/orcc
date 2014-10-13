@@ -2028,7 +2028,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		initEClass(typeFloatEClass, TypeFloat.class, "TypeFloat", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getTypeFloat_Size(), ecorePackage.getEInt(), "size",
-				null, 0, 1, TypeFloat.class, !IS_TRANSIENT, !IS_VOLATILE,
+				"32", 0, 1, TypeFloat.class, !IS_TRANSIENT, !IS_VOLATILE,
 				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
 				IS_ORDERED);
 
