@@ -105,6 +105,14 @@ class TypesTests extends CalTestsHelper {
 				int				res17	= i32 / i4;
 				int				res18	= i64 / u1;
 				int				res19	= i4 / u1;
+
+				// Multiplications
+				 int			res20	= i32 * 20;
+				 int			res21	= u16 * 62;
+				 int			res22	= i32 * u16;
+				 int			res23	= i4 * u60;
+				 int			res24	= u1 * i4;
+				 float			res25	= ha * u16;
 			end
 		'''.parse
 
@@ -169,5 +177,22 @@ class TypesTests extends CalTestsHelper {
 		irFact.createTypeInt(32).assertEquals(Typer::getType(f))
 		irFact.createTypeInt(64).assertEquals(Typer::getType(g))
 		irFact.createTypeInt(4).assertEquals(Typer::getType(h))
+	}
+
+	@Test
+	def testMultiplications() {
+		val a = actor.stateVar("res20").value;
+		val b = actor.stateVar("res21").value;
+		val c = actor.stateVar("res22").value;
+		val d = actor.stateVar("res23").value;
+		val e = actor.stateVar("res24").value;
+		val f = actor.stateVar("res25").value;
+
+		irFact.createTypeInt(37).assertEquals(Typer::getType(a))
+		irFact.createTypeUint(22).assertEquals(Typer::getType(b))
+		irFact.createTypeInt(48).assertEquals(Typer::getType(c))
+		irFact.createTypeInt(64).assertEquals(Typer::getType(d))
+		irFact.createTypeInt(5).assertEquals(Typer::getType(e))
+		irFact.createTypeFloat(16).assertEquals(Typer::getType(f))
 	}
 }
