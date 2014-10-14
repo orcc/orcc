@@ -113,6 +113,11 @@ class TypesTests extends CalTestsHelper {
 				 int			res23	= i4 * u60;
 				 int			res24	= u1 * i4;
 				 float			res25	= ha * u16;
+
+				// LSHIFT
+				int				res26	= i16 << 5;
+				uint			res27	= u32 << i4;
+				int				res28	= i4 << i4;
 			end
 		'''.parse
 
@@ -194,5 +199,16 @@ class TypesTests extends CalTestsHelper {
 		irFact.createTypeInt(64).assertEquals(Typer::getType(d))
 		irFact.createTypeInt(5).assertEquals(Typer::getType(e))
 		irFact.createTypeFloat(16).assertEquals(Typer::getType(f))
+	}
+
+	@Test
+	def testLShift() {
+		val a = actor.stateVar("res26").value;
+		val b = actor.stateVar("res27").value;
+		val c = actor.stateVar("res28").value;
+
+		irFact.createTypeInt(23).assertEquals(Typer::getType(a))
+		irFact.createTypeInt(47).assertEquals(Typer::getType(b))
+		irFact.createTypeInt(19).assertEquals(Typer::getType(c))
 	}
 }
