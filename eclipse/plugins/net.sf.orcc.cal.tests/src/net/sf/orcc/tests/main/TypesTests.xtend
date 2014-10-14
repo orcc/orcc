@@ -104,9 +104,10 @@ class TypesTests extends CalTestsHelper {
 				double			res16	= db / i16;
 				int				res17	= i32 / i4;
 				int				res18	= i64 / u1;
+				int				res19	= i4 / u1;
 			end
 		'''.parse
-		
+
 		actor = entity.actor
 		return
 	}
@@ -158,6 +159,7 @@ class TypesTests extends CalTestsHelper {
 		val e = actor.stateVar("res16").value;
 		val f = actor.stateVar("res17").value;
 		val g = actor.stateVar("res18").value;
+		val h = actor.stateVar("res19").value;
 
 		irFact.createTypeInt(32).assertEquals(Typer::getType(a))
 		irFact.createTypeInt(32).assertEquals(Typer::getType(b))
@@ -166,5 +168,6 @@ class TypesTests extends CalTestsHelper {
 		irFact.createTypeFloat(64).assertEquals(Typer::getType(e))
 		irFact.createTypeInt(32).assertEquals(Typer::getType(f))
 		irFact.createTypeInt(64).assertEquals(Typer::getType(g))
+		irFact.createTypeInt(4).assertEquals(Typer::getType(h))
 	}
 }
