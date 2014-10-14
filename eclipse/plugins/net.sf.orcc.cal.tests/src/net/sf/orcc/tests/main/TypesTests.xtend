@@ -118,6 +118,11 @@ class TypesTests extends CalTestsHelper {
 				int				res26	= i16 << 5;
 				uint			res27	= u32 << i4;
 				int				res28	= i4 << i4;
+
+				// RSHIFT
+				int				res29	= i16 >> 5;
+				uint			res30	= u32 >> i4;
+				int				res31	= i4 >> i4;
 			end
 		'''.parse
 
@@ -210,5 +215,16 @@ class TypesTests extends CalTestsHelper {
 		irFact.createTypeInt(23).assertEquals(Typer::getType(a))
 		irFact.createTypeInt(47).assertEquals(Typer::getType(b))
 		irFact.createTypeInt(19).assertEquals(Typer::getType(c))
+	}
+
+	@Test
+	def testRShift() {
+		val a = actor.stateVar("res29").value;
+		val b = actor.stateVar("res30").value;
+		val c = actor.stateVar("res31").value;
+
+		irFact.createTypeInt(16).assertEquals(Typer::getType(a))
+		irFact.createTypeUint(32).assertEquals(Typer::getType(b))
+		irFact.createTypeInt(4).assertEquals(Typer::getType(c))
 	}
 }
