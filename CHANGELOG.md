@@ -1,8 +1,24 @@
 # Next release
 ### Notable changes and features
+- Development environment
+    + Renaming a package correctly updates files it contains
+- Backe-ends
+    + Add "papify" option to the C back-end. It generates code useful to perform profiling thanks to Papi library.
+
 ### Bugfixes
+- Frontend
+    + [#128][#129] Big litterals (more than 64 bits) are now supported
+    + [#105] Generating code for a network containing an instance with the same name produce an error, to avoid overriding of generated files
+- Transformations
+    + [#111] Fix Classifier execution when z3 solver is used
+    + Fix a NullPointerException when the Classifier is used on a flattened network with broadcasts.
+
 ### Known issues
+- [#79] Using sub-list as procedure argument produces wrong code.
+- [#108] [C] Modifying output port variables both in action body and in procedure produces wrong code.
+
 ### Miscellaneous
+- Official supported eclipse version is now 4.4 Luna
 
 # 2.2.0 September 30, 2014
 ### Notable changes and features
