@@ -34,6 +34,7 @@ import java.util.List;
 
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
+import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Unit;
 import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.Def;
@@ -63,6 +64,8 @@ public class UnitImporter extends DfVisitor<Procedure> {
 
 	private int indexVar;
 
+	private Instance instance;
+	
 	public UnitImporter() {
 		this.irVisitor = new InnerIrVisitor();
 	}
@@ -81,7 +84,7 @@ public class UnitImporter extends DfVisitor<Procedure> {
 			Use use = load.getSource();
 			Var var = use.getVariable();
 			if (var.eContainer() instanceof Unit) {
-				final String actorVarName = actor.getName() + "_"
+				final String actorVarName = getCurrentEntityName() + "_"
 						+ var.getName();
 				Var varInActor = actor.getStateVar(actorVarName);
 				if (varInActor == null) {
@@ -101,7 +104,7 @@ public class UnitImporter extends DfVisitor<Procedure> {
 		@Override
 		public Procedure caseProcedure(Procedure proc) {
 			if (proc.eContainer() instanceof Unit) {
-				final String actorProcName = actor.getName() + "_"
+				final String actorProcName = getCurrentEntityName() + "_"
 						+ proc.getName();
 
 				Procedure procInActor = (Procedure) copier.get(proc);
@@ -157,6 +160,14 @@ public class UnitImporter extends DfVisitor<Procedure> {
 	}
 
 	@Override
+	public Procedure caseInstance(Instance instance) {
+		this.instance = instance;
+		final Procedure result = super.caseInstance(instance);
+		this.instance = null;
+		return result;
+	}
+	
+	@Override
 	public Procedure caseActor(Actor actor) {
 		this.actor = actor;
 		this.copier = new EcoreUtil.Copier();
@@ -189,4 +200,13 @@ public class UnitImporter extends DfVisitor<Procedure> {
 		return Arrays.asList(name);
 	}
 
+	private String getCurrentEntityName() {
+		if (instance != null) {
+			return instance.getName();
+		} else if (actor != null) {
+			return actor.getName();
+		} else {
+			return "";
+		}
+	}
 }
