@@ -81,9 +81,8 @@ public class UnitImporter extends DfVisitor<Procedure> {
 			Use use = load.getSource();
 			Var var = use.getVariable();
 			if (var.eContainer() instanceof Unit) {
-
-				final String actorVarName = ((Unit) var.eContainer())
-						.getSimpleName() + "_" + var.getName();
+				final String actorVarName = actor.getName() + "_"
+						+ var.getName();
 				Var varInActor = actor.getStateVar(actorVarName);
 				if (varInActor == null) {
 					varInActor = (Var) copier.get(var);
@@ -102,8 +101,9 @@ public class UnitImporter extends DfVisitor<Procedure> {
 		@Override
 		public Procedure caseProcedure(Procedure proc) {
 			if (proc.eContainer() instanceof Unit) {
-				final String actorProcName = ((Unit) proc.eContainer())
-						.getSimpleName() + "_" + proc.getName();
+				final String actorProcName = actor.getName() + "_"
+						+ proc.getName();
+
 				Procedure procInActor = (Procedure) copier.get(proc);
 				if (procInActor == null) {
 					procInActor = (Procedure) copier.copy(proc);
@@ -146,6 +146,7 @@ public class UnitImporter extends DfVisitor<Procedure> {
 					actor.getProcs().add(indexProc++, procInActor);
 					super.caseProcedure(procInActor);
 				}
+				
 				return procInActor;
 			} else {
 				proc.setAttribute("package", getPackage(proc.eContainer()));
