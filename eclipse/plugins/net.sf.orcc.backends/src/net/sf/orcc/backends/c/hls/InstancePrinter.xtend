@@ -432,7 +432,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 
 	override printActionsScheduling(Iterable<Action> actions) '''
 		«FOR action : actions SEPARATOR " else "»
-			if («action.inputPattern.checkInputPattern»isSchedulable_«action.name»()) {
+			if («action.inputPattern.checkInputPattern»«instance.getName()»_isSchedulable_«action.name»()) {
 				if(1
 				«IF action.outputPattern != null»
 					«action.outputPattern.printOutputPattern»
@@ -446,7 +446,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 
 	override printStateTransitions(State state) '''
 		«FOR transitions : state.outgoing.map[it as Transition] SEPARATOR " else "»
-			if («transitions.action.inputPattern.checkInputPattern» isSchedulable_«transitions.action.name»() «transitions.
+			if («transitions.action.inputPattern.checkInputPattern» «instance.getName()»_isSchedulable_«transitions.action.name»() «transitions.
 			action.outputPattern.printOutputPattern» «IF actor.hasAttribute(DIRECTIVE_DEBUG)» && (16384 - wIdx_«transitions.
 			action.name» + readIdx_«transitions.action.name»[0] >= 1) «ENDIF») {
 				«entityName»_«transitions.action.body.name»();
