@@ -63,8 +63,6 @@ public class UnitImporter extends DfVisitor<Procedure> {
 	private int indexProc;
 
 	private int indexVar;
-
-	private Instance instance;
 	
 	public UnitImporter() {
 		this.irVisitor = new InnerIrVisitor();
@@ -84,8 +82,8 @@ public class UnitImporter extends DfVisitor<Procedure> {
 			Use use = load.getSource();
 			Var var = use.getVariable();
 			if (var.eContainer() instanceof Unit) {
-				final String actorVarName = getCurrentEntityName() + "_"
-						+ var.getName();
+				final String actorVarName = ((Unit) var.eContainer())
+						.getSimpleName() + "_" + var.getName();
 				Var varInActor = actor.getStateVar(actorVarName);
 				if (varInActor == null) {
 					varInActor = (Var) copier.get(var);
@@ -104,8 +102,8 @@ public class UnitImporter extends DfVisitor<Procedure> {
 		@Override
 		public Procedure caseProcedure(Procedure proc) {
 			if (proc.eContainer() instanceof Unit) {
-				final String actorProcName = getCurrentEntityName() + "_"
-						+ proc.getName();
+				final String actorProcName = ((Unit) proc.eContainer())
+						.getSimpleName() + "_" + proc.getName();
 
 				Procedure procInActor = (Procedure) copier.get(proc);
 				if (procInActor == null) {
@@ -160,14 +158,6 @@ public class UnitImporter extends DfVisitor<Procedure> {
 	}
 
 	@Override
-	public Procedure caseInstance(Instance instance) {
-		this.instance = instance;
-		final Procedure result = super.caseInstance(instance);
-		this.instance = null;
-		return result;
-	}
-	
-	@Override
 	public Procedure caseActor(Actor actor) {
 		this.actor = actor;
 		this.copier = new EcoreUtil.Copier();
@@ -200,13 +190,4 @@ public class UnitImporter extends DfVisitor<Procedure> {
 		return Arrays.asList(name);
 	}
 
-	private String getCurrentEntityName() {
-		if (instance != null) {
-			return instance.getName();
-		} else if (actor != null) {
-			return actor.getName();
-		} else {
-			return "";
-		}
-	}
 }

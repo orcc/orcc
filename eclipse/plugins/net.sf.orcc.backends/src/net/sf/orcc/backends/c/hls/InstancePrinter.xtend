@@ -42,6 +42,11 @@ import net.sf.orcc.ir.TypeBool
 import net.sf.orcc.ir.TypeList
 
 import static net.sf.orcc.util.OrccAttributes.*
+import net.sf.orcc.ir.Procedure
+import net.sf.orcc.ir.InstCall
+import net.sf.orcc.ir.Arg
+import net.sf.orcc.ir.ArgByRef
+import net.sf.orcc.ir.ArgByVal
 
 /*
  * Compile Instance c source code
@@ -150,8 +155,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		////////////////////////////////////////////////////////////////////////////////
 		// Functions/procedures
 		«FOR proc : actor.procs»
-			«IF proc.native»extern«ELSE»static«ENDIF» «proc.returnType.doSwitch» «proc.name»(«proc.parameters.join(", ",
-			[variable.declare])»);
+			«IF proc.native»extern«ELSE»static«ENDIF» «proc.returnType.doSwitch» «instance.getName()»_«proc.getName()»(«proc.parameters.join(", ", [variable.declare])»);
 		«ENDFOR»
 		
 		«FOR proc : actor.procs.filter[!native]»
@@ -305,6 +309,52 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		currentAction = null
 		return output
 	}
+	
+	def private print(Arg arg) {
+		if(arg.byRef) {
+			"&" + (arg as ArgByRef).use.variable.name + (arg as ArgByRef).indexes.printArrayIndexes
+		} else {
+			(arg as ArgByVal).value.doSwitch
+		}
+	}
+	
+	override caseInstCall(InstCall call) '''
+  		«IF call.print»
+  			printf(«call.arguments.printfArgs.join(", ")»);
+  		«ELSE»
+   			«IF call.target != null»«call.target.variable.name» = «ENDIF»«instance.getName()»_«call.procedure.name»(«call.arguments.join(", ")[print]»);
+  		«ENDIF»
+ '''
+		
+	var boolean inlineActors = false
+	
+	def private getInline()
+		'''«IF inlineActors»__attribute__((always_inline)) «ENDIF»'''
+		
+	override print(Procedure proc) {
+		val isOptimizable = proc.hasAttribute(DIRECTIVE_OPTIMIZE_C);
+		val optCond = proc.getAttribute(DIRECTIVE_OPTIMIZE_C)?.getValueAsString("condition")
+		val optName = proc.getAttribute(DIRECTIVE_OPTIMIZE_C)?.getValueAsString("name")
+		'''
+		static «inline»«proc.returnType.doSwitch» «instance.getName()»_«proc.getName()»(«proc.parameters.join(", ")[declare]») {
+			«IF isOptimizable»
+				#if «optCond»
+				«optName»(«proc.parameters.join(", ")[variable.name]»);
+				#else
+			«ENDIF»
+			«FOR variable : proc.locals»
+				«variable.declare»;
+			«ENDFOR»
+
+			«FOR block : proc.blocks»
+				«block.doSwitch»
+			«ENDFOR»
+			«IF isOptimizable»
+				#endif // «optCond»
+			«ENDIF»
+		}
+		'''
+	}
 
 	override caseInstLoad(InstLoad load) {
 		if (load.eContainer != null) {
@@ -397,7 +447,8 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	override printStateTransitions(State state) '''
 		«FOR transitions : state.outgoing.map[it as Transition] SEPARATOR " else "»
 			if («transitions.action.inputPattern.checkInputPattern» isSchedulable_«transitions.action.name»() «transitions.
-			action.outputPattern.printOutputPattern» «IF actor.hasAttribute(DIRECTIVE_DEBUG)» && (16384 - wIdx_«transitions.action.name» + readIdx_«transitions.action.name»[0] >= 1) «ENDIF») {
+			action.outputPattern.printOutputPattern» «IF actor.hasAttribute(DIRECTIVE_DEBUG)» && (16384 - wIdx_«transitions.
+			action.name» + readIdx_«transitions.action.name»[0] >= 1) «ENDIF») {
 				«entityName»_«transitions.action.body.name»();
 				_FSM_state = my_state_«transitions.target.name»;
 				goto finished;
