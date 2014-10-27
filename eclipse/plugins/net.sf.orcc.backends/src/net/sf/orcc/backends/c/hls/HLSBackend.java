@@ -104,8 +104,14 @@ public class HLSBackend extends CBackend {
 
 	@Override
 	protected Result doLibrariesExtraction() {
-		// Never extract libraries (Note: we can also force attribute
-		// NO_LIBRARY_EXPORT to true)
+		Result result = FilesManager.extract("/runtime/HLS/scripts", outputPath);
+		result.merge(FilesManager.extract("/runtime/common/scripts", outputPath));
+
+		String libPath = outputPath + File.separator + "scripts";
+
+		// Ensure scripts have execution rights
+		new File(libPath, "hlsanalyse.py").setExecutable(true);
+		
 		return Result.newInstance();
 	}
 
