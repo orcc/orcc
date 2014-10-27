@@ -50,7 +50,7 @@ class ProfilingData:
 class ProfilingAnalyse(OrccAnalyse):
     def __init__(self, input_file):
         OrccAnalyse.__init__(self, os.path.splitext(os.path.basename(input_file))[0])
-        self.logCSV = False
+        self.logCSV = True
         self.logTXT = False
         self.logXML = False
         self.logHTML = True
@@ -213,6 +213,21 @@ class ProfilingAnalyse(OrccAnalyse):
         fic.write("                          </tfoot>" + "\n");
         fic.write("                      </table></ul>" + "\n");
         fic.write("                  </div>" + "\n");
+        
+    def logInCSV(self):
+        print ("\n  * Generate CSV Result file : " + os.path.join(self.SRC_DIR, self.SUMMARY_CSV))
+        fic = open(os.path.join(self.SRC_DIR, self.SUMMARY_CSV), 'w')
+        # Header
+        fic.write("Actor;Workload" + "\n")
+        # TODO : Add output_tag information ?
+
+        # Body
+        for actor in self.extractedData:
+            fic.write(actor.name + ";" + str(actor.workload).replace(".", ",") + "\n");
+
+        # Footer
+        # TODO : Add worst actor ?
+        fic.close()
 
 # Main
 
