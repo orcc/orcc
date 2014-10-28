@@ -331,24 +331,56 @@ class HwProjectPrinter extends TTAPrinter {
 		</file>
 		'''
 	
-	def getUcf(Design design)
+	def getUcf(Design design, boolean isZedBoard)
 		'''
 		NET "leds[0]" IOSTANDARD = LVCMOS18;
+		«IF(isZedBoard)»
+		NET "leds[0]" LOC = T22;
+		«ELSE»
 		NET "leds[0]" LOC = AC22;
+		«ENDIF»
 		NET "leds[1]" IOSTANDARD = LVCMOS18;
+		«IF(isZedBoard)»
+		NET "leds[1]" LOC = T21;
+		«ELSE»
 		NET "leds[1]" LOC = AC24;
+		«ENDIF»
 		NET "leds[2]" IOSTANDARD = LVCMOS18;
+		«IF(isZedBoard)»
+		NET "leds[2]" LOC = U22;
+		«ELSE»
 		NET "leds[2]" LOC = AE22;
+		«ENDIF»
 		NET "leds[3]" IOSTANDARD = LVCMOS18;		// LVCMOS25
+		«IF(isZedBoard)»
+		NET "leds[3]" LOC = U21;
+		«ELSE»
 		NET "leds[3]" LOC = AE23;
+		«ENDIF»
 		NET "leds[4]" IOSTANDARD = LVCMOS18;
+		«IF(isZedBoard)»
+		NET "leds[4]" LOC = V22;
+		«ELSE»
 		NET "leds[4]" LOC = AB23;
+		«ENDIF»
 		NET "leds[5]" IOSTANDARD = LVCMOS18;		// LVCMOS25
+		«IF(isZedBoard)»
+		NET "leds[5]" LOC = W22;
+		«ELSE»
 		NET "leds[5]" LOC = AG23;
+		«ENDIF»
 		NET "leds[6]" IOSTANDARD = LVCMOS18;		// LVCMOS25
+		«IF(isZedBoard)»
+		NET "leds[6]" LOC = U19;
+		«ELSE»
 		NET "leds[6]" LOC = AE24;
+		«ENDIF»
 		NET "leds[7]" IOSTANDARD = LVCMOS18;		// LVCMOS25
+		«IF(isZedBoard)»
+		NET "leds[7]" LOC = U14;
+		«ELSE»
 		NET "leds[7]" LOC = AD24;
+		«ENDIF»
 		
 		NET "rst_n" TIG;
 		//LVCMOS33
@@ -361,6 +393,10 @@ class HwProjectPrinter extends TTAPrinter {
 		TIMESPEC TS_sys_clk_pin = PERIOD "sys_clk_pin" 100000 KHz;
 		//LVCMOS33
 		NET "clk" IOSTANDARD = LVCMOS25;
+		«IF(isZedBoard)»
+		NET "clk" LOC = Y9;
+		«ELSE»
 		NET "clk" LOC = AE16;
+		«ENDIF»
 		'''
 }

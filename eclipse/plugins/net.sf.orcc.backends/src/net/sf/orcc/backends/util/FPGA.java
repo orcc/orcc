@@ -147,4 +147,13 @@ public class FPGA {
 		}
 	}
 
+	public boolean isZedBoard() {
+		switch (family) {
+		case ZEDBOARD:
+			return true;
+		default:
+			return false;
+		}
+	}
+	
 }

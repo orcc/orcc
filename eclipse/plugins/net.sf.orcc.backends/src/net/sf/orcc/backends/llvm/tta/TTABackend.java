@@ -284,7 +284,7 @@ public class TTABackend extends LLVMBackend {
 					hwProjectPrinter.getQpf(design), outputPath, "top.qpf"));
 		} else {
 			result.merge(FilesManager.writeFile(
-					hwProjectPrinter.getUcf(design), outputPath, "top.ucf"));
+					hwProjectPrinter.getUcf(design, fpga.isZedBoard()), outputPath, "top.ucf"));
 			result.merge(FilesManager.writeFile(
 					hwProjectPrinter.getXise(design), outputPath, "top.xise"));
 		}
