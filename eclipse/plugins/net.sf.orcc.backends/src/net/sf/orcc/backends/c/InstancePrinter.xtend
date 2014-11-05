@@ -697,7 +697,7 @@ class InstancePrinter extends CTemplate {
 		«FOR port : pattern.ports»
 			«var i = -1»
 			«FOR connection : outgoingPortMap.get(port)»
-				if («pattern.getNumTokens(port)» > SIZE_«port.name» - index_«port.name» + «port.fullName»->read_inds[«i = i + 1»]) {
+				if («pattern.getNumTokens(port)» > SIZE_«port.name» - index_«port.name» + «port.fullName»->reading[«i = i + 1»].index) {
 					stop = 1;
 					«IF newSchedul»
 						if( ! «entityName».sched->round_robin || i > 0) {
@@ -714,23 +714,23 @@ class InstancePrinter extends CTemplate {
 		'''«FOR port : pattern.ports»numTokens_«port.name» - index_«port.name» >= «pattern.getNumTokens(port)» && «ENDFOR»'''
 
 	def protected checkOutputPattern(Pattern pattern)
-		'''«FOR port : pattern.ports»«var i = -1»«FOR connection : outgoingPortMap.get(port)»!(«pattern.getNumTokens(port)» > SIZE_«port.name» - index_«port.name» + «port.fullName»->read_inds[«i = i + 1»]) && «ENDFOR»«ENDFOR»'''
+		'''«FOR port : pattern.ports»«var i = -1»«FOR connection : outgoingPortMap.get(port)»!(«pattern.getNumTokens(port)» > SIZE_«port.name» - index_«port.name» + «port.fullName»->reading[«i = i + 1»].index) && «ENDFOR»«ENDFOR»'''
 
 	def protected writeTokensFunctions(Port port) '''
 		static void write_«port.name»() {
-			index_«port.name» = «port.fullName»->write_ind;
+			index_«port.name» = «port.fullName»->writing.index;
 			numFree_«port.name» = index_«port.name» + fifo_«port.type.doSwitch»_get_room(«port.fullName», NUM_READERS_«port.name»);
 		}
 
 		static void write_end_«port.name»() {
-			«port.fullName»->write_ind = index_«port.name»;
+			«port.fullName»->writing.index = index_«port.name»;
 		}
 	'''
 
 	def protected readTokensFunctions(Port port) '''
 		static void read_«port.name»() {
 			«IF incomingPortMap.containsKey(port)»
-				index_«port.name» = «port.fullName»->read_inds[«port.readerId»];
+				index_«port.name» = «port.fullName»->reading[«port.readerId»].index;
 				numTokens_«port.name» = index_«port.name» + fifo_«port.type.doSwitch»_get_num_tokens(«port.fullName», «port.readerId»);
 			«ELSE»
 				/* Input port «port.fullName» not connected */
@@ -741,7 +741,7 @@ class InstancePrinter extends CTemplate {
 
 		static void read_end_«port.name»() {
 			«IF incomingPortMap.containsKey(port)»
-				«port.fullName»->read_inds[«port.readerId»] = index_«port.name»;
+				«port.fullName»->reading[«port.readerId»].index = index_«port.name»;
 			«ELSE»
 				/* Input port «port.fullName» not connected */
 			«ENDIF»
