@@ -35,14 +35,17 @@
 typedef struct {
     const int size;                         /** Size of the ringbuffer */
     const int nb_readers;                   /** Number of readers */
+    volatile char padding0[CACHELINE_SIZE]; /** Memory padding */
     T *contents;                            /** Buffer containing the FIFO's elements */
-    index_s* reading;                       /** Reading positions */
-    index_s writing;                        /** Writing position */
-    volatile char padding[CACHELINE_SIZE];  /** Memory padding */
+    volatile char padding1[CACHELINE_SIZE]; /** Memory padding */
+    unsigned int* read_inds;                /** Current reading positions */
+    volatile char padding2[CACHELINE_SIZE]; /** Memory padding */
+    unsigned int write_ind;                 /** Current writing position */
+    volatile char padding3[CACHELINE_SIZE]; /** Memory padding */
 } FIFO_T(T);
 
 static int FIFO_GET_NUM_TOKENS(T)(FIFO_T(T) *fifo, int reader_id) {
-    return fifo->writing.index - fifo->reading[reader_id].index;
+    return fifo->write_ind - fifo->read_inds[reader_id];
 }
 
 static int FIFO_GET_ROOM(T)(FIFO_T(T) *fifo, int num_readers) {
@@ -50,7 +53,7 @@ static int FIFO_GET_ROOM(T)(FIFO_T(T) *fifo, int num_readers) {
     int num_tokens, max_num_tokens = 0;
 
     for (i = 0; i < num_readers; i++) {
-        num_tokens = fifo->writing.index - fifo->reading[i].index;
+        num_tokens = fifo->write_ind - fifo->read_inds[i];
         max_num_tokens = max_num_tokens > num_tokens ? max_num_tokens : num_tokens;
     }
 
