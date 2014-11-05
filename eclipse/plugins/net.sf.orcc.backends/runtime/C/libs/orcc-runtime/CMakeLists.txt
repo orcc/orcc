@@ -18,6 +18,8 @@ set(orcc_runtime_headers
     include/options.h
     include/scheduler.h
     include/trace.h
+    include/fifo.h
+    include/generic_fifo.h
     include/util.h
     include/mapping.h
     include/profiling.h
