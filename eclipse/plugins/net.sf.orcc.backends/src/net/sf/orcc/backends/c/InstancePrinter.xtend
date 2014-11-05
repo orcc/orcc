@@ -719,7 +719,7 @@ class InstancePrinter extends CTemplate {
 	def protected writeTokensFunctions(Port port) '''
 		static void write_«port.name»() {
 			index_«port.name» = «port.fullName»->write_ind;
-			numFree_«port.name» = index_«port.name» + fifo_«port.type.doSwitch»_get_room(«port.fullName», NUM_READERS_«port.name»);
+			numFree_«port.name» = index_«port.name» + fifo_«port.type.doSwitch»_get_room(«port.fullName», NUM_READERS_«port.name», SIZE_«port.name»);
 		}
 
 		static void write_end_«port.name»() {

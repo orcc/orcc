@@ -38,7 +38,7 @@
 // Declare the FIFO structure with a size equal to (size)
 #define DECLARE_FIFO(type, size, count, readersnb) static type array_##count[(size)]; \
 static unsigned int read_inds_##count[readersnb] = {0}; \
-static FIFO_T(type) fifo_##count = { (size), readersnb, {0}, array_##count, {0}, read_inds_##count, {0}, 0, {0}};
+static FIFO_T(type) fifo_##count = {{0}, read_inds_##count, {0}, 0, {0}, array_##count};
 
 #define FIFO_T(T) FIFO_T_EXPAND(T)
 #define FIFO_T_EXPAND(T) fifo_##T##_t
