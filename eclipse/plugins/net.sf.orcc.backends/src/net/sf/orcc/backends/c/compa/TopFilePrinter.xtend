@@ -56,7 +56,7 @@ class TopFilePrinter extends CommonPrinter {
 			// Action initializes
 			«FOR child : network.children»
 				«IF currentMap.get(procNb).get(network.children.indexOf(child))»
-					extern void «child.label»_initialize();
+					extern int «child.label»_initialize();
 				«ENDIF»
 			«ENDFOR»
 			
@@ -64,7 +64,7 @@ class TopFilePrinter extends CommonPrinter {
 			// Action schedulers
 			«FOR child : network.children»
 				«IF currentMap.get(procNb).get(network.children.indexOf(child))»
-					extern void «child.label»_scheduler();
+					extern int «child.label»_scheduler();
 				«ENDIF»
 			«ENDFOR»
 			
@@ -85,7 +85,7 @@ class TopFilePrinter extends CommonPrinter {
 					i = 0;
 					«FOR child : network.children»
 						«IF currentMap.get(procNb).get(network.children.indexOf(child))»
-							«child.label»_scheduler();
+							i = «child.label»_scheduler();
 						«ENDIF»
 					«ENDFOR»
 				}
