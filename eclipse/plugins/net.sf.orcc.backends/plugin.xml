@@ -50,6 +50,15 @@
          <option
                id="net.sf.orcc.dontExportLibrary">
          </option>
+         <option
+               id="net.sf.orcc.tracing.enable">
+         </option>
+         <option
+               id="net.sf.orcc.backends.c.compa.faddr">
+         </option>
+         <option
+               id="net.sf.orcc.backends.c.compa.nbProc">
+         </option>
       </backend>
        <backend
             class="net.sf.orcc.backends.c.dal.DALBackend"
@@ -389,6 +398,20 @@
 				description="Specify the target triple"
 				id="net.sf.orcc.backends.llvm.aot.targetTriple"
 				name="Target triple">
+			<textBox></textBox>
+		</option>
+		<option
+				defaultValue="0xc0000000"
+				description="Memory address of the FIFOs"
+				id="net.sf.orcc.backends.c.compa.faddr"
+				name="FIFO address">
+			<textBox></textBox>
+		</option>
+		<option
+				defaultValue="15"
+				description="Number of processors"
+				id="net.sf.orcc.backends.c.compa.nbProc"
+				name="Number of processors">
 			<textBox></textBox>
 		</option>
 		<option
