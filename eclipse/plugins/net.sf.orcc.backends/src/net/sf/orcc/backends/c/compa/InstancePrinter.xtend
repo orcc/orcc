@@ -31,14 +31,14 @@ package net.sf.orcc.backends.c.compa
 import java.io.File
 import java.util.Map
 import net.sf.orcc.df.Action
+import net.sf.orcc.df.Actor
 import net.sf.orcc.df.Pattern
 import net.sf.orcc.df.Port
 import net.sf.orcc.df.State
 import net.sf.orcc.df.Transition
+import net.sf.orcc.ir.Procedure
 import net.sf.orcc.ir.TypeList
 import net.sf.orcc.util.OrccUtil
-import net.sf.orcc.ir.InstCall
-import net.sf.orcc.ir.Procedure
 
 /**
  * Generate and print instance source file for COMPA backend.
@@ -49,16 +49,21 @@ import net.sf.orcc.ir.Procedure
 class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {	
 	// Whether the actor has a main function or the main is within the Top file.
 	private boolean printMainFunc
+	private String actorsFolder
 	private boolean measureTime = false
 	private boolean enableTest = false
-	int nbProc = 15
-	int currentMappingNb = 14
-	val mappings = new mappings
-	val boolean[][] currentMap = mappings.mapping.get(currentMappingNb)
+	private int actorGlobalIx;
 	
-	new(Map<String, Object> options, boolean printTop) {
+	new(Map<String, Object> options, String srcPath, boolean printTop) {
 		super(options)
 		printMainFunc = !printTop
+		actorsFolder = srcPath + File.separator + "Actors"
+	}
+	
+	def print(String targetFolder, Actor actor, int actorIx) {
+		setActor(actor)
+		actorGlobalIx = actorIx
+		print(targetFolder)
 	}
 	
 	override protected print(String targetFolder) {
@@ -67,7 +72,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		val content = fileContent
 		val topContent = topFileContent
 //		val testContent = testFileContent
-		val file = new File(targetFolder + File::separator + entityName + ".c")
+		val file = new File(actorsFolder + File::separator + entityName + ".c")
 		val topFile = new File(targetFolder + File::separator + "Top_" + entityName + ".c")
 //		val testFile = new File(targetFolder + File::separator + entityName + "_test.h")
 
@@ -81,6 +86,45 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			return 1
 		}
 	}
+	
+//	def private printCompareWithTraces() '''
+//		static void compareWithTraces(u32 fifoIx, int *tokens, u32 FIFO_SIZE, const TCHAR* file_name, DWORD *file_ptr, DWORD *file_ln){
+//			FIL file;
+//			char trace_str[10];
+//			int trace_value;
+//			FRESULT rc = FR_OK;
+//		
+//			if(fifoIx > *file_ln){
+//				Xil_DCacheDisable();
+//				// Opening trace file.
+//				rc = f_open(&file, file_name, FA_READ);
+//				if(rc != FR_OK){
+//					xil_printf("Error %d while opening file.\n\r", rc);
+//					Xil_DCacheEnable();
+//					return;
+//				}
+//		
+//				// Position trace file pointer after the last read byte.
+//				f_lseek(&file, *file_ptr);
+//		
+//				// Compare until the number of lines read from the file is equal to the number of tokens in the fifo.
+//				while(fifoIx > *file_ln){
+//					memset(trace_str, 0, sizeof(trace_str));			// Clear string.
+//					f_gets(trace_str, sizeof(trace_str), &file);		// Read a line from trace file.
+//					trace_value = atoi(trace_str);						// Convert string to number.
+//					if (trace_value != tokens[*file_ln%FIFO_SIZE]){	// If different values, print a message to the console.
+//						xil_printf("Token %d: %d != %d\n\r", *file_ln, trace_value, tokens[*file_ln%FIFO_SIZE]);
+//						exit(-1);	// This actor must be debugged step by step!!
+//					}
+//					(*file_ln)++;	// Inc number of lines read from the trace file.
+//				}
+//		
+//				*file_ptr = file.fptr;	// Store the file position for the next time.
+//				f_close(&file);
+//				Xil_DCacheEnable();
+//			}
+//		}
+//	'''
 	
 	override protected printStateLabel(State state) '''
 		l_«state.name»:
@@ -126,9 +170,16 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			int «entityName»_scheduler() {
 				int i = 0;
 				«printCallTokensFunctions»
+
 				«actor.actionsOutsideFsm.printActionSchedulingLoop»
 				
 			finished:
+				«IF enableTrace»
+					«FOR port : actor.outputs.notNative»
+	«««					compareWithTraces_«port.type.doSwitch»(index_«port.name», («port.type.doSwitch»*)tokens_«port.name», SIZE_«port.name», file_name_«port.name», &file_ptr_«port.name», &file_ln_«port.name»);
+						if(compareWithTraces_«port.type.doSwitch»(«actorGlobalIx», «actor.outputs.indexOf(port)», index_«port.name», («port.type.doSwitch»*)tokens_«port.name», SIZE_«port.name») == 0) exit(-1);
+					«ENDFOR»
+				«ENDIF»
 				«FOR port : actor.inputs»
 					read_end_«port.name»();
 				«ENDFOR»
@@ -188,15 +239,23 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 					goto l_«state.name»;
 			«ENDFOR»
 			default:
-«««				xil_printf("unknown state in «entityName».c : %s\n", stateNames[_FSM_state]					
+«««				xil_printf("unknown state in «entityName».c : %s\n", stateNames[_FSM_state]				
 				exit(1);
 			}
 
 			// FSM transitions
 			«FOR state : actor.fsm.states»
-		«state.printStateLabel»
+				«state.printStateLabel»
 			«ENDFOR»
 		finished:
+			«IF enableTrace»
+				«FOR port : actor.outputs.notNative»
+«««					compareWithTraces_«port.type.doSwitch»(index_«port.name», («port.type.doSwitch»*)tokens_«port.name», SIZE_«port.name», file_name_«port.name», &file_ptr_«port.name», &file_ln_«port.name»);
+					if(i > 0)
+						if(compareWithTraces_«port.type.doSwitch»(«actorGlobalIx», «actor.outputs.indexOf(port)», index_«port.name», («port.type.doSwitch»*)tokens_«port.name», SIZE_«port.name») == 0) 
+							exit(-1);
+				«ENDFOR»
+			«ENDIF»
 			«FOR port : actor.inputs»
 				read_end_«port.name»();
 			«ENDFOR»
@@ -292,70 +351,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			«ENDFOR»
 		}
 	'''
-	
-	def protected printTestScheduler()'''
-		void testScheduler(){
-			uint i, nbWrittenTokens, nbReadTokens;
-			unsigned int nbFreeSlots;
-			unsigned int nbTokens;
-			char value[16];
-			FRESULT rc = FR_OK;
-			int traceToken, fifoToken;
 
-			«FOR port : actor.inputs»
-				write_«port.name»();
-				nbFreeSlots = fifo_«port.type.doSwitch»_get_room(«entityName»_«port.name», 1);
-				if(nbFreeSlots>0){
-«««					pushTokens_«port.type.doSwitch»(&fil_«port.name», &tokens_«port.name»[(index_«port.name» + (0)) % SIZE_«port.name»], nbFreeSlots);
-					for (nbWrittenTokens = 0; nbWrittenTokens < nbFreeSlots; nbWrittenTokens++) {
-						i = 0;
-						memset(value, 0, sizeof(value));
-						do{
-							rc = f_read(&fil_«port.name», &value[i], 1, 0);									if(rc != FR_OK){
-								xil_printf("f_read failed: %d\n", rc);
-								exit(-1);
-							}
-						}while(value[i++] != '\n');
-			
-						fifo_«port.type.doSwitch»_write_1(«entityName»_«port.name», atoi(value));
-					}
-					index_«port.name» += nbWrittenTokens;
-					write_end_«port.name»();
-				}
-			«ENDFOR»
-			«FOR port : actor.outputs»
-			
-				read_«port.name»();
-				nbTokens = fifo_«port.type.doSwitch»_get_num_tokens(«entityName»_«port.name», 0);
-				if(nbTokens>0){
-«««					popCompareTokens_«port.type.doSwitch»(&fil_«port.name», &tokens_«port.name»[(index_«port.name» + (0)) % SIZE_«port.name»], nbTokens);
-					for (nbReadTokens = 0; nbReadTokens < nbTokens; nbReadTokens++) {
-						i = 0;
-						memset(value, 0, sizeof(value));
-						do{
-							rc = f_read(&fil_«port.name», &value[i], 1, 0);
-							if(rc != FR_OK){
-								xil_printf("f_read failed: %d\n", rc);
-								exit(-1);
-							}
-						}while(value[i++] != '\n');
-			
-						traceToken = atoi(value);
-						fifoToken = fifo_«port.type.doSwitch»_read_1(«entityName»_«port.name», 0);
-						if(fifoToken != traceToken){
-							xil_printf("Error at token %d: %d != %d\n", nbReadTokens, fifoToken, traceToken);
-							exit(-1);
-						}
-			
-					}
-					index_«port.name» += nbReadTokens;
-					// index_IN += (64 * nbTokens);
-					read_end_«port.name»();
-				}
-			«ENDFOR»
-		}
-	'''
-	
 	override protected writeTokensFunctions(Port port) '''
 		static void write_«port.name»() {
 			index_«port.name» = (*«port.fullName»->write_ind);
@@ -380,7 +376,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		}
 	'''
 	
-	override protected getFileContent() '''
+	override protected getFileContent()	'''
 		// Source file is "«actor.file»"
 
 		#include <stdio.h>
@@ -388,15 +384,22 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«IF checkArrayInbounds»
 			#include <assert.h>
 		«ENDIF»
-
+		
+		«IF enableTrace»
+			#include <string.h>
+			#include "ff.h"
+		«ENDIF»
 «««		«IF printMainFunc»
 «««			#include "fifoAllocations.h"
 «««			
 «««		«ELSE»
-			#include "fifo.h"
+		#include "fifo.h"
 «««		«ENDIF»
 		#include "util.h"
 		#include "dataflow.h"
+		«IF enableTrace»
+			#include "tracesDefs.h"
+		«ENDIF»
 		
 «««		«IF enableTest»
 «««			#include "decoder_parser_parseheaders_test.h"
@@ -431,11 +434,10 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«IF !actor.inputs.nullOrEmpty»
 			////////////////////////////////////////////////////////////////////////////////
 			// Input FIFOs
-«««			«IF printMainFunc != true»
-				«FOR port : actor.inputs»
-					«if (incomingPortMap.get(port) != null) "extern "» fifo_«port.type.doSwitch»_t *«port.fullName»;
-				«ENDFOR»
-«««			«ENDIF»
+			«FOR port : actor.inputs»
+				«if (incomingPortMap.get(port) != null) "extern "» fifo_«port.type.doSwitch»_t *«port.fullName»;
+			«ENDFOR»
+
 			////////////////////////////////////////////////////////////////////////////////
 			// Input Fifo control variables
 			«FOR port : actor.inputs»
@@ -450,14 +452,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				«ENDIF»
 				
 			«ENDFOR»
-			«IF enableTrace»
-				////////////////////////////////////////////////////////////////////////////////
-				// Trace files declaration (in)
-				«FOR port : actor.inputs»
-					FILE *file_«port.name»;
-				«ENDFOR»
 
-			«ENDIF»
 			////////////////////////////////////////////////////////////////////////////////
 			// Predecessors
 			«FOR port : actor.inputs»
@@ -470,11 +465,10 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		«IF !actor.outputs.filter[! native].nullOrEmpty»
 			////////////////////////////////////////////////////////////////////////////////
 			// Output FIFOs
-«««			«IF printMainFunc != true»
-				«FOR port : actor.outputs.filter[! native]»
-					extern fifo_«port.type.doSwitch»_t *«port.fullName»;
-				«ENDFOR»
-«««			«ENDIF»
+			«FOR port : actor.outputs.filter[! native]»
+				extern fifo_«port.type.doSwitch»_t *«port.fullName»;
+			«ENDFOR»
+
 			////////////////////////////////////////////////////////////////////////////////
 			// Output Fifo control variables
 			«FOR port : actor.outputs.filter[! native]»
@@ -483,13 +477,17 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				#define NUM_READERS_«port.name» «outgoingPortMap.get(port).size»
 				#define SIZE_«port.name» «outgoingPortMap.get(port).get(0).sizeOrDefaultSize»
 				#define tokens_«port.name» «port.fullName»->contents
-
 			«ENDFOR»
 			«IF enableTrace»
 				////////////////////////////////////////////////////////////////////////////////
-				// Trace files declaration (out)
+				// Trace files declarations (for Output FIFOs)
+				static const int actorIx = «actorGlobalIx»;
 				«FOR port : actor.outputs.filter[! native]»
-					FILE *file_«port.name»;
+					static const int «port.fullName»_id = «actor.outputs.indexOf(port)»;
+«««					static const TCHAR* file_name_«port.name» = "/traces/«port.fullName».txt";
+«««					//const TCHAR* fileName_«port.name» = "/traces/«port.fullName».txt";
+«««					static DWORD file_ptr_«port.name» = 0;
+«««					static DWORD file_ln_«port.name» = 0;				
 				«ENDFOR»
 
 			«ENDIF»
@@ -588,6 +586,12 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			«action.print()»
 		«ENDFOR»
 
+«««		«IF enableTrace»
+«««		////////////////////////////////////////////////////////////////////////////////
+«««		// Compare tokens in the output FIFO(s) with tokens in the corresponding trace file(s).
+«««		«printCompareWithTraces»
+«««		«ENDIF»
+		
 		////////////////////////////////////////////////////////////////////////////////
 		// Initializes
 		«printInitialize»
@@ -602,6 +606,8 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 «««			«printMain»
 «««		«ENDIF»
 	'''
+	
+	
 	def protected getTopFileContent() '''
 		#include "xil_cache.h"
 		«IF measureTime»
@@ -660,14 +666,14 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 					testScheduler();
 				«ENDIF»
 				«IF measureTime»
-				startTime = XTmrCtr_GetValue(TmrCtrInstancePtr, TIMER_CNTR_0);
+					startTime = XTmrCtr_GetValue(TmrCtrInstancePtr, TIMER_CNTR_0);
 				«ENDIF»
 				i += «entityName»_scheduler();
 				«IF measureTime»
-				stopTime = XTmrCtr_GetValue(TmrCtrInstancePtr, TIMER_CNTR_0);
-				if(i!=0){
-					acumTime += (stopTime - startTime);
-				}
+					stopTime = XTmrCtr_GetValue(TmrCtrInstancePtr, TIMER_CNTR_0);
+					if(i!=0){
+						acumTime += (stopTime - startTime);
+					}
 				«ENDIF»
 				stop = stop || (i == 0);
 			}
@@ -725,8 +731,6 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		
 		«printTestInit»
 		
-		«printTestScheduler»
-		
 	'''
 
 //	override caseInstCall(InstCall call) '''
@@ -742,5 +746,39 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		if(proc.name != "print")
 		'''«modifier» «proc.returnType.doSwitch» «proc.name»(«proc.parameters.join(", ")[declare]»);'''
 	}
+	
+	override protected printCore(Action action, boolean isAligned) '''
+		static void «action.body.name»«IF isAligned»_aligned«ENDIF»() {
+
+			// Compute aligned port indexes
+			«FOR port : action.inputPattern.ports + action.outputPattern.ports»
+				i32 index_aligned_«port.name» = index_«port.name» % SIZE_«port.name»;
+			«ENDFOR»
+
+			«FOR variable : action.body.locals»
+				«variable.declare»;
+			«ENDFOR»
+			«beforeActionBody»
+
+			«FOR block : action.body.blocks»
+				«block.doSwitch»
+			«ENDFOR»
+
+			// Update ports indexes
+			«FOR port : action.inputPattern.ports»
+				index_«port.name» += «action.inputPattern.getNumTokens(port)»;
+			«ENDFOR»
+			«FOR port : action.outputPattern.ports»
+				index_«port.name» += «action.outputPattern.getNumTokens(port)»;
+			«ENDFOR»
+			
+			«FOR port : action.inputPattern.ports»
+				read_end_«port.name»();
+			«ENDFOR»
+			«FOR port : action.outputPattern.ports»
+				write_end_«port.name»();
+			«ENDFOR»
+		}
+	'''
 }
 

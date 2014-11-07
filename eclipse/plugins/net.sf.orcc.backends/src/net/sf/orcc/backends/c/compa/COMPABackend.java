@@ -38,13 +38,11 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.backends.c.CBackend;
-import net.sf.orcc.backends.c.compa.InstancePrinter;
 import net.sf.orcc.backends.c.transform.CBroadcastAdder;
 import net.sf.orcc.backends.transform.DisconnectedOutputPortRemoval;
 import net.sf.orcc.backends.util.Mapping;
 import net.sf.orcc.backends.util.Validator;
 import net.sf.orcc.df.Actor;
-import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.transform.ArgumentEvaluator;
 import net.sf.orcc.df.transform.Instantiator;
@@ -69,10 +67,11 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  * @author Antoine Lorence
  */
 public class COMPABackend extends CBackend {
-	private static final int currentMappingNb = 14;
-	private static final int nbProcessors = 15;
+	private static int nbProcessors; 		// Not counting the Source & Display executor!!!
+	private static int fBaseAddr;
 	private final boolean printTop = false;
-	private final boolean[][] currentMap = new mappings().mapping[currentMappingNb];
+	private static boolean[][] currentMap;
+	private boolean enableTrace = false;
 	
 	@Override
 	protected void doInitializeOptions() {
@@ -81,6 +80,9 @@ public class COMPABackend extends CBackend {
 //		new File(path + File.separator + "bin").mkdirs();
 //
 		srcPath = path + File.separator + "src";
+		nbProcessors = getAttribute("net.sf.orcc.backends.c.compa.nbProc", 4);
+		currentMap = new mappings().mapping[nbProcessors - 1];
+		fBaseAddr = getAttribute("net.sf.orcc.backends.c.compa.addr", 0xc0000000);
 	}
 	
 	
@@ -204,19 +206,31 @@ public class COMPABackend extends CBackend {
 
 		transformActors(network.getAllActors());
 		network.computeTemplateMaps();
-
-		// print instances
-//		printChildren(network);
-		printChildrenCompa(network);
-		
 		
 		// Print fifo allocation file into the orcc lib include folder.
 		OrccLogger.trace("Printing the fifo allocation file... ");
-		if (new NetworkPrinter(network, options).printFifoFile(path + "/libs/orcc/include") > 0) {
+		if (new NetworkPrinter(network, options, fBaseAddr).printFifoFile(path + "/libs/orcc/include") > 0) {
 			OrccLogger.traceRaw("Cached\n");
 		} else {
 			OrccLogger.traceRaw("Done\n");
 		}
+
+		// Print traces names file into the orcc lib include folder.
+		if(enableTrace){
+			OrccLogger.trace("Printing the traces definitions file... ");
+			if (new NetworkPrinter(network, options, fBaseAddr).printTracesDefsFile(path + "/libs/orcc/include") > 0) {
+				OrccLogger.traceRaw("Cached\n");
+			} else {
+				OrccLogger.traceRaw("Done\n");
+			}
+		}
+		
+		// Delete old generated files.
+		deleteOldFiles(srcPath);
+		
+		// print instances
+//		printChildren(network);
+		printChildrenCompa(network);
 		
 		// Print Top files
 		new TopFilePrinter(network, currentMap, nbProcessors).print(srcPath);
@@ -224,7 +238,7 @@ public class COMPABackend extends CBackend {
 		if (printTop){
 			// print network
 			OrccLogger.trace("Printing network... ");
-			if (new NetworkPrinter(network, options).print(srcPath) > 0) {
+			if (new NetworkPrinter(network, options, fBaseAddr).print(srcPath) > 0) {
 				OrccLogger.traceRaw("Cached\n");
 			} else {
 				OrccLogger.traceRaw("Done\n");
@@ -249,45 +263,40 @@ public class COMPABackend extends CBackend {
 	}
 
 
-	@Override
-	protected boolean printInstance(Instance instance) {
-//		// Copy Xilinx platform specific files into the instance source folder.
-//		OrccLogger.trace("Copying Xilinx platform files... ");
-//		final boolean xilFilesOk = copyFolderToFileSystem("/runtime/COMPA/xilinx",	path + File.separator + instance.getSimpleName(), debug);
-//		if (xilFilesOk) {
-//			OrccLogger.traceRaw("OK" + "\n");
-//		} else {
-//			OrccLogger.warnRaw("Error" + "\n");
-//		}
-//		if (printTop)
-			return new InstancePrinter(options, printTop).print(srcPath, instance) > 0;
-//		else
-//			return new InstancePrinter(options, printTop).print(srcPath + File.separator + instance.getSimpleName(), instance) > 0;
-	}
+//	@Override
+//	protected boolean printInstance(Instance instance) {
+////		// Copy Xilinx platform specific files into the instance source folder.
+////		OrccLogger.trace("Copying Xilinx platform files... ");
+////		final boolean xilFilesOk = copyFolderToFileSystem("/runtime/COMPA/xilinx",	path + File.separator + instance.getSimpleName(), debug);
+////		if (xilFilesOk) {
+////			OrccLogger.traceRaw("OK" + "\n");
+////		} else {
+////			OrccLogger.warnRaw("Error" + "\n");
+////		}
+////		if (printTop)
+//			return new InstancePrinter(options, srcPath, printTop).print(targetFolder, instance) > 0;
+////		else
+////			return new InstancePrinter(options, printTop).print(srcPath + File.separator + instance.getSimpleName(), instance) > 0;
+//	}
+//	
+//	@Override
+//	protected boolean printActor(Actor actor) {
+////		if (printTop)
+//			return new InstancePrinter(options, srcPath, printTop).print(targetFolder, actor) > 0;
+////		else
+////			return new InstancePrinter(options, printTop).print(srcPath + File.separator + actor.getSimpleName(), actor) > 0;
+//	}
 	
-	@Override
-	protected boolean printActor(Actor actor) {
-//		if (printTop)
-			return new InstancePrinter(options, printTop).print(srcPath, actor) > 0;
-//		else
-//			return new InstancePrinter(options, printTop).print(srcPath + File.separator + actor.getSimpleName(), actor) > 0;
-	}
-	
-	protected boolean printVertex(Vertex vertex, String targetFolder){
+	protected boolean printVertex(Vertex vertex, int actorIx, String targetFolder){
 		final Actor actor = vertex.getAdapter(Actor.class);
-		return new InstancePrinter(options, printTop).print(targetFolder, actor) > 0;
+		return new InstancePrinter(options, srcPath, printTop).print(targetFolder, actor, actorIx) > 0;
 		
 	}
 	
-	/**
-	 * Print entities of the given network.
-	 * 
-	 * @param entities
-	 *            a list of entities
-	 */
 	protected void printChildrenCompa(Network network) {
 //		checkConnectivy
 		String procFolder;
+		int totalPrintedActors = 0;
 		for (int i=0; i< nbProcessors; i++) {
 			if (i<10){
 				procFolder = srcPath + File.separator + "Top_0" + i;
@@ -304,10 +313,26 @@ public class COMPABackend extends CBackend {
 				for (ActorsIndex actorIx : ActorsIndex.values()){
 					if(currentMap[i][actorIx.ordinal()]){
 						OrccLogger.traceln(network.getChild(actorIx.toString()).getLabel());
-						printVertex(network.getChild(actorIx.toString()), procFolder);
+						printVertex(network.getChild(actorIx.toString()), actorIx.ordinal(), procFolder);
+						totalPrintedActors++;
 					}
 				}		
+				OrccLogger.traceln(totalPrintedActors + " of " + ActorsIndex.values().length + " actors were mapped");
 			}
+		}
+	}
+	
+	protected void deleteOldFiles(String path) {
+		File currFolder = new File(path);
+		if(currFolder. exists()){
+			for (File f : currFolder.listFiles()) {
+				if(f.isDirectory()) {
+					deleteOldFiles(f.getAbsolutePath());
+					f.delete();
+				}
+				else
+					f.delete();
+			}			
 		}
 	}
 }
