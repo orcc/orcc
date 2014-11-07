@@ -181,7 +181,7 @@ class InstancePrinter extends CTemplate {
 	 * @param actor the given actor
 	 * @return 1 if file was cached, 0 if file was printed
 	 */
-	def print(String targetFolder, Actor actor) {
+	def protected print(String targetFolder, Actor actor) {
 		setActor(actor)
 		print(targetFolder)
 	}
@@ -760,7 +760,7 @@ class InstancePrinter extends CTemplate {
 		}
 	'''
 	
-	def private printCore(Action action, boolean isAligned) '''
+	def protected printCore(Action action, boolean isAligned) '''
 		static «IF inlineActions»«inline»«ELSE»«noInline»«ENDIF»void «action.body.name»«IF isAligned»_aligned«ENDIF»() {
 			«action.profileStart»
 
@@ -1043,7 +1043,7 @@ class InstancePrinter extends CTemplate {
 
 	override caseInstCall(InstCall call) '''
 		«IF call.print»
-			printf(«call.arguments.printfArgs.join(", ")»);
+«««			printf(«call.arguments.printfArgs.join(", ")»);
 		«ELSE»
 			«IF call.target != null»«call.target.variable.name» = «ENDIF»«call.procedure.name»(«call.arguments.join(", ")[print]»);
 		«ENDIF»
