@@ -212,7 +212,11 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 		static void cast_«entityName»_«connOut.sourcePort.name»_read_untagged_0() {
 			i32 «connOut.maskName» = «connOut.localrName» & («connOut.safeSize - 1» );
 			«IF connOut.fifoType.bool»
+				«IF connOut.targetPort != null»			
 				«connOut.fifoType» tmp_«connOut.targetPort.name»;
+				«ELSE»
+				«connOut.fifoType» tmp_«connOut.sourcePort.name»;
+				«ENDIF»				
 			«ELSE»
 				«connOut.fifoType.doSwitch» tmp_«connOut.sourcePort.name»;
 			«ENDIF»
