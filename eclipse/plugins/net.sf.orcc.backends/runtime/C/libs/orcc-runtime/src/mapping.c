@@ -440,10 +440,76 @@ int get_processor_id_of_actor(network_t *network, int actorId) {
 
 int do_quick_mapping(network_t *network, options_t *opt, idx_t *part) {
     int ret = ORCC_OK;
+    int i, unMappedActors, selectedProcIndex, maxCommCost, maxIndex, total_workload = 0;
+    proc_info_t *processors;
     assert(network != NULL);
     assert(opt != NULL);
     assert(part != NULL);
-    // TODO
+
+    processors = init_processors(opt->nb_processors);
+
+    print_orcc_trace(ORCC_VL_VERBOSE_1, "Applying Quick Mapping strategy for mapping");
+
+    unMappedActors = network->nb_actors;
+    selectedProcIndex = 0;
+
+    for (i = 0; i < network->nb_actors; i++) {
+        total_workload += network->actors[i]->workload;
+    }
+
+    while (unMappedActors > 0) {
+        maxIndex = 0;
+        maxCommCost = 0;
+
+        for (i = 0; i < network->nb_actors; i++) {
+            if (network->actors[i]->processor_id == -1) {
+                if (network->actors[i]->triedProcId != processors[selectedProcIndex].processor_id) {
+                    network->actors[i]->commCost = 0;
+                    network->actors[i]->triedProcId = processors[selectedProcIndex].processor_id;
+                }
+
+                if (network->actors[i]->commCost >= maxCommCost) {
+                    maxCommCost = network->actors[i]->commCost;
+                    maxIndex = i;
+                }
+            }
+        }
+
+        network->actors[maxIndex]->processor_id = processors[selectedProcIndex].processor_id;
+        part[maxIndex] = network->actors[maxIndex]->processor_id;
+        processors[selectedProcIndex].utilization += network->actors[maxIndex]->workload;
+
+        for (i = 0; i < network->nb_connections; i++) {
+            if (network->connections[i]->src->id == network->actors[maxIndex]->id) {
+                network->actors[network->connections[i]->dst->id]->commCost += network->connections[i]->workload;
+            }
+
+            if (network->connections[i]->dst->id == network->actors[maxIndex]->id) {
+                network->actors[network->connections[i]->src->id]->commCost += network->connections[i]->workload;
+            }
+        }
+
+        if (processors[selectedProcIndex].utilization >= total_workload / opt->nb_processors
+            && selectedProcIndex < opt->nb_processors - 1) {
+            selectedProcIndex++;
+        }
+
+        unMappedActors--;
+    }
+
+    if (check_verbosity(ORCC_VL_VERBOSE_2) == TRUE) {
+        print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : QM result");
+        for (i = 0; i < network->nb_actors; i++) {
+            print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Actor[%d]\tname = %s\tworkload = %d\tprocessorId = %d",
+                             i, network->actors[i]->name, network->actors[i]->workload, network->actors[i]->processor_id);
+        }
+        for (i = 0; i < opt->nb_processors; i++) {
+            print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Workload Proc[%d]: %d",
+                             i, processors[i].utilization);
+        }
+    }
+
+    delete_processors(processors);
     return ret;
 }
 
@@ -504,23 +570,91 @@ int do_weighted_round_robin_mapping(network_t *network, options_t *opt, idx_t *p
  * @author Long Nguyen
  */
 int find_min_utilized_processor(proc_info_t *processors, int nb_processors) {
+    int i, minIndex = 0;
     assert(processors != NULL);
-    // TODO
-    return 0;
+
+    for (i = 0; i < nb_processors; i++) {
+        if (processors[i].utilization < processors[minIndex].utilization) {
+            minIndex = i;
+        }
+    }
+
+    return minIndex;
 }
 
 int calculate_comm_of_actor(network_t *network, proc_info_t *processors, int actorIndex, int procIndex) {
+    int i, procId, comm = 0;
     assert(processors != NULL);
-    // TODO
-    return 0;
+
+    for (i = 0; i < network->nb_connections; i++) {
+        if (network->connections[i]->src->id == network->actors[actorIndex]->id) {
+            procId = get_processor_id_of_actor(network, network->connections[i]->dst->id);
+            if (procId != -1 && procId != processors[procIndex].processor_id) {
+                comm += network->connections[i]->workload;
+            }
+        }
+
+        if (network->connections[i]->dst->id == network->actors[actorIndex]->id) {
+            procId = get_processor_id_of_actor(network, network->connections[i]->src->id);
+            if (procId != -1 && procId != processors[procIndex].processor_id) {
+                comm += network->connections[i]->workload;
+            }
+        }
+    }
+
+    return comm;
 }
 
 int do_weighted_round_robin_comm_mapping(network_t *network, options_t *opt, idx_t *part) {
     int ret = ORCC_OK;
+    int i, j;
+    int selectedProc, minCommIndex;
+    proc_info_t *processors;
     assert(network != NULL);
     assert(opt != NULL);
     assert(part != NULL);
-    // TODO
+
+    print_orcc_trace(ORCC_VL_VERBOSE_1, "Applying Communication Optimized Weighted strategy for mapping");
+
+    processors = init_processors(opt->nb_processors);
+    sort_actors(network->actors, network->nb_actors);
+
+    for (i = 0; i < network->nb_actors; i++) {
+        selectedProc = find_min_utilized_processor(processors, opt->nb_processors);
+
+        minCommIndex = -1;
+
+        for (j = 0; j < network->nb_actors; j++) {
+            if (network->actors[j]->processor_id == -1) {
+                if (minCommIndex == -1) {
+                    minCommIndex = j;
+                }
+
+                if (calculate_comm_of_actor(network, processors, j, selectedProc)
+                    <= calculate_comm_of_actor(network, processors, minCommIndex, selectedProc)) {
+                    minCommIndex = j;
+                }
+            }
+        }
+
+        network->actors[minCommIndex]->processor_id = processors[selectedProc].processor_id;
+        part[minCommIndex] = network->actors[minCommIndex]->processor_id;
+        processors[selectedProc].utilization += network->actors[minCommIndex]->workload;
+    }
+
+    if (check_verbosity(ORCC_VL_VERBOSE_2) == TRUE) {
+        print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : COWLB result");
+        for (i = 0; i < network->nb_actors; i++) {
+            print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Actor[%d]\tname = %s\tworkload = %d\tprocessorId = %d",
+                             i, network->actors[i]->name, network->actors[i]->workload, network->actors[i]->processor_id);
+        }
+        for (i = 0; i < opt->nb_processors; i++) {
+            print_orcc_trace(ORCC_VL_VERBOSE_2, "DEBUG : Workload Proc[%d]: %d",
+                             i, processors[i].utilization);
+        }
+    }
+
+    delete_processors(processors);
     return ret;
 }
 
