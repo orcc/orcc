@@ -124,6 +124,12 @@ actor_t *sched_get_next_rr(local_scheduler_t *sched);
 actor_t *sched_get_next_ddd(local_scheduler_t *sched);
 
 /**
+ * Add the actor to the schedulable or waiting list.
+ * The list is chosen according to associate scheduler of the actor.
+ */
+void sched_add_schedulable(local_scheduler_t *sched, actor_t *actor);
+
+/**
  * Add waited actors to the schedulable list.
  * Use a fully connected topology of communications.
  */
