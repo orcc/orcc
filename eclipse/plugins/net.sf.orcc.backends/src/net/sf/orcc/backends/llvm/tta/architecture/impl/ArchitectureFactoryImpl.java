@@ -320,16 +320,24 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		EList<Segment> segments = getAllSegments(tta.getBuses());
 		Socket i1 = createInputSocket(name + "_i1", segments);
 		Socket i2 = createInputSocket(name + "_i2", segments);
+		Socket i3 = createInputSocket(name + "_i3", segments);
+		Socket i4 = createInputSocket(name + "_i4", segments);
 		Socket o1 = createOutputSocket(name + "_o1", segments);
 		// Port
 		FuPort in1t = createFuPort("in1t", 32, true, true);
 		FuPort in2 = createFuPort("in2", 32, false, false);
+		FuPort in3 = createFuPort("in3", 32, false, false);
+		FuPort in4 = createFuPort("in4", 32, false, false);
 		FuPort out = createFuPort("out", 32, false, false);
 		in1t.connect(i1);
 		in2.connect(i2);
+		in3.connect(i3);
+		in4.connect(i4);
 		out.connect(o1);
 		functionUnit.getPorts().add(in1t);
 		functionUnit.getPorts().add(in2);
+		functionUnit.getPorts().add(in3);
+		functionUnit.getPorts().add(in4);
 		functionUnit.getPorts().add(out);
 		functionUnit.setImplementation(name);
 
@@ -352,6 +360,9 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 			functionUnit.getOperations().add(
 					createOperationDefault2(operation, in1t, in2));
 		}
+		functionUnit.getOperations().add(
+				createOperationDefault("custom_memcpy",in1t, 0, 1, true, in2, 0, 1, true, 
+						in3, 0, 1, true, in4, 0, 1, true));
 		return functionUnit;
 	}
 
@@ -900,6 +911,71 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		}
 		operation.getPipeline().add(element1);
 		operation.getPipeline().add(element2);
+		return operation;
+	}
+	
+	private Operation createOperationDefault(String name, FuPort port1,
+			int startCycle1, int cycle1, boolean isReads1,
+			FuPort port2, int startCycle2, int cycle2, boolean isReads2,
+			FuPort port3, int startCycle3, int cycle3, boolean isReads3,
+			FuPort port4, int startCycle4, int cycle4, boolean isReads4) {
+		Operation operation = createOperation(name);
+		operation.setControl(false);
+		Element element1, element2, element3, element4;
+		if (isReads1) {
+			element1 = createReads(port1, startCycle1, cycle1);
+		} else {
+			element1 = createWrites(port1, startCycle1, cycle1);
+		}
+		if (isReads2) {
+			element2 = createReads(port2, startCycle2, cycle2);
+		} else {
+			element2 = createWrites(port2, startCycle2, cycle2);
+		}
+		if (isReads3) {
+			element3 = createReads(port3, startCycle3, cycle3);
+		} else {
+			element3 = createWrites(port3, startCycle3, cycle3);
+		}
+		if (isReads4) {
+			element4 = createReads(port4, startCycle4, cycle4);
+		} else {
+			element4 = createWrites(port4, startCycle4, cycle4);
+		}
+		operation.getPipeline().add(element1);
+		operation.getPipeline().add(element2);
+		operation.getPipeline().add(element3);
+		operation.getPipeline().add(element4);
+		return operation;
+	}
+	
+	private Operation createOperationDefault(String name, FuPort port1,
+			int startCycle1, int cycle1, boolean isReads1,
+			FuPort port2, int startCycle2, int cycle2, boolean isReads2,
+			FuPort port3, int startCycle3, int cycle3, boolean isReads3) {
+		Operation operation = createOperation(name);
+		operation.setControl(false);
+		Element element1, element2, element3;
+		if (isReads1) {
+			element1 = createReads(port1, startCycle1, cycle1);
+		} else {
+			element1 = createWrites(port1, startCycle1, cycle1);
+		}
+		if (isReads2) {
+			element2 = createReads(port2, startCycle2, cycle2);
+		} else {
+			element2 = createWrites(port2, startCycle2, cycle2);
+		}
+		if (isReads3) {
+			element3 = createReads(port3, startCycle3, cycle3);
+		} else {
+			element3 = createWrites(port3, startCycle3, cycle3);
+		}
+		
+		operation.getPipeline().add(element1);
+		operation.getPipeline().add(element2);
+		operation.getPipeline().add(element3);
+		
 		return operation;
 	}
 

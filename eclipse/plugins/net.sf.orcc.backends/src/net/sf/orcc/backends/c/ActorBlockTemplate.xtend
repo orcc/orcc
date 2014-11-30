@@ -64,17 +64,33 @@ class ActorBlockTemplate {
 	def dispatch generate(ForBlock forBlock) {
 		comma = ""
 		jump = ""
+		val unitStride = false
+//		forBlock.
+//		if ( unitStride ) {
+//			if (stride.toString.contains("-")) {
+//				lowerBound.append('''«ActorInstructionTemplate::eInstance.generate(scopFor.UB)»''')
+//				upperBound.append('''«ActorInstructionTemplate::eInstance.generate(scopFor.LB)»''')
+//			} else {
+//				lowerBound.append('''«ActorInstructionTemplate::eInstance.generate(scopFor.LB)»''')
+//				upperBound.append('''«ActorInstructionTemplate::eInstance.generate(scopFor.UB)»''')
+//			}
+//			buffer.append('''foreach int «scopFor.iterator.name» in «lowerBound» .. «upperBound» ''')
+//			buffer.append('''do
+//			''')
 		val buffer = new StringBuffer()
 		buffer.append('''
 		''')
-		buffer.append('''«ActorBlockTemplate::eInstance.generate(forBlock.initBlock)»''')
-		buffer.append('''while («ActorBlockTemplate::eInstance.generate(forBlock.testBlock)») do''');
-		
+		buffer.append('''«ActorBlockTemplate::eInstance.generate(forBlock.initBlock)»;
+		''')
+		buffer.append('''while («ActorBlockTemplate::eInstance.generate(forBlock.testBlock)») do
+		''');
 		comma = ";"
 		jump = "
 "
-		buffer.append('''«ActorBlockTemplate::eInstance.generate(forBlock.bodyBlock)»''')
-		buffer.append('''«ActorBlockTemplate::eInstance.generate(forBlock.stepBlock)»''');
+		buffer.append('''«ActorBlockTemplate::eInstance.generate(forBlock.bodyBlock)»
+		''')
+		buffer.append('''«ActorBlockTemplate::eInstance.generate(forBlock.stepBlock)»
+		''');
 		buffer.append('''end''');
 		'''«buffer»
 		'''

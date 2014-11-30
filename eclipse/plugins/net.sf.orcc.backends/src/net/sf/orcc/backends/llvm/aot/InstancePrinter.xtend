@@ -1023,6 +1023,35 @@ class InstancePrinter extends LLVMTemplate {
 		}
 		return paramList
 	}
+	
+	def protected format(EList<Arg> args, EList<Param> params, Action action) {
+		val paramList = new ArrayList<CharSequence>
+		if(params.size != 0) {
+			for (i : 0..params.size-1) {
+				val arg = args.get(i)
+				val value = (arg as ArgByVal).value
+				val variable = (value as ExprVar).use.variable
+				if ( action != null && action.outputPattern.contains(variable)  
+						&& !action.outputPattern.varToPortMap.get(variable).native ) {
+					 val port = action.outputPattern.varToPortMap.get(variable);
+					 val connection = outgoingPortMap.get(port).get(0)
+					 val connId = connection.getSafeId(port)
+					 val buffer = '''[«connection.safeSize» x «port.type.doSwitch»]«connection.addrSpace»* @fifo_«connId»_content'''
+					 paramList.add(buffer);
+				} else if ( action != null && action.inputPattern.contains(variable) && 
+					!action.inputPattern.varToPortMap.get(variable).native ) {
+					val port = action.outputPattern.varToPortMap.get(variable);
+					val connection = outgoingPortMap.get(port).get(0)
+					val connId = connection.getSafeId(port)
+					val buffer = '''[«connection.safeSize» x «port.type.doSwitch»]«connection.addrSpace»* @fifo_«connId»_content'''
+					paramList.add(buffer);
+				} else {
+					paramList.add(printArgument(args.get(i), params.get(i).variable.type))
+				}
+			}
+		}
+		return paramList
+	}
 
 	def protected printArgument(Arg arg, Type type) {
 		if (arg.byRef)

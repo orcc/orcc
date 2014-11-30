@@ -13,6 +13,12 @@ import fr.irisa.cairn.gecos.model.modules.CreateProject;
 import fr.irisa.cairn.gecos.model.scop.almaflow.GecosToCALInfo;
 import fr.irisa.cairn.gecos.model.scop.almaflow.PortInfoGecosToCAL;
 import fr.irisa.cairn.gecos.model.scop.almaflow.UR1OptimizationFlowModule;
+import fr.irisa.cairn.gecos.model.tools.controlflow.BuildControlFlow;
+import fr.irisa.cairn.gecos.model.tools.controlflow.ClearControlFlow;
+import fr.irisa.cairn.gecos.model.transforms.ssa.ComputeSSAForm;
+import fr.irisa.cairn.gecos.model.transforms.ssa.RemoveSSAForm;
+import fr.irisa.cairn.gecos.model.transforms.untested.PropogateExpression;
+import fr.irisa.cairn.tools.ecore.DanglingAnalyzer.DanglingException;
 import fr.irisa.cairn.tools.ecore.query.EMFUtils;
 import gecos.blocks.BasicBlock;
 import gecos.blocks.CompositeBlock;
@@ -22,9 +28,9 @@ import gecos.blocks.WhileBlock;
 import gecos.core.ParameterSymbol;
 import gecos.core.ProcedureSet;
 import gecos.core.Symbol;
-import gecosproject.GecosProject;
-import gecosproject.GecosSourceFile;
-import gecosproject.GecosprojectFactory;
+import gecos.gecosproject.GecosProject;
+import gecos.gecosproject.GecosSourceFile;
+import gecos.gecosproject.GecosprojectFactory;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -47,6 +53,7 @@ import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.Param;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.util.Attribute;
 import net.sf.orcc.util.OrccLogger;
@@ -285,6 +292,18 @@ public class TestGeCosTransform {
 			gecosSourceFile.setModel(procedureSet);
 			String pathName = actor.getFile().getRawLocation().toOSString();
 			pathName = pathName.substring(0, pathName.lastIndexOf("/")+1);
+			
+			new ClearControlFlow(gecosProject).compute();
+			new BuildControlFlow(gecosProject).compute();
+			try {
+				new ComputeSSAForm(gecosProject).compute();
+			} catch (DanglingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			new PropogateExpression(gecosProject).compute();
+			new RemoveSSAForm(gecosProject).compute();
+			
 			new XtendCGenerator(gecosProject, pathName).compute();
 			/*String[] cmd = {"bash", "-c", "sed -i \"s/\\(\\* *[a-z,A-Z,_,0-9]\\+ *\\)\\++/][/g\" /home/mythri/src-regen/_dummyProgram.c"};
 			System.out.println(cmd);
@@ -357,22 +376,24 @@ public class TestGeCosTransform {
 		for ( int i = 0; i < numActors+1; i++ ) {
 			List<ActorPortInfo> ipportList = new ArrayList<ActorPortInfo>();
 			List<ActorPortInfo> opportList = new ArrayList<ActorPortInfo>();
-			System.out.println("Actor@ " + i + "  " + actorsMap.size());
+		//	System.out.println("Actor@ " + i + "  " + actorsMap.size());
 			List<GecosToCALInfo> list = actorsMap.get(i);
 			GecosToCALInfo actorEntry = list.get(0);
+			List<Symbol> symList = getSymbolsForActor(actorEntry);
+			
 			if ( i == numActors )  { //That is scatter
 				ipportList = getPortListFromCALPorts(action, action.getInputPattern().getPorts(), true);
-				List<ActorPortInfo> l = getPortList(actorEntry.ipPortList, action);
+				List<ActorPortInfo> l = getPortList(actorEntry.ipPortList, action, symList);
 				ipportList.addAll(l);
 			} else {
-				ipportList = getPortList(actorEntry.ipPortList, action);
+				ipportList = getPortList(actorEntry.ipPortList, action, symList);
 			}
 			if ( i == numActors  ) { //This is Scatter
 				opportList = getPortListFromCALPorts(action, action.getOutputPattern().getPorts(), false);
-				List<ActorPortInfo> l = getPortList(actorEntry.opPortList, action);
+				List<ActorPortInfo> l = getPortList(actorEntry.opPortList, action, symList);
 				opportList.addAll(l);
 			} else {
-				opportList = getPortList(actorEntry.opPortList, action);
+				opportList = getPortList(actorEntry.opPortList, action, symList);
 			}
 			String suffix = "_part_"+i+".cal";
 			String actorSuffix = "_part_" + i;
@@ -387,7 +408,7 @@ public class TestGeCosTransform {
 			File f = new File(name);
 			CharSequence c = actorGen.printActorSignature(pkgName, actorName+actorSuffix, ipportList, opportList);
 			String content = c.toString();
-			List<Symbol> symList = getSymbolsForActor(actorEntry);
+			
 			c = actorGen.printActorSymbols(symList);
 			//content.concat(c.toString());
 			content = content + c.toString();
@@ -402,8 +423,8 @@ public class TestGeCosTransform {
 				}
 				opportList.clear();
 				ipportList.clear();
-				opportList = getPortList(info.opPortList, action);
-				ipportList = getPortList(info.ipPortList, action);
+				opportList = getPortList(info.opPortList, action, symList);
+				ipportList = getPortList(info.ipPortList, action, symList);
 
 				List<GScopFSM> fsms = EMFUtils.eAllContentsInstancesOf(info.proc, GScopFSM.class);
 				List<GScopRoot> roots = EMFUtils.eAllContentsInstancesOf(info.proc, GScopRoot.class);
@@ -416,8 +437,11 @@ public class TestGeCosTransform {
 				if ( fsms.size() != 0 ) {
 					c = actorGen.printAction("action_"+actionId,info.proc, fsms.get(0), ipportList, 
 										opportList, info.guard, info.stateChange, scatterInit, doneStateId);
-				} else {
+				} else if ( roots.size() != 0 ){
 					c = actorGen.printAction("action_"+actionId,info.proc, roots.get(0), ipportList, 
+							opportList, info.guard, info.stateChange, scatterInit);
+				} else {
+					c = actorGen.printAction("action_"+actionId,info.proc, info.proc.getBody(), ipportList, 
 							opportList, info.guard, info.stateChange, scatterInit);
 				}
 				content = content + c.toString();
@@ -547,7 +571,7 @@ private static List<NetworkPortInfo> getNetworkPorts(String actorName, Action ac
 		return portList;
 	}
 	
-	private static List<ActorPortInfo> getPortList(List<PortInfoGecosToCAL> list, Action action) {
+	private static List<ActorPortInfo> getPortList(List<PortInfoGecosToCAL> list, Action action, List<Symbol> symList) {
 		List<ActorPortInfo> opportList = new ArrayList<ActorPortInfo>();
 		for ( PortInfoGecosToCAL e : list ) {
 			String arrayName = e.arrayName;
@@ -557,7 +581,7 @@ private static List<NetworkPortInfo> getNetworkPorts(String actorName, Action ac
 					arrayName = e.arrayName.substring(0,arrayName.lastIndexOf("_"));
 				}
 			}
-			String arrayType = getTypeOfArray(arrayName, action);
+			String arrayType = getTypeOfArray(arrayName, action, symList);
 			ActorPortInfo p = new ActorPortInfo("Port_"+e.bufferName, (int)e.bufferSize, e.bufferName, arrayType);
 			opportList.add(p);
 		}
@@ -573,11 +597,14 @@ private static List<NetworkPortInfo> getNetworkPorts(String actorName, Action ac
 			return "boolean";
 		} else if ( type.isUint() ) {
 			return "uint";
-		} 
+		} else if ( type.isList() ) {
+			TypeList t = (TypeList)type;
+			return getBaseType(t.getInnermostType());
+		}
 		return type.toString();
 	}
 
-	private static String getTypeOfArray(String arrayName, Action action) {
+	private static String getTypeOfArray(String arrayName, Action action, List<Symbol> symList) {
 		String type = null;
 		for ( Port p : action.getInputPattern().getPorts() ) {
 			String name = p.getName();
@@ -595,9 +622,14 @@ private static List<NetworkPortInfo> getNetworkPorts(String actorName, Action ac
 		}
 		for ( Var v : action.getBody().getLocals() ) {
 			if ( v.getName().equals(arrayName) ) {
-				return v.getType().toString();
+				return getBaseType(v.getType()); //.toString();
 			}
 		}
+//		for ( Symbol sym : symList ) {
+//			if ( sym.getName().equals(arrayName) ) {
+//				return sym.getType().toString();
+//			}
+//		}
 		return type;
 	}
 }

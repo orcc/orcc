@@ -42,6 +42,7 @@ import net.sf.orcc.ir.Arg
 import org.eclipse.emf.common.util.EList
 
 import static net.sf.orcc.backends.BackendsConstants.*
+import net.sf.orcc.util.util.EcoreHelper
 
 class SwActorPrinter extends InstancePrinter {
 	
@@ -195,7 +196,8 @@ class SwActorPrinter extends InstancePrinter {
 		«val args = call.arguments»
 		«val parameters = call.procedure.parameters»
 		«IF call.procedure.native»
-			«IF target != null»%«target.variable.name» = «ENDIF»tail call «call.procedure.returnType.doSwitch» asm sideeffect "ORCC_FU.«call.procedure.name.toUpperCase»", "«IF target != null»=ir, «ENDIF»ir«args.ir»"(i32 0«IF !args.nullOrEmpty», «args.format(parameters).join(", ")»«ENDIF») nounwind
+			«val action = EcoreHelper::getContainerOfType(call, typeof(Action))»
+			«IF target != null»%«target.variable.name» = «ENDIF»tail call «call.procedure.returnType.doSwitch» asm sideeffect "ORCC_FU.«call.procedure.name.toUpperCase»", "«IF target != null»=ir, «ENDIF»ir«args.ir»"(i32 0«IF !args.nullOrEmpty», «args.format(parameters, action).join(", ")»«ENDIF») nounwind
 		«ELSE»
 			«super.caseInstCall(call)»
 		«ENDIF»

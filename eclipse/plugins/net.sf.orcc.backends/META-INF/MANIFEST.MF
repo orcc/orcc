@@ -19,7 +19,8 @@ Require-Bundle: net.sf.orcc.core;bundle-version="1.4.0",
  fr.irisa.cairn.gecos.model.scop.generator.c;bundle-version="1.0.0",
  fr.irisa.cairn.gecos.model.scop.scheduling;bundle-version="1.0.0",
  fr.irisa.cairn.gecos.model.generator.c;bundle-version="1.0.0",
- org.polymodel.scop.generator.c;bundle-version="1.0.0"
+ org.polymodel.scop.generator.c;bundle-version="1.0.0",
+ fr.irisa.cairn.gecos.model.transforms;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .

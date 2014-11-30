@@ -176,9 +176,21 @@ class ActorInstructionTemplate {
 	def dispatch generate(ArrayInstruction arrayInstruction) {
 		val buffer = new StringBuffer()
 		buffer.append('''«ActorInstructionTemplate::eInstance.generate(arrayInstruction.dest)»''')
-		for (Instruction instruction:arrayInstruction.index) {
-			buffer.append('''[«ActorInstructionTemplate::eInstance.generate(instruction)»]''')
+//		for (Instruction instruction:arrayInstruction.index) {
+//			buffer.append('''[«ActorInstructionTemplate::eInstance.generate(instruction)»]''')
+//		}
+		val numDims = arrayInstruction.index.size;
+		var List<Instruction> size = ActorTemplate.arraySizeMap.get((arrayInstruction.dest as SymbolInstruction).getSymbol());//getSizeArray(scopRead.getSymbol().getType());
+		var i = 0;
+		buffer.append("[");
+		for(Instruction inst : arrayInstruction.index) {
+			buffer.append('''(«ActorInstructionTemplate::eInstance.generate(inst)»)''')
+			if ( i < (numDims - 1) ) {
+				buffer.append('''*  «ActorInstructionTemplate::eInstance.generate(size.get(i))»  +''');
+			}
+			i = i + 1;
 		}
+		buffer.append("]");
 		'''«buffer»'''
 	}
 
@@ -281,7 +293,6 @@ class ActorInstructionTemplate {
 			case "sub" : buffer.append('''«generateInstructionWithMultipleSubInstruction(genericInstruction.operands, "-")»''')
 			case "mul" : buffer.append('''«generateInstructionWithMultipleSubInstruction(genericInstruction.operands, "*")»''')
 			case "div" : buffer.append('''«generateInstructionWithMultipleSubInstruction(genericInstruction.operands, "/")»''')
-			case "mod" : buffer.append('''«generateInstructionWithMultipleSubInstruction(genericInstruction.operands, "mod")»''')
 			case "shl" : buffer.append('''«generateInstructionWithMultipleSubInstruction(genericInstruction.operands, "<<")»''')
 			case "shr" : buffer.append('''«generateInstructionWithMultipleSubInstruction(genericInstruction.operands, ">>")»''')
 			case "neg" : buffer.append('''-«ActorInstructionTemplate::eInstance.generate(genericInstruction.operands.get(0))»''')
@@ -350,7 +361,7 @@ class ActorInstructionTemplate {
 				genericInstruction.basicBlock.containingProcedureSet.setAnnotation("need_define_min", null);
 				
 				for(i : 0..genericInstruction.operands.size()-2)
-					buffer.append("_min_(")
+					buffer.append("min(")
 					
 				var tmp=false
 				for (Instruction instruction : genericInstruction.operands) {
@@ -369,7 +380,7 @@ class ActorInstructionTemplate {
 				genericInstruction.basicBlock.containingProcedureSet.setAnnotation("need_define_max", null);
 				
 				for(i : 0..genericInstruction.operands.size()-2)
-					buffer.append("_max_(")
+					buffer.append("max(")
 					
 				var tmp=false
 				for (Instruction instruction : genericInstruction.operands) {
@@ -383,15 +394,23 @@ class ActorInstructionTemplate {
 						buffer.append(", ")
 				}
 			}
+			case "mod" : {
+				genericInstruction.basicBlock.containingProcedureSet.setAnnotation("need_define_mod", null);
+				buffer.append('''_custom_mod_(«ActorInstructionTemplate::eInstance.generate(genericInstruction.operands.get(0))», «ActorInstructionTemplate::eInstance.generate(genericInstruction.operands.get(1))»)''')
+			}
+			case "mmod" : {
+				genericInstruction.basicBlock.containingProcedureSet.setAnnotation("need_define_mod", null);
+				buffer.append('''_custom_mod_(«ActorInstructionTemplate::eInstance.generate(genericInstruction.operands.get(0))», «ActorInstructionTemplate::eInstance.generate(genericInstruction.operands.get(1))»)''')
+			}
 			case "floor" : {
 				//in order to generate floor macro
 				genericInstruction.basicBlock.containingProcedureSet.setAnnotation("need_define_floor", null);
-				buffer.append('''_floor_(«ActorInstructionTemplate::eInstance.generate(genericInstruction.operands.get(0))», «ActorInstructionTemplate::eInstance.generate(genericInstruction.operands.get(1))»)''')
+				buffer.append('''floord(«ActorInstructionTemplate::eInstance.generate(genericInstruction.operands.get(0))», «ActorInstructionTemplate::eInstance.generate(genericInstruction.operands.get(1))»)''')
 			}
 			case "ceil" : {
 				//in order to generate ceil macro
 				genericInstruction.basicBlock.containingProcedureSet.setAnnotation("need_define_ceil", null);
-				buffer.append('''_ceil_(«ActorInstructionTemplate::eInstance.generate(genericInstruction.operands.get(0))», «ActorInstructionTemplate::eInstance.generate(genericInstruction.operands.get(1))»)''')
+				buffer.append('''ceild(«ActorInstructionTemplate::eInstance.generate(genericInstruction.operands.get(0))», «ActorInstructionTemplate::eInstance.generate(genericInstruction.operands.get(1))»)''')
 			}
 			
 			default : 
@@ -447,14 +466,26 @@ class ActorInstructionTemplate {
 	def dispatch generate(SimpleArrayInstruction simpleArrayInstruction) {
 		val buffer = new StringBuffer()
 		buffer.append('''«ActorInstructionTemplate::eInstance.generate(simpleArrayInstruction.dest)»''')
-		for(Instruction instruction : simpleArrayInstruction.index) {
-			buffer.append('''[«ActorInstructionTemplate::eInstance.generate(instruction)»]''')
+//		for(Instruction instruction : simpleArrayInstruction.index) {
+//			buffer.append('''[«ActorInstructionTemplate::eInstance.generate(instruction)»]''')
+//		}
+		val numDims = simpleArrayInstruction.index.size;
+		var List<Instruction> size = ActorTemplate.arraySizeMap.get((simpleArrayInstruction.dest as SymbolInstruction).getSymbol());//getSizeArray(scopRead.getSymbol().getType());
+		var i = 0;
+		buffer.append("[");
+		for(Instruction inst : simpleArrayInstruction.index) {
+			buffer.append('''(«ActorInstructionTemplate::eInstance.generate(inst)»)''')
+			if ( i < (numDims - 1) ) {
+				buffer.append('''*  «ActorInstructionTemplate::eInstance.generate(size.get(i))»  +''');
+			}
+			i = i + 1;
 		}
+		buffer.append("]")
 		'''«buffer»'''
 	}
 
 	def dispatch generate(SizeofTypeInstruction sizeofTypeInstruction) {
-		''''''
+		'''4'''
 	}
 
 	def dispatch generate(SizeofValueInstruction sizeofValueInstruction) {
@@ -506,7 +537,7 @@ class ActorInstructionTemplate {
 			case QuasiAffineOperator::CEIL : buffer.append('''ceild(«expression.generate», «quasiAffineTerm.coef»)''')
 			case QuasiAffineOperator::DIV : buffer.append('''(«expression.generate») / «quasiAffineTerm.coef»''')
 			case QuasiAffineOperator::FLOOR : buffer.append('''floord(«expression.generate», «quasiAffineTerm.coef»)''')
-			case QuasiAffineOperator::MOD : buffer.append('''(«expression.generate») mod «quasiAffineTerm.coef»''')
+			case QuasiAffineOperator::MOD : buffer.append('''_custom_mod(«expression.generate», «quasiAffineTerm.coef»)''')
 			case QuasiAffineOperator::MUL : buffer.append('''(«expression.generate») * «quasiAffineTerm.coef»''')
 		}
 		} else {
@@ -531,7 +562,7 @@ class ActorInstructionTemplate {
 		val buffer = new StringBuffer()
 		switch(expr.operator) {
 		case CompositeOperator.DIV:  buffer.append('''(«expr.left») / («expr.right»)''')
-		case CompositeOperator.MOD: buffer.append('''(«expr.left») mod («expr.right»)''')
+		case CompositeOperator.MOD: buffer.append('''_custom_mod(«expr.left», «expr.right»)''')
 		}
 		'''«buffer.toString»'''
 	}

@@ -173,11 +173,28 @@ END_TRIGGER;
 END_OPERATION_WITH_STATE(THROW_AWAY)
 
 //////////////////////////////////////////////////////////////////////////////
+// CUSTOM_MEMCPY
+//////////////////////////////////////////////////////////////////////////////
+OPERATION_WITH_STATE(CUSTOM_MEMCPY, ORCC_FU)
+
+TRIGGER
+    memcpy((void *)(long)UINT(4),(void *)(long)UINT(2),UINT(3));
+END_TRIGGER;
+
+END_OPERATION_WITH_STATE(CUSTOM_MEMCPY)
+
+
+
+//////////////////////////////////////////////////////////////////////////////
 // PRINT_CYCLE_COUNT
 //////////////////////////////////////////////////////////////////////////////
 OPERATION(PRINT_CYCLECOUNT)
 
 TRIGGER
+    FILE* file = fopen("out_cycle","a");
+    fprintf(file,"CYCLE = %lld\n",CYCLE_COUNT);
+    fflush(file);
+    fclose(file);
     OUTPUT_STREAM << "CYCLE = " << CYCLE_COUNT << "\n";
 END_TRIGGER;
 

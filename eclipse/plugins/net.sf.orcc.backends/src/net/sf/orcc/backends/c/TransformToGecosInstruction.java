@@ -70,7 +70,7 @@ public class TransformToGecosInstruction {
 			TypeList list = (TypeList)type;
 			//return GecosUserTypeFactory.PTR(convertToGeCosType(list.getType()));
 			//FIXME:  The expression should be parsed and used
-			return GecosUserTypeFactory.ARRAY(convertToGeCosType(list.getType()), 100);
+			return GecosUserTypeFactory.ARRAY(convertToGeCosType(list.getType()), list.getSize());
 		}
 		return null;
 	}

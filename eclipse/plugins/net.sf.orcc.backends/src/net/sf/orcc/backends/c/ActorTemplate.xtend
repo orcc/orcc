@@ -29,6 +29,8 @@ class ActorTemplate  {
 				List<ActorPortInfo> ipportList, List<ActorPortInfo> opportList ) {
 		'''
 		package «pkgName»;
+		import fr.irisa.common.Simulation.*;
+		
 			actor «actorName»()  «ipportList.join(",",[p|p.generateActorPort])»  ==>
 				«opportList.join(",",[p|p.generateActorPort])»  :
 			«printFunctions()»
@@ -37,6 +39,12 @@ class ActorTemplate  {
 	
 	def printFunctions() {
 		'''
+		@native procedure custom_memcpy(int inTable, int outTable, int numLoc) end
+	
+		function _custom_mod_ (int a, int b) --> int :
+			a mod b
+		end
+		
 		function floord (int a, int b) --> int :
 			if ( ((a >= 0 ) && (b < 0)) || ((b >= 0) && (a < 0)) ) then
 				if ( a mod b = 0 ) then
@@ -110,6 +118,7 @@ class ActorTemplate  {
 				do
 					«IF scatterInit»
 						«ipportList.join("",[p|p.portName+" := "+p.varName+";\n"])»
+						print_cyclecount();
 					«ENDIF»
 					«scopFSM.states.drop(1).join("", [s|s.generate(scopFSM,"done",1)])»
 					«IF stateChange != null»
@@ -134,6 +143,7 @@ class ActorTemplate  {
 				var
 					«opportList.join(",",[p|p.baseType+"  "+p.varName+"["+p.size+"]"])»
 				do
+					print_cyclecount();
 					«opportList.join("",[p|p.varName+" := "+p.portName+";\n"])»
 					done := 0;
 					state := 0;
@@ -157,6 +167,7 @@ class ActorTemplate  {
 				do
 					«IF scatterInit»
 						«ipportList.join("",[p|p.portName+" := "+p.varName+";\n"])»
+						print_cyclecount();
 					«ENDIF»
 					«FOR s : scop.statements»
 						«IF (s instanceof Block)»
@@ -165,6 +176,32 @@ class ActorTemplate  {
 							«ActorInstructionTemplate::eInstance.generate(s)»
 						«ENDIF»	
 					«ENDFOR»
+					«IF stateChange != null»
+						«ActorInstructionTemplate::eInstance.generate(stateChange)»;
+					«ENDIF»
+				end
+				
+		'''
+	}
+	
+	def printAction(String name, Procedure proc, Block body, List<ActorPortInfo> ipportList, 
+		List<ActorPortInfo> opportList, Instruction gaurd, Instruction stateChange, boolean scatterInit ) {
+		'''
+			«name»: action  «ipportList.join(",",[p|p.generateActionPort])» ==>
+						«opportList.join(",",[p|p.generateActionPort])»
+				«IF gaurd != null»
+				guard
+					«ActorInstructionTemplate::eInstance.generate(gaurd)» «IF scatterInit» && done = 0 «ENDIF»
+				«ENDIF»
+				«IF proc.scope.symbols.size > 0 || opportList.size > 0 »var«ENDIF»
+					«proc.scope.symbols.join(",\n",[s|s.generateSymbol])»«IF proc.scope.symbols.size >0 && opportList.size > 0»,«ENDIF»
+					«opportList.join(",",[p|p.baseType+"  "+p.varName+"["+p.size+"]"])»
+				do
+					«IF scatterInit»
+						«ipportList.join("",[p|p.portName+" := "+p.varName+";\n"])»
+						print_cyclecount();
+					«ENDIF»
+					«ActorBlockTemplate.eInstance.generate(body)»
 					«IF stateChange != null»
 						«ActorInstructionTemplate::eInstance.generate(stateChange)»;
 					«ENDIF»
