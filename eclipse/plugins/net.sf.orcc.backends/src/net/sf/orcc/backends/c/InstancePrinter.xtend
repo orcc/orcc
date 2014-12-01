@@ -186,6 +186,13 @@ class InstancePrinter extends CTemplate {
 	private def initializePapifyOptions() {
 		if(papify) {
 			papifyActions = actor.actions.filter[hasAttribute(PAPIFY_ATTRIBUTE)]
+			// if actor is set to be papified but no actions are specified, all actions are papified
+			if(actor.hasAttribute(PAPIFY_ATTRIBUTE) && papifyActions.length == 0) {
+				for(action : actor.actions){
+					action.addAttribute(PAPIFY_ATTRIBUTE)
+				}
+				papifyActions = actor.actions.filter[hasAttribute(PAPIFY_ATTRIBUTE)]
+			}
 			// ?. operator ensure no Exception will be thrown if the current actor doesn't have PAPIFY_ATTRIBUTE
 			papiEvents = actor.getAttribute(PAPIFY_ATTRIBUTE)?.attributes?.map[name]
 		}
@@ -193,7 +200,6 @@ class InstancePrinter extends CTemplate {
 
 	def protected getFileContent() '''
 		// Source file is "«actor.file»"
-
 		#include <stdio.h>
 		#include <stdlib.h>
 		«printAdditionalIncludes»
