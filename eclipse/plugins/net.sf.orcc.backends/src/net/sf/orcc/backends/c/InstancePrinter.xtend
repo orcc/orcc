@@ -614,7 +614,7 @@ class InstancePrinter extends CTemplate {
 					«papiStructI».counterValues = malloc(sizeof(unsigned long) * «papiStructI».eventCodeSetSize);
 				«ENDFOR»
 
-				fprintf(papi_output_«actor.name»,"Actor; Action; tini; tend;«papiEvents.join('; ')»\n");
+				fprintf(papi_output_«actor.name»,"Actor; Action; tini; tend; «papiEvents.join('; ')»\n");
 				fclose(papi_output_«actor.name»);
 				event_init();
 
