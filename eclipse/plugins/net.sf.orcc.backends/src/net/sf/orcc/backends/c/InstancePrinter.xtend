@@ -200,6 +200,7 @@ class InstancePrinter extends CTemplate {
 
 	def protected getFileContent() '''
 		// Source file is "«actor.file»"
+		
 		#include <stdio.h>
 		#include <stdlib.h>
 		«printAdditionalIncludes»
@@ -760,7 +761,6 @@ class InstancePrinter extends CTemplate {
 			«action.profileStart»
 
 			«IF action.hasAttribute(PAPIFY_ATTRIBUTE) && papify»
-				/* Here goes PAPI init action code */
 				papi_«actor.name»_start_usec = PAPI_get_real_usec();
 				event_start(&(«action.papifyStruct».eventSet), -1);
 			«ENDIF»
