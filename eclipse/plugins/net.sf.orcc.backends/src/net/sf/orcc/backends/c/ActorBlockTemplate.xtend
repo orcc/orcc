@@ -147,22 +147,6 @@ class ActorBlockTemplate {
 		'''
 	}
 	
-	//FIXME if the bodyBlock is a basicBlock with more than 1 instruction then add {}
-	def dispatch generate(LoopBlock loopBlock) {
-		val buffer = new StringBuffer()
-		buffer.append('''
-		do «ActorBlockTemplate::eInstance.generate(loopBlock.bodyBlock)» while (''')
-		comma = ""
-		jump = ""
-		buffer.append('''«ActorBlockTemplate::eInstance.generate(loopBlock.testBlock)»
-		''')
-		buffer.append(''');
-		''')
-		comma = ";"
-		jump = "
-"
-		'''«buffer»'''
-	}
 
 	def dispatch generate(SimpleForBlock simpleForBlock) {
 		comma = ""
