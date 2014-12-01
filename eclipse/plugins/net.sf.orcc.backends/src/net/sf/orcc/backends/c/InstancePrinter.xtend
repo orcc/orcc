@@ -212,6 +212,7 @@ class InstancePrinter extends CTemplate {
 			#include "eventLib.h"
 			FILE* papi_output_«actor.name»;
 			papi_action_s *Papi_actions_«actor.name»;
+			long long papi_«actor.name»_start_usec, papi_«actor.name»_end_usec;
 		«ENDIF»
 		«IF profile»
 			#include "profiling.h"
@@ -606,7 +607,7 @@ class InstancePrinter extends CTemplate {
 					«papiStructI».counterValues = malloc(sizeof(unsigned long) * «papiStructI».eventCodeSetSize);
 				«ENDFOR»
 
-				fprintf(papi_output_«actor.name»,"Actor; Action; «papiEvents.join('; ')»\n");
+				fprintf(papi_output_«actor.name»,"Actor; Action; tini; tend;«papiEvents.join('; ')»\n");
 				fclose(papi_output_«actor.name»);
 				event_init();
 
@@ -754,6 +755,7 @@ class InstancePrinter extends CTemplate {
 
 			«IF action.hasAttribute(PAPIFY_ATTRIBUTE) && papify»
 				/* Here goes PAPI init action code */
+				papi_«actor.name»_start_usec = PAPI_get_real_usec();
 				event_start(&(«action.papifyStruct».eventSet), -1);
 			«ENDIF»
 			«FOR variable : action.body.locals»
@@ -793,10 +795,11 @@ class InstancePrinter extends CTemplate {
 			«IF action.hasAttribute(PAPIFY_ATTRIBUTE) && papify»
 				«val papiStructI = action.papifyStruct»
 				event_stop(&(«papiStructI».eventSet), «papiStructI».eventCodeSetSize, «papiStructI».counterValues, -1);
+				papi_«actor.name»_end_usec = PAPI_get_real_usec();
 				papi_output_«actor.name» = fopen("papi-output/papi_output_«actor.name».csv","a+");
 				fprintf(papi_output_«actor.name»,
-					"\"%s\";\"%s\";«(0..papiEvents.size-1).join(';')['''\"%lu\"''']»\n",
-					"«actor.name»", «papiStructI».action_id,
+					"\"%s\";\"%s\";\"%llu\";\"%llu\";«(0..papiEvents.size-1).join(';')['''\"%lu\"''']»\n",
+					"«actor.name»", «papiStructI».action_id, papi_«actor.name»_start_usec, papi_«actor.name»_end_usec,
 					«(0..papiEvents.size-1).join(', ')['''«papiStructI».counterValues[«it»]''']»);
 				fclose(papi_output_«actor.name»);
 			«ENDIF»
