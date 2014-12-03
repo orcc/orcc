@@ -1,5 +1,14 @@
 # Next release
 ### Notable changes and features
+
+### Bugfixes
+
+### Known issues
+
+### Miscellaneous
+
+# 2.3.0 December 3, 2014
+### Notable changes and features
 - Development environment
     + All files correctly updated when a package is renamed inside a project
 - Backe-ends
