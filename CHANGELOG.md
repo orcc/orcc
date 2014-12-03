@@ -1,17 +1,19 @@
 # Next release
 ### Notable changes and features
 - Development environment
-    + Renaming a package correctly updates files it contains
+    + All files correctly updated when a package is renamed inside a project
 - Backe-ends
-    + Add "papify" option to the C back-end. It generates code useful to perform profiling thanks to Papi library.
+    + Add "papify" option to the C back-end. It generates code for profiling using Papi library.
 
 ### Bugfixes
 - Frontend
     + [#128][#129] Big litterals (more than 64 bits) are now supported
-    + [#105] Generating code for a network containing an instance with the same name produce an error, to avoid overriding of generated files
+    + [#105] Generating code for a network containing an instance with the same name produces an error, to avoid files names conflicts
 - Transformations
     + [#111] Fix Classifier execution when z3 solver is used
     + Fix a NullPointerException when the Classifier is used on a flattened network with broadcasts.
+- Back-ends
+    + Fix a bug with additional generation in Standard back-ends with full instanciation
 
 ### Known issues
 - [#79] Using sub-list as procedure argument produces wrong code.
@@ -19,6 +21,7 @@
 
 ### Miscellaneous
 - Official supported eclipse version is now 4.4 Luna
+- Many warnings in C library and generated code have been fixed, even with clang compiler
 
 # 2.2.0 September 30, 2014
 ### Notable changes and features
