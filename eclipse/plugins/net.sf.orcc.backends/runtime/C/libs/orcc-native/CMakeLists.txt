@@ -75,6 +75,19 @@ else()
     )
 endif()
 
+# Try to find SDL_IMAGE on the user system
+find_package(SDL_IMAGE QUIET)
+
+if(SDL_IMAGE_FOUND)
+    list(APPEND extra_includes ${SDL_IMAGE_INCLUDE_DIR})
+    list(APPEND extra_libraries ${SDL_IMAGE_LIBRARY})
+    list(APPEND orcc_native_sources
+        src/sdl_image_util.c
+        include/sdl_image_util.h
+    )
+endif()
+
+
 find_package(OPENHEVC QUIET)
 if(OPENHEVC_FOUND)
     list(APPEND extra_libraries ${OPENHEVC_LIBRARY})
