@@ -20,13 +20,12 @@ if(THREADS_FOUND)
     list(APPEND orcc_native_headers include/thread.h)
 endif()
 
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 # try to find openCV
-find_package(OpenCV)
-
-if(OPENCV_FOUND)
+find_package(OpenCV QUIET)
+if(OpenCV_FOUND)
     list(APPEND orcc_native_sources src/source_camera.c)
-    list(APPEND extra_libraries ${OpenCV_LIBS}) # opencv libs
-    list(APPEND extra_libraries m) # maths lib required
+    list(APPEND extra_libraries opencv_core opencv_highgui) # opencv libs
 else()
     message(STATUS "Cannot find OpenCV")
 endif()
