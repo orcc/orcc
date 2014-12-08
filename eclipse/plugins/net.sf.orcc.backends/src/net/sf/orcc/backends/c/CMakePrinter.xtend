@@ -95,7 +95,8 @@ class CMakePrinter extends CommonPrinter {
 			«ENDFOR»
 		)
 
-		# Needed to ensure OpenCV imported targets are available in add_libary command
+		# Ensure OpenCV imported targets are reachable in this file
+		# They may be imported in ${extra_libraries}
 		find_package(OpenCV QUIET)
 
 		include_directories(${extra_includes})
