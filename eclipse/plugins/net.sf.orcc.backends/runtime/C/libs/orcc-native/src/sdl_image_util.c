@@ -263,22 +263,36 @@ void displayRGB_displayPicture(unsigned char *pictureBufferR,
 void displayTrackRect(int posx1, int posy1, int posx2, int posy2){
 	int w = 0;
 	int h = 0;
+	int arg1 = 0;
+	int arg2 = 0;
 
-	if (posx1 >= posx2){
+	if ((posx1 >= posx2) && (posy1 >= posy2)){
 		w = posx1 - posx2;
+		h = posy1 - posy2;
+		arg1 = posx2;
+		arg2 = posy2;
+	}
+	else if ((posx1 >= posx2) && (posy1 < posy2)){
+		w = posx1 - posx2;
+		h = posy2 - posy1;
+		arg1 = posx2;
+		arg2 = posy1;
+	}
+
+	else if ((posx1 < posx2) && (posy1 >= posy2)){
+		w = posx2 - posx1;
+		h = posy1 - posy2;
+		arg1 = posx1;
+		arg2 = posy2;
 	}
 	else{
 		w = posx2 - posx1;
-	}
-
-	if (posy1 >= posy2){
-		h = posy1 - posy2;
-	}
-	else{
 		h = posy2 - posy1;
+		arg1 = posx1;
+		arg2 = posy1;
 	}
 	
-	drawEmptyRect(m_image, posx1, posy1, w, h, 255, 0, 0);
+	drawEmptyRect(m_image, arg1, arg2, w, h, 255, 0, 0);
 	SDL_BlitSurface(m_image, NULL, m_screen, &rect);
 	SDL_UpdateRects(m_screen, 1, &rect);
 }
