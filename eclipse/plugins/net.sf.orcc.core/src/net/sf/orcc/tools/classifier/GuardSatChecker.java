@@ -162,19 +162,19 @@ public class GuardSatChecker {
 			case EQ:
 				return "(= " + e1 + " " + e2 + ")";
 			case GE:
-				return "(not (bvult " + e1 + " " + e2 + "))";
+				return "(not (bvslt " + e1 + " " + e2 + "))";
 			case GT:
-				return "(and (not (= " + e1 + " " + e2 + ")) (not (bvult " + e1
+				return "(and (not (= " + e1 + " " + e2 + ")) (not (bvslt " + e1
 						+ " " + e2 + ")))";
 			case LE:
-				return "(or (= " + e1 + " " + e2 + ") (bvult " + e1 + " " + e2
+				return "(or (= " + e1 + " " + e2 + ") (bvslt " + e1 + " " + e2
 						+ "))";
 			case LOGIC_AND:
 				return "(and " + e1 + " " + e2 + ")";
 			case LOGIC_OR:
 				return "(or " + e1 + " " + e2 + ")";
 			case LT:
-				return "(bvult " + e1 + " " + e2 + ")";
+				return "(bvslt " + e1 + " " + e2 + ")";
 			case MINUS:
 				return "(bvadd " + e1 + " (bvneg " + e2 + "))";
 			case MOD:
