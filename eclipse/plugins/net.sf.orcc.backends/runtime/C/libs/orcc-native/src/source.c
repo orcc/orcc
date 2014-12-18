@@ -46,6 +46,65 @@ static int stop;
 static clock_t startTime;
 static unsigned int nbByteRead = 0;
 
+
+/*****************************
+ 	 Read from stdin
+ *****************************/
+#ifdef _WIN32
+#include <Winsock2.h>
+
+char getLastUserChar() {
+    HANDLE tui_handle = GetStdHandle(STD_INPUT_HANDLE);
+    DWORD tui_evtc;
+    char retVal = 0;
+    INPUT_RECORD tui_inrec;
+    DWORD tui_numread;
+    bool tui_havehappened = false;
+
+    GetNumberOfConsoleInputEvents(tui_handle,&tui_evtc);
+    while (tui_evtc > 0) {
+        ReadConsoleInput(tui_handle,&tui_inrec,1,&tui_numread);
+        if (tui_inrec.EventType == KEY_EVENT) {
+            if (tui_inrec.Event.KeyEvent.bKeyDown) {
+                retVal = tui_inrec.Event.KeyEvent.uChar.AsciiChar;
+                tui_havehappened = true;
+            }
+        }
+        GetNumberOfConsoleInputEvents(tui_handle,&tui_evtc);
+    }
+
+    return retVal;
+}
+
+#elif __linux
+
+char getLastUserChar() {
+	char val = 0;
+    fd_set rfds;
+    struct timeval tv;
+    int retval;
+
+    FD_ZERO(&rfds);
+    FD_SET(0, &rfds);
+
+    tv.tv_sec = 0;
+    tv.tv_usec = 1;
+
+   retval = select(1, &rfds, NULL, NULL, &tv);
+
+   if (retval > 0) {
+        val = getchar();
+    }
+	return val;
+}
+
+#endif
+
+
+/*****************************
+ 	 Read from file
+ *****************************/
+
 // count number of times file were read
 // This variable is deprecated and will be removed in the future. Please don't use it anymore.
 int loopsCount;
