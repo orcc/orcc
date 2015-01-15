@@ -69,7 +69,9 @@ public class RenameTransformation extends DfVisitor<Object> {
 	}
 
 	private final Map<String, String> transformations;
-
+	
+	private Boolean toLowerCase = true;
+	
 	/**
 	 * Creates a transformation that uses a replacement map.
 	 * 
@@ -81,6 +83,12 @@ public class RenameTransformation extends DfVisitor<Object> {
 
 		irVisitor = new IrVisitor();
 	}
+	
+	public RenameTransformation(Map<String, String> transformations, Boolean toLowerCase) {
+		this(transformations);
+		this.toLowerCase = toLowerCase;
+	}
+
 
 	@Override
 	public Object caseActor(Actor actor) {
@@ -106,7 +114,7 @@ public class RenameTransformation extends DfVisitor<Object> {
 	}
 
 	private void checkport(Port port) {
-		String name = port.getName().toLowerCase();
+		String name = toLowerCase ? port.getName().toLowerCase() : port.getName();
 		if (transformations.containsKey(name)) {
 			port.setName(transformations.get(name));
 		}
