@@ -20,13 +20,12 @@ if(THREADS_FOUND)
     list(APPEND orcc_native_headers include/thread.h)
 endif()
 
-# try to find openCV
-find_package(OpenCV)
-
-if(OPENCV_FOUND)
+# Try to find openCV
+find_package(OpenCV QUIET)
+if(OpenCV_FOUND)
     list(APPEND orcc_native_sources src/source_camera.c)
-    list(APPEND extra_libraries ${OpenCV_LIBS}) # opencv libs
-    list(APPEND extra_libraries m) # maths lib required
+    # Add 2 needed imported targets to extra libraries variable 
+    list(APPEND extra_libraries ${OpenCV_LIBS})
 else()
     message(STATUS "Cannot find OpenCV")
 endif()

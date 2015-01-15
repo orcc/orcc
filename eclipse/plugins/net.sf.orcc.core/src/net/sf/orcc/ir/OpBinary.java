@@ -863,6 +863,22 @@ public enum OpBinary implements Enumerator {
 			return false;
 		}
 	}
+	
+	/**
+	 * Returns true if this operator is a logical operator.
+	 * 
+	 * @return <code>true</code> if this operator is a logical operator,
+	 *         <code>false</code> otherwise
+	 */
+	public boolean isLogical() {
+		switch (this) {
+		case LOGIC_AND:
+		case LOGIC_OR:
+			return true;
+		default:
+			return false;
+		}
+	}
 
 	/**
 	 * Returns true if this operator is right-to-left associative.

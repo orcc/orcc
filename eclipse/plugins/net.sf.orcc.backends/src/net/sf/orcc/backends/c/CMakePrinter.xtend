@@ -94,7 +94,11 @@ class CMakePrinter extends CommonPrinter {
 				«child.label».c
 			«ENDFOR»
 		)
-		
+
+		# [MSVC] Ensure OpenCV imported targets are reachable in this file
+		# They may be imported in ${extra_libraries}
+		find_package(OpenCV QUIET)
+
 		include_directories(${extra_includes})
 		add_definitions(${extra_definitions})
 		add_executable(«network.simpleName» ${filenames})
