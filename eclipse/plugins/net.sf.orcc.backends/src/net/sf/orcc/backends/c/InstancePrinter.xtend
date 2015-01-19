@@ -215,6 +215,7 @@ class InstancePrinter extends CTemplate {
 		#include "scheduler.h"
 		#include "dataflow.h"
 		#include "cycle.h"
+		#include "sdl_image_util.h"
 		«IF actor.hasAttribute(PAPIFY_ATTRIBUTE) && papify»
 			#include "eventLib.h"
 			FILE* papi_output_«actor.name»;

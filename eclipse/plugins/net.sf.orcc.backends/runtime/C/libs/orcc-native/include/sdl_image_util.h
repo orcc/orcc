@@ -33,16 +33,12 @@
 #include "types.h"
 
 void readRGBpicture(u8 *R, u8 *G, u8 *B);
-void displayRGB_displayPicture(unsigned char *pictureBufferR,
-	unsigned char *pictureBufferG, unsigned char *pictureBufferB,
-	 int   pictureWidth,  int pictureHeight);
-void displayRGB_displayRect(unsigned char *pictureBufferR,
-	unsigned char *pictureBufferG, unsigned char *pictureBufferB,
-	 int   pictureWidth,  int pictureHeight);
+void displayRGB_displayPicture(u8 pictureBufferR[70400], u8 pictureBufferG[70400], u8 pictureBufferB[70400], i16 pictureWidth, i16 pictureHeight);
+void displayRGB_displayRect(u8 pictureBufferR[70400], u8 pictureBufferG[70400], u8 pictureBufferB[70400], i16 pictureWidth, i16 pictureHeight);
 void displayRGB_init(int winWidth, int winHeight, int pictureWidth, int pictureHeight);
 void displayRGB_setSize(int winWidth, int winHeight, int pictureWidth, int pictureHeight);
 int get_pict_width();
 int get_pict_height();
 void get_mouse_position(int *position);
 
-#endif SDL_IMAGE_UTIL
+#endif

@@ -76,13 +76,16 @@ else()
 endif()
 
 # Try to find SDL_IMAGE on the user system
-find_package(SDL_IMAGE QUIET)
+find_package(SDL_image QUIET)
 
 if(SDL_IMAGE_FOUND)
-    list(APPEND extra_includes ${SDL_IMAGE_INCLUDE_DIR})
+    message(STATUS "Find SDL_image: ${SDL_IMAGE_LIBRARY}")
     list(APPEND extra_libraries ${SDL_IMAGE_LIBRARY})
+    list(APPEND extra_includes ${SDL_IMAGE_INCLUDE_DIR})
     list(APPEND orcc_native_sources
         src/sdl_image_util.c
+    )
+    list(APPEND orcc_native_headers
         include/sdl_image_util.h
     )
 endif()

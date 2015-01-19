@@ -27,7 +27,7 @@
  * SUCH DAMAGE.
  */
 
-#include <SDL_IMAGE.h>
+#include <SDL_image.h>
 #include <SDL.h>
 #include "sdl_image_util.h"
 #include "util.h"
@@ -231,9 +231,7 @@ void drawEmptyRect(SDL_Surface * surf, int posX, int posY, int width, int length
 /*******************************************************************************
 * displayYUV444_displayPicture
 ******************************************************************************/
-void displayRGB_displayPicture(unsigned char *pictureBufferR,
-	unsigned char *pictureBufferG, unsigned char *pictureBufferB,
-	 int   pictureWidth,  int pictureHeight) {
+void displayRGB_displayPicture(u8 pictureBufferR[70400], u8 pictureBufferG[70400], u8 pictureBufferB[70400], i16 pictureWidth, i16 pictureHeight) {
 
 	unsigned int h, w;
 	int red, green, blue;
@@ -262,9 +260,7 @@ void displayRGB_displayPicture(unsigned char *pictureBufferR,
 	
 }
 
-void displayRGB_displayRect(unsigned char *pictureBufferR,
-	unsigned char *pictureBufferG, unsigned char *pictureBufferB,
-	 int   pictureWidth,  int pictureHeight) {
+void displayRGB_displayRect(u8 pictureBufferR[70400], u8 pictureBufferG[70400], u8 pictureBufferB[70400], i16 pictureWidth, i16 pictureHeight) {
 
 	unsigned int h, w;
 	int red, green, blue;
