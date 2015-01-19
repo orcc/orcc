@@ -35,7 +35,10 @@
 void readRGBpicture(u8 *R, u8 *G, u8 *B);
 void displayRGB_displayPicture(unsigned char *pictureBufferR,
 	unsigned char *pictureBufferG, unsigned char *pictureBufferB,
-	unsigned int   pictureWidth, unsigned int pictureHeight);
+	 int   pictureWidth,  int pictureHeight);
+void displayRGB_displayRect(unsigned char *pictureBufferR,
+	unsigned char *pictureBufferG, unsigned char *pictureBufferB,
+	 int   pictureWidth,  int pictureHeight);
 void displayRGB_init(int winWidth, int winHeight, int pictureWidth, int pictureHeight);
 void displayRGB_setSize(int winWidth, int winHeight, int pictureWidth, int pictureHeight);
 int get_pict_width();
