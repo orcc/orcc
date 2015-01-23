@@ -42,7 +42,7 @@ static unsigned int fileSize;
 static char         useCompare;
 
 int compareYUV_compareComponent(
-        const int x_size, const int y_size,
+        const int x_size, const int y_size, const int x_size_test_img,
         const unsigned char *true_img_uchar,
         const unsigned char *test_img_uchar,
         unsigned char SizeMbSide, char Component_Type)
@@ -59,8 +59,9 @@ int compareYUV_compareComponent(
                 for (pix_x = 0; pix_x < SizeMbSide; pix_x++)
                 {
                     int Idx_pix = (blk_y * SizeMbSide + pix_y) * x_size + (blk_x * SizeMbSide + pix_x);
+                    int Idx_test_pix = (blk_y * SizeMbSide + pix_y) * x_size_test_img + (blk_x * SizeMbSide + pix_x);
 
-                    if (true_img_uchar[Idx_pix] - test_img_uchar[Idx_pix] != 0)
+                    if (true_img_uchar[Idx_pix] - test_img_uchar[Idx_test_pix] != 0)
                     {
                         error++;
                         if (error < 50)
@@ -153,9 +154,9 @@ void compareYUV_comparePicture(unsigned char *pictureBufferY, unsigned char *pic
         compareYUV_readComponent(&U, pictureWidth/2, pictureHeight/2, sizeChanged);
         compareYUV_readComponent(&V, pictureWidth/2, pictureHeight/2, sizeChanged);
 
-        numErrors += compareYUV_compareComponent(pictureWidth, pictureHeight, Y, pictureBufferY,16, 'Y');
-        numErrors += compareYUV_compareComponent(pictureWidth >> 1, pictureHeight >> 1, U, pictureBufferU,8,'U');
-        numErrors += compareYUV_compareComponent(pictureWidth >> 1, pictureHeight >> 1, V, pictureBufferV,8, 'V');
+        numErrors += compareYUV_compareComponent(pictureWidth, pictureHeight, pictureWidth, Y, pictureBufferY,16, 'Y');
+        numErrors += compareYUV_compareComponent(pictureWidth >> 1, pictureHeight >> 1, pictureWidth >> 1, U, pictureBufferU,8,'U');
+        numErrors += compareYUV_compareComponent(pictureWidth >> 1, pictureHeight >> 1, pictureWidth >> 1, V, pictureBufferV,8, 'V');
 
         if(numErrors == 0)
         {
