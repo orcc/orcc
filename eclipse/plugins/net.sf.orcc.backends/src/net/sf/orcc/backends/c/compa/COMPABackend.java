@@ -69,6 +69,9 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
 public class COMPABackend extends CBackend {
 	private static int nbProcessors; 		// Not counting the Source & Display executor!!!
 	private static int fBaseAddr;
+	int nbDynActors;
+	int ctrl_fifo_size;
+	int ctrl_fifo_start_addr;
 	private final boolean printTop = false;
 	private static boolean[][] currentMap;
 	private boolean enableTrace = false;
@@ -80,9 +83,13 @@ public class COMPABackend extends CBackend {
 //		new File(path + File.separator + "bin").mkdirs();
 //
 		srcPath = path + File.separator + "src";
-		nbProcessors = getAttribute("net.sf.orcc.backends.c.compa.nbProc", 4);
+		nbProcessors = getAttribute("net.sf.orcc.backends.c.compa.nbProc", 16);
+		nbDynActors = 15; // TODO: determine this value from the network or user option
+		ctrl_fifo_size = getAttribute("net.sf.orcc.backends.c.compa.ctrlFifoSize", 1024);
+		ctrl_fifo_start_addr = getAttribute("net.sf.orcc.backends.c.compa.ctrlFifoStartAddr", 0x40000000);
 		currentMap = new mappings().mapping[nbProcessors - 1];
-		fBaseAddr = getAttribute("net.sf.orcc.backends.c.compa.addr", 0xc0000000);
+		fBaseAddr = getAttribute("net.sf.orcc.backends.c.compa.addr", 0x80000000);
+//		enableTrace = options.get(ENABLE_TRACES) as Boolean
 	}
 	
 	
@@ -207,6 +214,10 @@ public class COMPABackend extends CBackend {
 		transformActors(network.getAllActors());
 		network.computeTemplateMaps();
 		
+		
+		// Delete old generated files.
+		deleteOldFiles(srcPath);
+		
 		// Print fifo allocation file into the orcc lib include folder.
 		OrccLogger.trace("Printing the fifo allocation file... ");
 		if (new NetworkPrinter(network, options, fBaseAddr).printFifoFile(path + "/libs/orcc/include") > 0) {
@@ -215,8 +226,32 @@ public class COMPABackend extends CBackend {
 			OrccLogger.traceRaw("Done\n");
 		}
 
-		// Print traces names file into the orcc lib include folder.
+		// Print actors' enumeration header file.
+		OrccLogger.trace("Printing actors' enumeration header file ... ");
+		if (new NetworkPrinter(network, options, fBaseAddr).printActorsEnumHeaderFile(path + "/libs/orcc/include") > 0) {
+			OrccLogger.traceRaw("Cached\n");
+		} else {
+			OrccLogger.traceRaw("Done\n");
+		}	
+		
+		// Print Microblazes' configuration file.
+		OrccLogger.trace("Printing the Microblazes' configuration file ... ");
+		if (new HWConfigPrinter(nbProcessors, nbDynActors, ctrl_fifo_size, ctrl_fifo_start_addr).printMbConfigFile(path + "/libs/orcc/include") > 0) {
+			OrccLogger.traceRaw("Cached\n");
+		} else {
+			OrccLogger.traceRaw("Done\n");
+		}	
+		
+		// Print scheduler callers definition file.
+		OrccLogger.trace("Printing the scheduler callers definition file ... ");
+		if (new NetworkPrinter(network, options, fBaseAddr).printSchedCallerDefFile(path + "/src/Actors") > 0) {
+			OrccLogger.traceRaw("Cached\n");
+		} else {
+			OrccLogger.traceRaw("Done\n");
+		}	
+
 		if(enableTrace){
+			// Print traces names file into the orcc lib include folder.
 			OrccLogger.trace("Printing the traces definitions file... ");
 			if (new NetworkPrinter(network, options, fBaseAddr).printTracesDefsFile(path + "/libs/orcc/include") > 0) {
 				OrccLogger.traceRaw("Cached\n");
@@ -224,9 +259,6 @@ public class COMPABackend extends CBackend {
 				OrccLogger.traceRaw("Done\n");
 			}
 		}
-		
-		// Delete old generated files.
-		deleteOldFiles(srcPath);
 		
 		// print instances
 //		printChildren(network);
