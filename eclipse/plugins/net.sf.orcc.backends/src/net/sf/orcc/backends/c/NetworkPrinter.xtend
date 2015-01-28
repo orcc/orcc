@@ -323,7 +323,7 @@ class NetworkPrinter extends CTemplate {
 	'''
 	
 	def protected printFifoAssign(String name, Port port, int fifoIndex) '''
-		fifo_«port.type.doSwitch»_t *«name»_«port.name» = &fifo_«fifoIndex»;
+		static fifo_«port.type.doSwitch»_t *«name»_«port.name» = &fifo_«fifoIndex»;
 	'''
 
 	def protected printScheduler() '''
