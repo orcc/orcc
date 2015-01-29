@@ -29,12 +29,12 @@
 
 #include <SDL_image.h>
 #include <SDL.h>
+#include "math.h"
 #include "sdl_image_util.h"
 #include "util.h"
 #include "types.h"
 
 //static SDL_Surface *image;
-static SDL_RWops *rwop;
 
 static SDL_Surface *m_screen;
 static SDL_Surface *m_image;
@@ -43,6 +43,7 @@ static SDL_Surface *get_image;
 static SDL_Overlay *m_overlay;
 
 static int init = 0;
+static int iImgIndex = 0;
 
 static int x, y, xS, yS, onclick = 0;
 static SDL_Rect rect;
@@ -155,43 +156,56 @@ void get_mouse_position(int *position)
 void readRGBpicture(u8 *R, u8 *G, u8 *B){
 	//////////////////////////special case//////////////////////////////////
 	// special case supporting 2 digits starting from 01.jpg to 71
-	char *path = "D:\\WORK\\trackIm\\animal_RVC\\00.jpg";
-	if (path[28] < 57){ // index 28 corresponds to position of char 0"0" in pointer *path
-		path[28]++;
-	}
-	else{
-		path[28] = 48;
-		path[27] ++; //index 27 corresponds to position of char "0"0 in pointer *path
-	}
-	// reloop when last image is 71.jpg
-	if (path[28] == 50 && path[27] == 55){
-		path[28] = 49;
-		path[27] = 48;
-	}
+    char *pathDir = "/home/asanchez/sequences/videodata/datasets/animal";
+    char *strExt = ".jpg";
+    char *path = NULL;
+    int iDigits;
+
+    if (iImgIndex == 71) {
+        iImgIndex = 0;
+    }
+    iImgIndex++;
+
+    iDigits = floor(log10(abs(iImgIndex))) + 1;
+    path = (char*)malloc(sizeof(char)*(strlen(pathDir)+iDigits+strlen(strExt)+2));
+    sprintf(path,"%s/%d%s", pathDir, iImgIndex, strExt);
+
 	//////////////////////////////////////////////////////////////////////////
-	rwop = SDL_RWFromFile(path, "r");
-	get_image = IMG_LoadJPG_RW(rwop);
-	if (!get_image) {
-		printf("IMG_LoadJPG_RW: %s\n", IMG_GetError());
-		// handle error
-	}
-	for (yS = 0; yS < get_image->h; yS++){
-		for (xS = 0; xS < get_image->w; xS++){
-			pixelS = GetPixel(get_image, xS, yS);
-			SDL_GetRGB(pixelS, get_image->format, &r, &g, &b);
-			R[xS + yS*get_image->w] = r;
-			G[xS + yS*get_image->w] = g;
-			B[xS + yS*get_image->w] = b;
-		}
-	}
+    SDL_RWops *rwop = SDL_RWFromFile(path, "r");
+    if (rwop != NULL) {
+        get_image = IMG_LoadJPG_RW(rwop);
+        if (!get_image) {
+            printf("IMG_LoadJPG_RW: %s\n", IMG_GetError());
+        } else {
+            for (yS = 0; yS < get_image->h; yS++){
+                for (xS = 0; xS < get_image->w; xS++){
+                    pixelS = GetPixel(get_image, xS, yS);
+                    SDL_GetRGB(pixelS, get_image->format, &r, &g, &b);
+                    R[xS + yS*get_image->w] = r;
+                    G[xS + yS*get_image->w] = g;
+                    B[xS + yS*get_image->w] = b;
+                }
+            }
+            SDL_FreeSurface(get_image);
+            rwop->close(rwop);
+        }
+    }
 }
 
 int get_pict_width(){
-	return get_image->w;
+    if (get_image) {
+        return get_image->w;
+    } else {
+        return 0;
+    }
 }
 
 int get_pict_height(){
-	return get_image->h;
+    if (get_image) {
+        return get_image->h;
+    } else {
+        return 0;
+    }
 }
 
 void drawEmptyRect(SDL_Surface * surf, int posX, int posY, int width, int length, int R, int G, int B)
@@ -362,7 +376,7 @@ void displayRGB_setSize(int winWidth, int winHeight, int pictureWidth, int pictu
 void displayRGB_init(int winWidth, int winHeight, int pictureWidth, int pictureHeight) {
 	if (!init) {
 		m_overlay = NULL;
-		init = 1;
+        init = 1;
 		// First, initialize SDL's video subsystem.
 		if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 			fprintf(stderr, "Video initialization failed: %s\n", SDL_GetError());
