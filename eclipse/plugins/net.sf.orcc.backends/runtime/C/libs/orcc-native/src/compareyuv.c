@@ -85,6 +85,7 @@ int compareYUV_compareComponent(
 
     if (error != 0) {
         fprintf(stderr, "\n%d error(s) in %c Component !!!\n", error, Component_Type);
+        exit(-1);
     }
     return error;
 }
@@ -125,6 +126,12 @@ void compareYUV_readComponent(unsigned char **Component, unsigned short width, u
     }
     numByteRead = fread(*Component, sizeof(unsigned char),  width*height, ptrFile);
     if(numByteRead != (width*height)) {
+    	long long currPos = ftell(ptrFile);
+    	fseek(ptrFile, 0, SEEK_END);
+    	if(currPos == ftell(ptrFile)) {
+    		printf("\nComparison done.\nExiting.\n");
+    		exit(0);
+    	}
         fprintf(stderr, "Error when using fread\n");
         exit(-6);
     }
