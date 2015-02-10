@@ -34,22 +34,22 @@
 #include "util.h"
 #include "types.h"
 
-//static SDL_Surface *image;
-
-static SDL_Surface *m_screen;
-static SDL_Surface *m_image;
-static SDL_Surface *rectangle;
-static SDL_Surface *get_image;
-static SDL_Overlay *m_overlay;
-
-static int init = 0;
-static int iImgIndex = 0;
+#define NB_IMAGES 71
 
 static int x, y, xS, yS, onclick = 0;
 static SDL_Rect rect;
 static SDL_Rect rectSelected;
 static u32 pixelS;
 static u8 r, g, b;
+
+static SDL_Surface *m_screen;
+static SDL_Surface *m_image;
+static SDL_Surface *rectZone;
+static SDL_Surface *get_image;
+static SDL_Overlay *m_overlay;
+
+static int init = 0;
+static int iImgIndex = 0;
 
 Uint32 GetPixel(SDL_Surface *surface, int x, int y)
 {
@@ -161,7 +161,7 @@ void readRGBpicture(u8 *R, u8 *G, u8 *B){
     char *path = NULL;
     int iDigits;
 
-    if (iImgIndex == 71) {
+    if (iImgIndex == NB_IMAGES) {
         iImgIndex = 0;
     }
     iImgIndex++;
@@ -242,6 +242,16 @@ void drawEmptyRect(SDL_Surface * surf, int posX, int posY, int width, int length
 
 	SDL_FillRect(surf, &lineDown, SDL_MapRGB(surf->format, R, G, B));
 }
+
+/*******************************************************************************
+ * clip255
+ ******************************************************************************/
+char clip255(int value) {
+    if (value > 255) return 255;
+    if (value <   0) return   0;
+    return value;
+}
+
 /*******************************************************************************
 * displayYUV444_displayPicture
 ******************************************************************************/
@@ -280,12 +290,12 @@ void displayRGB_displayRect(u8 pictureBufferR[70400], u8 pictureBufferG[70400], 
 	int red, green, blue;
 	int pixel, idx_pixel;
 	
-	if (rectangle != NULL) {
-		SDL_FreeSurface(rectangle);
+	if (rectZone != NULL) {
+		SDL_FreeSurface(rectZone);
 	}
-	rectangle = SDL_CreateRGBSurface(SDL_SWSURFACE, pictureWidth, pictureHeight, m_screen->format->BitsPerPixel,
+	rectZone = SDL_CreateRGBSurface(SDL_SWSURFACE, pictureWidth, pictureHeight, m_screen->format->BitsPerPixel,
 		m_screen->format->Rmask, m_screen->format->Gmask, m_screen->format->Bmask, m_screen->format->Amask);
-	SDL_PixelFormat *format = rectangle->format;
+	SDL_PixelFormat *format = rectZone->format;
 	rectSelected.x = x + 360;
 	rectSelected.y = y;
 	rectSelected.w = pictureWidth;
@@ -301,12 +311,11 @@ void displayRGB_displayRect(u8 pictureBufferR[70400], u8 pictureBufferG[70400], 
 			pixel = ((clip255(red) << format->Rshift) & format->Rmask) |
 				((clip255(green) << format->Gshift) & format->Gmask) |
 				((clip255(blue) << format->Bshift) & format->Bmask);
-			*(int *)&((char *)rectangle->pixels)[idx_pixel * format->BytesPerPixel] = pixel;
+			*(int *)&((char *)rectZone->pixels)[idx_pixel * format->BytesPerPixel] = pixel;
 		}
 	}
-	SDL_BlitSurface(rectangle, NULL, m_screen, &rectSelected);
+	SDL_BlitSurface(rectZone, NULL, m_screen, &rectSelected);
 	SDL_UpdateRects(m_screen, 1, &rectSelected);
-
 }
 
 void displayTrackRect(int posx1, int posy1, int posx2, int posy2){

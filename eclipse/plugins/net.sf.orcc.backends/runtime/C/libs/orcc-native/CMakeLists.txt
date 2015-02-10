@@ -90,6 +90,21 @@ if(SDL_IMAGE_FOUND)
     )
 endif()
 
+find_package(OpenCV REQUIRED)
+if(OpenCV_FOUND)
+    list(APPEND extra_libraries ${OpenCV_LIBS})
+    list(APPEND extra_includes ${OpenCV_INCLUDE_DIRS})
+    message(STATUS "Found OpenCV")
+    list(APPEND orcc_native_sources
+        src/trackimg.c
+    )
+    list(APPEND orcc_native_headers
+        include/trackimg.h
+    )
+    set_source_files_properties(src/trackimg.c PROPERTIES LANGUAGE CXX )
+else()
+    message(STATUS "Cannot find OpenCV")
+endif()
 
 find_package(OPENHEVC QUIET)
 if(OPENHEVC_FOUND)
