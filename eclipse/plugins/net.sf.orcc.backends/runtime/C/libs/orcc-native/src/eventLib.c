@@ -3,12 +3,12 @@
 
 int total = 0;
 
-void structure_test(papi_action_s *someAction){
+void structure_test(papi_action_s *someAction, int eventCodeSetSize, int *eventCodeSet){
     int i;
     printf("Action name: %s\n", someAction->action_id);
     printf("Event Code Set:\n");
-    for(i=0; i<someAction->eventCodeSetSize; i++){
-        printf("\t-%d\n", someAction->eventCodeSet[i]);
+    for(i=0; i<eventCodeSetSize; i++){
+        printf("\t-%d\n", eventCodeSet[i]);
     }
 }
 

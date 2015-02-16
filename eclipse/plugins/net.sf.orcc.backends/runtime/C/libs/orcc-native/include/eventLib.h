@@ -34,8 +34,5 @@ static int TESTS_COLOR = 0;
 
 typedef struct papi_action_s {
     char *action_id;
-    int eventCodeSetSize;
-    int *eventCodeSet; //size = eventCodeSetSize
-    unsigned long *eventSet; //size = eventCodeSetSize
     unsigned long *counterValues; //size = eventCodeSetSize
 } papi_action_s;
