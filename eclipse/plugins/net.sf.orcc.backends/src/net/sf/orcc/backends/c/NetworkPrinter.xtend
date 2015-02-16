@@ -50,6 +50,7 @@ class NetworkPrinter extends CTemplate {
 	
 	protected var boolean profile = false	
 	protected var boolean newSchedul = false
+	var boolean papify = false
 	
 	def setNetwork(Network network) {
 		this.network = network
@@ -63,6 +64,9 @@ class NetworkPrinter extends CTemplate {
 		if (options.containsKey(NEW_SCHEDULER)) {
 			newSchedul = options.get(NEW_SCHEDULER) as Boolean
 		}
+		if(options.containsKey(PAPIFY)){
+			papify = options.get(PAPIFY) as Boolean;
+		}		
 	}
 
 	def protected getNetworkFileContent() '''
@@ -206,6 +210,10 @@ class NetworkPrinter extends CTemplate {
 	// This method can be override by other backends in case of calling additional 
 	// functions before and after the Main function
 	def protected afterMain() ''''''
-	def protected beforeMain() ''''''
+	def protected beforeMain() '''
+	«IF papify»
+		event_init();
+	«ENDIF»
+	'''
 	
 }
