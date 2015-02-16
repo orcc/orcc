@@ -220,6 +220,9 @@ class InstancePrinter extends CTemplate {
 			FILE* papi_output_«actor.name»;
 			papi_action_s *Papi_actions_«actor.name»;
 			long long papi_«actor.name»_start_usec, papi_«actor.name»_end_usec;
+			int papi_«actor.name»_eventCodeSetSize;
+			int *papi_«actor.name»_eventCodeSet;
+			unsigned long *papi_«actor.name»_eventset;
 		«ENDIF»
 		«IF profile»
 			#include "profiling.h"
@@ -599,30 +602,29 @@ class InstancePrinter extends CTemplate {
 				mkdir("papi-output", 0777);
 				Papi_actions_«actor.name» = malloc(sizeof(papi_action_s) * «papifyActions.size»);
 				papi_output_«actor.name» = fopen("papi-output/papi_output_«actor.name».csv","w");
-
+				
+				papi_«actor.name»_eventCodeSetSize = «actor.getAttribute(PAPIFY_ATTRIBUTE).attributes.size»;
+				papi_«actor.name»_eventCodeSet = malloc(sizeof(unsigned long) * papi_«actor.name»_eventCodeSetSize);
+				«FOR i : 0 .. papiEvents.size - 1»
+					papi_«actor.name»_eventCodeSet[«i»] = «papiEvents.get(i)»;
+				«ENDFOR»
+				papi_«actor.name»_eventset = malloc(sizeof(int) * papi_«actor.name»_eventCodeSetSize);
+				papi_«actor.name»_eventset = PAPI_NULL;
+				
 				«FOR action : papifyActions»
 					«val papiStructI = action.papifyStruct»
 					«papiStructI».action_id = malloc(strlen("«action.name»")+1);
 					«papiStructI».action_id = "«action.name»";
-					«papiStructI».eventCodeSetSize = «actor.getAttribute(PAPIFY_ATTRIBUTE).attributes.size»;
-					«papiStructI».eventCodeSet = malloc(sizeof(unsigned long) * «papiStructI».eventCodeSetSize);
-					«FOR i : 0 .. papiEvents.size - 1»
-						«papiStructI».eventCodeSet[«i»] = «papiEvents.get(i)»;
-					«ENDFOR»
-					«papiStructI».eventSet = malloc(sizeof(int) * «papiStructI».eventCodeSetSize);
-					«papiStructI».eventSet = PAPI_NULL;
-					«papiStructI».counterValues = malloc(sizeof(unsigned long) * «papiStructI».eventCodeSetSize);
+					«papiStructI».counterValues = malloc(sizeof(unsigned long) * papi_«actor.name»_eventCodeSetSize);
 				«ENDFOR»
 
-				fprintf(papi_output_«actor.name»,"Actor; Action; tini; tend; «papiEvents.join('; ')»\n");
+				fprintf(papi_output_«actor.name»,"Actor,Action,tini,tend,«papiEvents.join(',')»\n");
 				fclose(papi_output_«actor.name»);
-				event_init();
+				
+				
+				printf("Creating eventlist for actor «actor.name»\n");
+				event_create_eventList(&(papi_«actor.name»_eventset), papi_«actor.name»_eventCodeSetSize, papi_«actor.name»_eventCodeSet, -1);
 
-				«FOR action : papifyActions»
-					«val papiStructI = action.papifyStruct»
-					printf("Creating eventlist for action «action.name» in actor «actor.name»\n");
-					event_create_eventList(&(«papiStructI».eventSet), «papiStructI».eventCodeSetSize, «papiStructI».eventCodeSet, -1);
-				«ENDFOR»
 				/* End of Papify initialization */
 
 			«ENDIF»
@@ -762,7 +764,7 @@ class InstancePrinter extends CTemplate {
 
 			«IF action.hasAttribute(PAPIFY_ATTRIBUTE) && papify»
 				papi_«actor.name»_start_usec = PAPI_get_real_usec();
-				event_start(&(«action.papifyStruct».eventSet), -1);
+				event_start(&(papi_«actor.name»_eventset), -1);
 			«ENDIF»
 			«FOR variable : action.body.locals»
 				«variable.declare»;
@@ -800,11 +802,11 @@ class InstancePrinter extends CTemplate {
 			«ENDFOR»
 			«IF action.hasAttribute(PAPIFY_ATTRIBUTE) && papify»
 				«val papiStructI = action.papifyStruct»
-				event_stop(&(«papiStructI».eventSet), «papiStructI».eventCodeSetSize, «papiStructI».counterValues, -1);
+				event_stop(&(papi_«actor.name»_eventset), papi_«actor.name»_eventCodeSetSize, «papiStructI».counterValues, -1);
 				papi_«actor.name»_end_usec = PAPI_get_real_usec();
 				papi_output_«actor.name» = fopen("papi-output/papi_output_«actor.name».csv","a+");
 				fprintf(papi_output_«actor.name»,
-					"\"%s\";\"%s\";\"%llu\";\"%llu\";«(0..papiEvents.size-1).join(';')['''\"%lu\"''']»\n",
+					"%s,%s,%llu,%llu,«(0..papiEvents.size-1).join(',')['''%lu''']»\n",
 					"«actor.name»", «papiStructI».action_id, papi_«actor.name»_start_usec, papi_«actor.name»_end_usec,
 					«(0..papiEvents.size-1).join(', ')['''«papiStructI».counterValues[«it»]''']»);
 				fclose(papi_output_«actor.name»);
