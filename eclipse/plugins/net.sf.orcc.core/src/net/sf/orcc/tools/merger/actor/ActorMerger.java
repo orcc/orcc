@@ -108,7 +108,7 @@ public class ActorMerger extends DfVisitor<Void> {
 				List<Port> unconnected = new ArrayList<Port>(actor.getInputs());
 				unconnected.removeAll(actor.getIncomingPortMap().keySet());
 				for (Port input : unconnected) {
-					int size = 0;
+					Integer size = new Integer(0);
 					Port inputPort = EcoreUtil.copy(input);
 					subNetwork.addInput(inputPort);
 					if (actor.getIncomingPortMap().get(input) != null) {
@@ -121,7 +121,7 @@ public class ActorMerger extends DfVisitor<Void> {
 				unconnected = new ArrayList<Port>(actor.getOutputs());
 				unconnected.removeAll(actor.getOutgoingPortMap().keySet());
 				for (Port output : unconnected) {
-					int size = 0;
+					Integer size = new Integer(0);
 					Port outputPort = EcoreUtil.copy(output);
 					subNetwork.addOutput(outputPort);
 					if (actor.getOutgoingPortMap().get(output) != null) {
@@ -250,7 +250,7 @@ public class ActorMerger extends DfVisitor<Void> {
 					int superActorPortIndex = MergerUtil.findPort(superActor.getInputs(),
 							port.getValueAsString("targetPort"));
 					if (superActorPortIndex >= 0) {
-						int size = ((Integer)port.getValueAsObject("externalFifo")).intValue();
+						Integer size = ((Integer)port.getValueAsObject("externalFifo"));
 						newConnections.add(dfFactory.createConnection(superActor,
 							port, superActor, superActor.getInputs().get(superActorPortIndex), size));
 					}

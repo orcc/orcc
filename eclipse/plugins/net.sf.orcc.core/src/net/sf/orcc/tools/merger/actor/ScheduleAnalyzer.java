@@ -103,8 +103,13 @@ public class ScheduleAnalyzer extends BufferSizer {
 				Var buffer = buffersMap.get(port);
 				if (buffer != null) {
 					if (queryBufferAccess(buffer) > 0) {
-						OrccLogger.traceln("Info: generating internal FIFO starting from "
+						if (fullFifos) {
+							OrccLogger.traceln("Info: generating feedback FIFO starting from "
 								+ port.getName());
+						} else {
+							OrccLogger.traceln("Info: generating feedback variable starting from "
+									+ port.getName());
+						}
 						externalizeConnection(superActor, actor, port, fullFifos);
 					}
 				}
@@ -155,7 +160,7 @@ public class ScheduleAnalyzer extends BufferSizer {
 		port.addAttribute("externalized");
 		if (fullFifos) {
 			port.addAttribute("externalFifo");
-			port.setAttribute("externalFifo", new Integer(size));
+			port.setAttribute("externalFifo", size);
 			port.addAttribute("targetPort");
 			port.setAttribute("targetPort", target.getName());
 			superActor.getOutputs().add((Port)copier.copy(port));

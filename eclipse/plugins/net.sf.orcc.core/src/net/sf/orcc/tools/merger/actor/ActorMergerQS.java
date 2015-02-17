@@ -388,8 +388,8 @@ public class ActorMergerQS extends ActorMergerBase {
 				Var buffer = null;
 				if (!conn.hasAttribute("bufferCreated")) {
 					// create actor-level buffer
-					int size = conn.getSize();
-					if (size > 0) {
+					Integer size = conn.getSize();
+					if (size.intValue() > 0) {
 						String name = "buffer_" + conn.getSourcePort().getName() + "_" + conn.getTargetPort().getName();
 						Type eltType = conn.getSourcePort().getType();
 						Type type = irFactory.createTypeList(size, eltType);
@@ -623,10 +623,12 @@ public class ActorMergerQS extends ActorMergerBase {
 			memVar.setAttribute(idxName, new Integer((val + tokenRate)));
 		} else {
 			Var buffer = findVariable(locals,  port.getName() + "_tmp");
-			procParams.add(irFactory.createExprVar(buffer));
-			int val = ((Integer)buffer.getValueAsObject(idxName)).intValue();
-			procParams.add(irFactory.createExprInt(val));
-			buffer.setAttribute(idxName, new Integer((val + tokenRate)));
+			if (buffer != null) {
+				procParams.add(irFactory.createExprVar(buffer));
+				int val = ((Integer)buffer.getValueAsObject(idxName)).intValue();
+				procParams.add(irFactory.createExprInt(val));
+				buffer.setAttribute(idxName, new Integer((val + tokenRate)));
+			}
 		}
 	}
 }
