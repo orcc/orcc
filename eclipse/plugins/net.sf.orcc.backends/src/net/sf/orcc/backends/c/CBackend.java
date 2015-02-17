@@ -62,6 +62,7 @@ import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.transform.ArgumentEvaluator;
 import net.sf.orcc.df.transform.BroadcastAdder;
+import net.sf.orcc.df.transform.BroadcastRemover;
 import net.sf.orcc.df.transform.FifoSizePropagator;
 import net.sf.orcc.df.transform.Instantiator;
 import net.sf.orcc.df.transform.NetworkFlattener;
@@ -148,6 +149,9 @@ public class CBackend extends AbstractBackend {
 			networkTransfos.add(new ActorMerger());
 		} else {
 			networkTransfos.add(new CBroadcastAdder());
+		}
+		if (mergeActors) {
+			networkTransfos.add(new BroadcastRemover());
 		}
 		networkTransfos.add(new ArgumentEvaluator());
 		networkTransfos.add(new TypeResizer(true, false, true, false));
