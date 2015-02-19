@@ -28,6 +28,72 @@
  */
 package net.sf.orcc.backends.c.omp
 
-class CMakePrinter {
+import net.sf.orcc.df.Actor
+
+class CMakePrinter extends net.sf.orcc.backends.c.CMakePrinter {
+
+	override rootCMakeContent() '''
+		# Generated from «network.simpleName»
+
+		cmake_minimum_required (VERSION 2.6)
+
+		project («network.simpleName»)
+
+		# Configure ouput folder for generated binary
+		set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
+		
+		# Allow the use of OpenMP instead of Threads
+		set(USE_OPENMP True)
+		
+		# Definitions configured and used in subdirectories
+		set(extra_definitions)
+		set(extra_includes)
+		set(extra_libraries)
+
+		# Runtime libraries inclusion
+		include_directories(
+			${PROJECT_BINARY_DIR}/libs # to find config.h
+			libs/orcc-native/include
+			libs/orcc-runtime/include
+		)
+
+		«addLibrariesSubdirs»
+	'''
+
+	override srcCMakeContent() '''
+		# Generated from «network.simpleName»
+
+		set(filenames
+			«network.simpleName».c
+			«FOR child : network.children.actorInstances.filter[!getActor.native]»
+				«child.label».c
+			«ENDFOR»
+			«FOR child : network.children.filter(typeof(Actor)).filter[!native]»
+				«child.label».c
+			«ENDFOR»
+		)
+
+		# [MSVC] Ensure OpenCV imported targets are reachable in this file
+		# They may be imported in ${extra_libraries}
+		find_package(OpenCV QUIET)
+		
+		if(USE_OPENMP)
+			find_package(OpenMP QUIET)
+			if(OPENMP_FOUND)
+			    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+			    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+			    message(STATUS "Found OpenMP: " ${OpenMP_C_FLAGS})
+			else()
+			    message(STATUS "Cannot find OpenMP")
+			endif()
+		endif()
+		
+		include_directories(${extra_includes})
+		add_definitions(${extra_definitions})
+		add_executable(«network.simpleName» ${filenames})
+
+		# Build library without any external library required
+		target_link_libraries(«network.simpleName» orcc-native orcc-runtime ${extra_libraries})
+	'''
 
 }

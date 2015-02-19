@@ -137,6 +137,8 @@ void sched_add_waiting_list(local_scheduler_t *sched);
 
 void *scheduler_routine(void *data);
 
+void *scheduler_routine_omp(void *data1, void *data2);
+
 void launcher(options_t *opt, network_t *network);
 
 #endif  /* _ORCC_SCHEDULER_H_ */

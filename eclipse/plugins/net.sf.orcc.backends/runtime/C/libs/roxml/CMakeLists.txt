@@ -1,5 +1,5 @@
 
-if(THREADS_FOUND)
+if(THREADS_FOUND OR USE_OPENMP)
     list(APPEND extra_libraries roxml)
     list(APPEND extra_definitions -DROXML_ENABLE)
     set(ROXML_ENABLE 1 PARENT_SCOPE)

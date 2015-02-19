@@ -28,11 +28,17 @@
  */
 package net.sf.orcc.backends.c.omp;
 
+import static net.sf.orcc.OrccLaunchConstants.ENABLE_TRACES;
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
 import net.sf.orcc.backends.c.CBackend;
+import net.sf.orcc.backends.c.TracesPrinter;
+import net.sf.orcc.backends.c.omp.CMakePrinter;
+import net.sf.orcc.backends.c.omp.InstancePrinter;
+import net.sf.orcc.backends.c.omp.NetworkPrinter;
 import net.sf.orcc.backends.c.transform.CBroadcastAdder;
 import net.sf.orcc.backends.transform.DisconnectedOutputPortRemoval;
 import net.sf.orcc.backends.util.Alignable;
@@ -60,5 +66,30 @@ import net.sf.orcc.util.Result;
  * 
  */
 public class OMPBackend extends CBackend {
+	
+	private NetworkPrinter netPrinter;
+	private InstancePrinter childrenPrinter;
+	private CMakePrinter cmakePrinter;
 
+	public OMPBackend() {
+		netPrinter = new NetworkPrinter();
+		childrenPrinter = new InstancePrinter();
+		cmakePrinter = new CMakePrinter();
+	}
+
+	@Override
+	protected Result doAdditionalGeneration(Network network) {
+		cmakePrinter.setNetwork(network);
+		final Result result = Result.newInstance();
+		result.merge(FilesManager.writeFile(cmakePrinter.rootCMakeContent(),
+				outputPath, "CMakeLists.txt"));
+		result.merge(FilesManager.writeFile(cmakePrinter.srcCMakeContent(),
+				srcPath, "CMakeLists.txt"));
+
+		final Mapping mapper = new Mapping(network, mapping);
+		result.merge(FilesManager.writeFile(mapper.getContentFile(), srcPath,
+				network.getSimpleName() + ".xcf"));
+
+		return result;
+	}	
 }

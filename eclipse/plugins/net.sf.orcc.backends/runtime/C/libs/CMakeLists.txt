@@ -17,12 +17,15 @@ endif()
 
 configure_file(config.h.in config.h)
 
-find_package(Threads QUIET)
-if(THREADS_FOUND)
-    list(APPEND extra_libraries ${CMAKE_THREAD_LIBS_INIT})
-    list(APPEND extra_definitions -DTHREADS_ENABLE)
-else()
-    message(STATUS "Cannot find Threads")
+if(NOT USE_OPENMP)
+    find_package(Threads QUIET)
+    if(THREADS_FOUND)
+        list(APPEND extra_libraries ${CMAKE_THREAD_LIBS_INIT})
+        list(APPEND extra_definitions -DTHREADS_ENABLE)
+        message(STATUS "Find Threads : " ${extra_definitions})
+    else()
+        message(STATUS "Cannot find Threads")
+    endif()
 endif()
 
 include_directories(
