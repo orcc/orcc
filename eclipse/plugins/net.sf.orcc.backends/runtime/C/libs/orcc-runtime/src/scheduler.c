@@ -252,88 +252,6 @@ void sched_add_waiting_list(local_scheduler_t *sched) {
     }
 }
 
-//!TODO : Only works for 2 cores
-//! Make this function dynamic
-//! Try to avoid code duplication
-//! Try to merge with previous scheduler_routine
-//! Try to allow dynamic mapping with omp
-void *scheduler_routine_omp(void *data1, void *data2) {
-#pragma omp parallel
-{
-    #pragma omp sections
-    {
-        #pragma omp section
-        {
-            local_scheduler_t *sched = (local_scheduler_t *) data1;
-            actor_t *my_actor;
-            schedinfo_t si;
-            int j;
-            ticks tick_in, tick_out;
-            double diff_tick;
-
-            sched_init_actors(sched, &si);
-
-            while (1) {
-                my_actor = sched_get_next_schedulable(sched);
-                if(my_actor != NULL){
-                    tick_in = getticks();
-                    si.num_firings = 0;
-
-                    my_actor->sched_func(&si);
-
-                    if (si.num_firings != 0) {
-                        tick_out = getticks();
-                        diff_tick = elapsed(tick_out, tick_in);
-                        my_actor->ticks += diff_tick;
-                    } else {
-                        my_actor->misses++;
-                    }
-                    my_actor->switches++;
-
-                    if(opt->print_firings) {
-                        printf("%2i  %5i\t%s\t%s\n", sched->id, si.num_firings, si.reason == starved ? "starved" : "full", my_actor->name);
-                    }
-                }
-            }
-        }
-        #pragma omp section
-        {
-                local_scheduler_t *sched = (local_scheduler_t *) data2;
-                actor_t *my_actor;
-                schedinfo_t si;
-                int j;
-                ticks tick_in, tick_out;
-                double diff_tick;
-
-                sched_init_actors(sched, &si);
-
-                while (1) {
-                    my_actor = sched_get_next_schedulable(sched);
-                    if(my_actor != NULL){
-                        tick_in = getticks();
-                        si.num_firings = 0;
-
-                        my_actor->sched_func(&si);
-
-                        if (si.num_firings != 0) {
-                            tick_out = getticks();
-                            diff_tick = elapsed(tick_out, tick_in);
-                            my_actor->ticks += diff_tick;
-                        } else {
-                            my_actor->misses++;
-                        }
-                        my_actor->switches++;
-
-                        if(opt->print_firings) {
-                            printf("%2i  %5i\t%s\t%s\n", sched->id, si.num_firings, si.reason == starved ? "starved" : "full", my_actor->name);
-                        }
-                    }
-                }
-        }
-    }
-}
-}
-
 void *scheduler_routine(void *data) {
     local_scheduler_t *sched = (local_scheduler_t *) data;
     actor_t *my_actor;
@@ -411,7 +329,28 @@ void launcher(options_t *opt, network_t *network) {
     }
     orcc_thread_join(thread_agent);
 #elif OPENMP_ENABLE
-    (*scheduler_routine_omp)((void *) scheduler->schedulers[0], (void *) scheduler->schedulers[1]);
+    // 2 cores Hard-coded for OpenMP
+    // Replaced by the next code following
+    // Remove it if it works on DSP
+//    #pragma omp parallel
+//        {
+//        #pragma omp sections
+//            {
+//            #pragma omp section
+//                {
+//                    (*scheduler_routine)((void *) scheduler->schedulers[0]);
+//                }
+//            #pragma omp section
+//                {
+//                    (*scheduler_routine)((void *) scheduler->schedulers[1]);
+//                }
+//            }
+//        }
+
+    #pragma omp parallel for
+    for(i=0 ; i < nb_threads; i++){
+        (*scheduler_routine)((void *) scheduler->schedulers[i]);
+    }
 #else
     (*scheduler_routine)((void *) scheduler->schedulers[i]);
 #endif
