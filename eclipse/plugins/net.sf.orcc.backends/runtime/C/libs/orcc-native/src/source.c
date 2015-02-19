@@ -51,7 +51,9 @@ static unsigned int nbByteRead = 0;
  	 Read from stdin
  *****************************/
 #ifdef _WIN32
-#include <Winsock2.h>
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#include <winsock2.h>
 
 char getLastUserChar() {
     HANDLE tui_handle = GetStdHandle(STD_INPUT_HANDLE);
@@ -59,7 +61,7 @@ char getLastUserChar() {
     char retVal = 0;
     INPUT_RECORD tui_inrec;
     DWORD tui_numread;
-    bool tui_havehappened = false;
+    BOOLEAN tui_havehappened = FALSE;
 
     GetNumberOfConsoleInputEvents(tui_handle,&tui_evtc);
     while (tui_evtc > 0) {
@@ -67,7 +69,7 @@ char getLastUserChar() {
         if (tui_inrec.EventType == KEY_EVENT) {
             if (tui_inrec.Event.KeyEvent.bKeyDown) {
                 retVal = tui_inrec.Event.KeyEvent.uChar.AsciiChar;
-                tui_havehappened = true;
+                tui_havehappened = TRUE;
             }
         }
         GetNumberOfConsoleInputEvents(tui_handle,&tui_evtc);
