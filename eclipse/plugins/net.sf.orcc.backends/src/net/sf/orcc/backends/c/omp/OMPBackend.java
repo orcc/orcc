@@ -28,34 +28,13 @@
  */
 package net.sf.orcc.backends.c.omp;
 
-import static net.sf.orcc.OrccLaunchConstants.ENABLE_TRACES;
-
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-
 import net.sf.orcc.backends.c.CBackend;
-import net.sf.orcc.backends.c.TracesPrinter;
 import net.sf.orcc.backends.c.omp.CMakePrinter;
 import net.sf.orcc.backends.c.omp.InstancePrinter;
 import net.sf.orcc.backends.c.omp.NetworkPrinter;
-import net.sf.orcc.backends.c.transform.CBroadcastAdder;
-import net.sf.orcc.backends.transform.DisconnectedOutputPortRemoval;
-import net.sf.orcc.backends.util.Alignable;
 import net.sf.orcc.backends.util.Mapping;
-import net.sf.orcc.backends.util.Validator;
-import net.sf.orcc.df.Actor;
-import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
-import net.sf.orcc.df.transform.ArgumentEvaluator;
-import net.sf.orcc.df.transform.Instantiator;
-import net.sf.orcc.df.transform.NetworkFlattener;
-import net.sf.orcc.df.transform.TypeResizer;
-import net.sf.orcc.df.transform.UnitImporter;
-import net.sf.orcc.df.util.XdfWriter;
-import net.sf.orcc.ir.transform.RenameTransformation;
 import net.sf.orcc.util.FilesManager;
-import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.Result;
 
 /**

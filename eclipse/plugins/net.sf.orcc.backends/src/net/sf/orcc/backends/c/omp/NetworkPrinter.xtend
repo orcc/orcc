@@ -28,8 +28,6 @@
  */
 package net.sf.orcc.backends.c.omp
 
-import net.sf.orcc.df.Connection
-
 /**
  * Generate and print network source file for OpenMP backend.
  *  

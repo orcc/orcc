@@ -28,14 +28,6 @@
  */
 package net.sf.orcc.backends.c.omp
 
-import java.util.Map
-import net.sf.orcc.df.Action
-import net.sf.orcc.df.Pattern
-import net.sf.orcc.df.Port
-import net.sf.orcc.df.State
-import net.sf.orcc.df.Transition
-import net.sf.orcc.ir.TypeList
-
 /**
  * Generate and print instance source file for OpenMP backend.
  *  
