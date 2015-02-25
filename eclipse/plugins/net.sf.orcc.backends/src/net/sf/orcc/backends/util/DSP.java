@@ -55,8 +55,8 @@ public class DSP {
 	}
 	
 	public static DSP builder(String name) {
-		if (name.equals("C6000")) {
-			return new DSP(Brand.TI, Family.C6000, "TMS320C66XX.TMS320C6678", "little");
+		if (name.equals("C6678")) {
+			return new DSP(Brand.TI, name, Family.C6000, "TMS320C66XX", "TMS320C6678", "little");
 		} else {
 			return new DSP(Brand.OTHER);
 		}
@@ -66,24 +66,44 @@ public class DSP {
 	private Family family;
 	private String variant;
 	private String endianness;
+	private String device;
+	private String familyVersion;
+	private String deviceVersion;
 
 	public DSP(Brand brand) {
 		this.brand = brand;
 	}
 
-	public DSP(Brand brand, Family serie, String variant) {
+	public DSP(Brand brand, String device, Family serie, String familyVersion, String deviceVersion) {
 		this(brand);
+		this.device = device;
 		this.family = serie;
-		this.variant = variant;
+		this.familyVersion = familyVersion;
+		this.deviceVersion = deviceVersion;
+		this.variant = familyVersion + deviceVersion;
 	}
 
-	public DSP(Brand brand, Family serie, String variant, String endianness) {
-		this(brand);
-		this.family = serie;
-		this.variant = variant;
+	public DSP(Brand brand, String device, Family serie, String familyVersion, String deviceVersion, String endianness) {
+		this(brand, device, serie, familyVersion, deviceVersion);
 		this.endianness = endianness;
 	}
 	
+	public Brand getBrand() {
+		return brand;
+	}
+
+	public String getDevice() {
+		return device;
+	}
+
+	public String getDeviceVersion() {
+		return deviceVersion;
+	}
+
+	public String getFamilyVersion() {
+		return familyVersion;
+	}
+
 	public String getVariant() {
 		return variant;
 	}
@@ -94,24 +114,6 @@ public class DSP {
 
 	public Family getFamily() {
 		return family;
-	}
-
-	public boolean isTI() {
-		switch (brand) {
-		case TI:
-			return true;
-		default:
-			return false;
-		}
-	}
-
-	public boolean isC6000() {
-		switch (family) {
-		case C6000:
-			return true;
-		default:
-			return false;
-		}
 	}
 	
 }

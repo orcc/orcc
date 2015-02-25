@@ -70,7 +70,7 @@ public class BackendsConstants {
 	public static final String FPGA_DEFAULT_CONFIGURATION = "Stratix III (EP3SL150F1152C2)";
 
 	public static final String DSP_CONFIGURATION = "net.sf.orcc.backends.dsp";
-	public static final String DSP_DEFAULT_CONFIGURATION = "C6000";
+	public static final String DSP_DEFAULT_CONFIGURATION = "C6678";
 
 	public static final String JIT_BIT_ACCURATE = "net.sf.orcc.backends.llvm.jit.bitaccurate";
 	public static final boolean JIT_BIT_ACCURATE_DEFAULT = false;

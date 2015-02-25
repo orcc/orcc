@@ -380,13 +380,13 @@
             </comboBox>
          </option>
          <option
-               defaultValue="C6000"
+               defaultValue="C6678"
                description="Name of your DSP device"
                id="net.sf.orcc.backends.dsp"
                name="DSP board">
             <comboBox>
                <comboBoxItem
-                  id="C6000">
+                  id="C6678">
                </comboBoxItem>
             </comboBox>
          </option>         
