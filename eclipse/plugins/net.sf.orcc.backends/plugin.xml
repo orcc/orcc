@@ -89,6 +89,9 @@
             class="net.sf.orcc.backends.c.dsp.DSPBackend"
             name="DSP (experimental)">
          <option
+               id="net.sf.orcc.backends.dsp">
+         </option>
+         <option
                id="net.sf.orcc.plugins.compileXDF">
          </option>
          <option
@@ -376,6 +379,17 @@
                </comboBoxItem>
             </comboBox>
          </option>
+         <option
+               defaultValue="C6000"
+               description="Name of your DSP device"
+               id="net.sf.orcc.backends.dsp"
+               name="DSP board">
+            <comboBox>
+               <comboBoxItem
+                  id="C6000">
+               </comboBoxItem>
+            </comboBox>
+         </option>         
          <option
                defaultValue="false"
                description="Force the inlining inside the actors to ease the profiling"

@@ -30,25 +30,17 @@ package net.sf.orcc.backends.c.dsp;
 
 import static net.sf.orcc.backends.BackendsConstants.BXDF_FILE;
 import static net.sf.orcc.backends.BackendsConstants.IMPORT_BXDF;
+import static net.sf.orcc.backends.BackendsConstants.DSP_CONFIGURATION;
+import static net.sf.orcc.backends.BackendsConstants.DSP_DEFAULT_CONFIGURATION;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.backends.c.CBackend;
 import net.sf.orcc.backends.c.omp.InstancePrinter;
 import net.sf.orcc.backends.c.omp.NetworkPrinter;
+import net.sf.orcc.backends.util.DSP;
 import net.sf.orcc.backends.util.Mapping;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.tools.mapping.XmlBufferSizeConfiguration;
-import net.sf.orcc.util.DomUtil;
 import net.sf.orcc.util.FilesManager;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.Result;
@@ -65,9 +57,14 @@ public class DSPBackend extends CBackend {
 	private NetworkPrinter netPrinter;
 	private InstancePrinter childrenPrinter;
 
+	private CcsProjectPrinter ccsProjectPrinter;
+	private DSP dsp;
+	
 	public DSPBackend() {
 		netPrinter = new NetworkPrinter();
 		childrenPrinter = new InstancePrinter();
+
+		ccsProjectPrinter = new CcsProjectPrinter();
 	}
 
 	@Override
@@ -104,9 +101,7 @@ public class DSPBackend extends CBackend {
 		result.merge(FilesManager.extract("/runtime/DSP/libs/roxml", outputPath));
 
 		result.merge(FilesManager.extract("/runtime/DSP/config/config.cfg", srcPath));
-		result.merge(FilesManager.extract("/runtime/DSP/config/.ccsproject", srcPath));
 		result.merge(FilesManager.extract("/runtime/DSP/config/.cproject", srcPath));
-		result.merge(FilesManager.extract("/runtime/DSP/config/.project", srcPath));
 
 		//! TODO : Merge DSP-native and orcc-native in this backend ASAP
 		result.merge(FilesManager.extract("/runtime/DSP/libs/dsp-native/cache.c", srcPath));
@@ -125,29 +120,11 @@ public class DSPBackend extends CBackend {
 		result.merge(FilesManager.writeFile(mapper.getContentFile(), srcPath,
 				network.getSimpleName() + ".xcf"));
 
-//		File file = new File(srcPath, ".project");
-//		OutputStream is;
-//		try {
-//			OrccLogger.traceln("ASN = " + file.getAbsoluteFile());
-//			is = new FileOutputStream(file);
-//		} catch (IOException e) {
-//			throw new OrccRuntimeException("I/O error", e);
-//		}
-//
-//		try {
-//			Document document = DomUtil.parseDocument(is);
-//			Element adfElement = document.getDocumentElement();
-//			Element element = DomUtil.getFirstElementChild(adfElement);
-//			OrccLogger.traceln("ASN...");
-//			String toto = element.getNodeValue();
-//			OrccLogger.traceln("ASN = " + toto);
-//		} finally {
-//			try {
-//				is.close();
-//			} catch (IOException e) {
-//				throw new OrccRuntimeException("I/O error", e);
-//			}
-//		}
+		dsp = DSP.builder(getOption(DSP_CONFIGURATION, DSP_DEFAULT_CONFIGURATION));
+		ccsProjectPrinter.setDsp(dsp);
+		result.merge(FilesManager.writeFile(ccsProjectPrinter.getProject(network.getSimpleName()), srcPath, ".project"));
+
+		result.merge(FilesManager.writeFile(ccsProjectPrinter.getCcsProject(dsp), srcPath, ".ccsproject"));
 		
 		return result;
 	}
