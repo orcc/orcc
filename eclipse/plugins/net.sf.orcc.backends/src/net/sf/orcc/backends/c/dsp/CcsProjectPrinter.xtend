@@ -102,8 +102,8 @@ class CcsProjectPrinter extends CommonPrinter {
 						<option id="com.ti.ccstudio.buildDefinitions.«dsp.family»_7.4.compilerID.INCLUDE_PATH.1984753222" name="Add dir to #include search path (--include_path, -I)" superClass="com.ti.ccstudio.buildDefinitions.«dsp.family»_7.4.compilerID.INCLUDE_PATH" valueType="includePath">
 							<listOptionValue builtIn="false" value="&quot;${CG_TOOL_ROOT}/include&quot;"/>
 							<listOptionValue builtIn="false" value="/opt/ti/xdctools_3_25_06_96/packages"/>
-							<listOptionValue builtIn="false" value="&quot;${workspace_loc:/orcc_runtime/include}&quot;"/>
-							<listOptionValue builtIn="false" value="&quot;${workspace_loc:/orcc_native/include}&quot;"/>
+							<listOptionValue builtIn="false" value="&quot;${workspace_loc:/orcc-runtime/include}&quot;"/>
+							<listOptionValue builtIn="false" value="&quot;${workspace_loc:/orcc-native/include}&quot;"/>
 							<listOptionValue builtIn="false" value="&quot;${workspace_loc:/roxml/include}&quot;"/>
 						</option>
 						<option id="com.ti.ccstudio.buildDefinitions.«dsp.family»_7.4.compilerID.DISPLAY_ERROR_NUMBER.846120419" name="Emit diagnostic identifier numbers (--display_error_number, -pden)" superClass="com.ti.ccstudio.buildDefinitions.«dsp.family»_7.4.compilerID.DISPLAY_ERROR_NUMBER" value="true" valueType="boolean"/>
@@ -127,8 +127,8 @@ class CcsProjectPrinter extends CommonPrinter {
 						<option id="com.ti.ccstudio.buildDefinitions.«dsp.family»_7.4.linkerID.MAP_FILE.3341693" name="Input and output sections listed into &lt;file&gt; (--map_file, -m)" superClass="com.ti.ccstudio.buildDefinitions.«dsp.family»_7.4.linkerID.MAP_FILE" value="&quot;${ProjName}.map&quot;" valueType="string"/>
 						<option id="com.ti.ccstudio.buildDefinitions.«dsp.family»_7.4.linkerID.LIBRARY.1880073700" name="Include library file or command file as input (--library, -l)" superClass="com.ti.ccstudio.buildDefinitions.«dsp.family»_7.4.linkerID.LIBRARY" valueType="libs">
 							<listOptionValue builtIn="false" value="&quot;libc.a&quot;"/>
-							<listOptionValue builtIn="false" value="&quot;${workspace_loc:/orcc_native/Debug/orcc_native.lib}&quot;"/>
-							<listOptionValue builtIn="false" value="&quot;${workspace_loc:/orcc_runtime/Debug/orcc_runtime.lib}&quot;"/>
+							<listOptionValue builtIn="false" value="&quot;${workspace_loc:/orcc-native/Debug/orcc-native.lib}&quot;"/>
+							<listOptionValue builtIn="false" value="&quot;${workspace_loc:/orcc-runtime/Debug/orcc-runtime.lib}&quot;"/>
 							<listOptionValue builtIn="false" value="&quot;${workspace_loc:/roxml/Debug/roxml.lib}&quot;"/>
 						</option>
 						<option id="com.ti.ccstudio.buildDefinitions.«dsp.family»_7.4.linkerID.SEARCH_PATH.59482104" name="Add &lt;dir&gt; to library search path (--search_path, -i)" superClass="com.ti.ccstudio.buildDefinitions.«dsp.family»_7.4.linkerID.SEARCH_PATH" valueType="libPaths">
@@ -194,7 +194,7 @@ class CcsProjectPrinter extends CommonPrinter {
 							<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Top_mpegh_part2_main_no_md5}&quot;"/>
 							<listOptionValue builtIn="false" value="/opt/ti/pdk_C6678_2_1_3_7/packages"/>
 							<listOptionValue builtIn="false" value="/opt/ti/openmp_dsp_2_01_17_00/packages/ti/runtime/openmp"/>
-							<listOptionValue builtIn="false" value="&quot;${workspace_loc:/orcc_native/include}&quot;"/>
+							<listOptionValue builtIn="false" value="&quot;${workspace_loc:/orcc-native/include}&quot;"/>
 							<listOptionValue builtIn="false" value="&quot;${workspace_loc:/roxml/include}&quot;"/>
 						</option>
 						<option id="com.ti.ccstudio.buildDefinitions.«dsp.family»_7.4.compilerID.DISPLAY_ERROR_NUMBER.86355221" name="Emit diagnostic identifier numbers (--display_error_number, -pden)" superClass="com.ti.ccstudio.buildDefinitions.«dsp.family»_7.4.compilerID.DISPLAY_ERROR_NUMBER" value="true" valueType="boolean"/>
@@ -342,7 +342,7 @@ class CcsProjectPrinter extends CommonPrinter {
 							<listOptionValue builtIn="false" value="/opt/ti/xdctools_3_25_06_96/packages"/>
 							<listOptionValue builtIn="false" value="/opt/ti/bios_6_37_03_30/packages"/>
 							<listOptionValue builtIn="false" value="/opt/ti/bios_6_37_03_30/packages/ti/bios/include"/>
-							<listOptionValue builtIn="false" value="&quot;${workspace_loc:/orcc_runtime/include}&quot;"/>
+							<listOptionValue builtIn="false" value="&quot;${workspace_loc:/orcc-runtime/include}&quot;"/>
 							<listOptionValue builtIn="false" value="&quot;${workspace_loc:/roxml/include}&quot;"/>
 						</option>
 						<option id="com.ti.ccstudio.buildDefinitions.«dsp.family»_7.4.compilerID.DISPLAY_ERROR_NUMBER.220419449" name="Emit diagnostic identifier numbers (--display_error_number, -pden)" superClass="com.ti.ccstudio.buildDefinitions.«dsp.family»_7.4.compilerID.DISPLAY_ERROR_NUMBER" value="true" valueType="boolean"/>
