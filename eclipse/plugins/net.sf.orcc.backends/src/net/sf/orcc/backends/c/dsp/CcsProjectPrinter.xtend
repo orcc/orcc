@@ -407,15 +407,15 @@ class CcsProjectPrinter extends CommonPrinter {
 						</extensions>
 					</storageModule>
 					<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-					«IF projectID.compareTo("orcc-native") == 0»
-					«dsp.getNative»
-					«ELSEIF projectID.compareTo("orcc-runtime") == 0»
-					«dsp.getRuntime»
-					«ELSEIF projectID.compareTo("roxml") == 0»
-					«dsp.getRoxml»
-					«ELSE»
-					«dsp.getTopApp»
-					«ENDIF»
+						«IF projectID.compareTo("orcc-native") == 0»
+						«dsp.getNative»
+						«ELSEIF projectID.compareTo("orcc-runtime") == 0»
+						«dsp.getRuntime»
+						«ELSEIF projectID.compareTo("roxml") == 0»
+						«dsp.getRoxml»
+						«ELSE»
+						«dsp.getTopApp»
+						«ENDIF»
 					</storageModule>
 					<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
 				</cconfiguration>		
