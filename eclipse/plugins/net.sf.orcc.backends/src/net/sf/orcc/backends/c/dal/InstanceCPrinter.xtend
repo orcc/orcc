@@ -45,7 +45,6 @@ class InstanceCPrinter extends CTemplate {
 	protected var Actor actor
 	protected var int maxIter
 	protected var int maxOut
-	private var int tmpIter
 	protected var Map<Port, Connection> incomingPortMap
 	protected var Map<Port, List<Connection>> outgoingPortMap
 	
@@ -59,7 +58,7 @@ class InstanceCPrinter extends CTemplate {
 	protected new() {
 		super()
 		instance = null
-		maxIter = 0
+		maxIter = 1
 	}
 	
 	override caseTypeBool(TypeBool type) 
@@ -79,28 +78,7 @@ class InstanceCPrinter extends CTemplate {
 	def protected getFileContent() {
 		if (actor.getMoC() != null) {
 			isSDF = actor.getMoC().isSDF();
-		}
-		maxIter = 1000000;
-		if (isSDF) {
-			for (port : actor.getInputs()) {
-				tmpIter = incomingPortMap.get(port).sizeOrDefaultSize / port.getNumTokensConsumed()
-				if (tmpIter < maxIter) {
-					maxIter = tmpIter
-				}
-			}
-			for (port : actor.getOutputs()) {
-				tmpIter = outgoingPortMap.get(port).get(0).sizeOrDefaultSize / Math.abs(port.getNumTokensProduced())
-				if (tmpIter < maxIter) {
-					maxIter = tmpIter
-				}
-			}
-		} else if (!actor.hasAttribute("variableInputPattern")) {
-			for (port : actor.getInputs()) {
-				tmpIter = incomingPortMap.get(port).sizeOrDefaultSize / port.getNumTokensConsumed()
-				if (tmpIter < maxIter) {
-					maxIter = tmpIter
-				}
-			}
+			maxIter = actor.<Integer>getValueAsObject("MaxIter");
 		}
 	'''
 		#include <stdio.h>
