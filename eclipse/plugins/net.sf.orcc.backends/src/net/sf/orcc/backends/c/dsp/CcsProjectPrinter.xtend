@@ -541,43 +541,43 @@ class CcsProjectPrinter extends CommonPrinter {
 		            <device HW_revision="1" XML_version="1.2" description="«dsp.device» core" id="«dsp.deviceVersion»" partnum="«dsp.deviceVersion»">
 		                    <router HW_revision="1.0" XML_version="1.2" description="ICEPick_D Router" id="IcePick_D_0" isa="ICEPICK_D">
 		                        <subpath id="subpath_0">
-		                            <cpu HW_revision="1.0" XML_version="1.2" description="«dsp.device» CPU" id="«dsp.device»_0" isa="«dsp.familyVersion»">
+		                            <cpu HW_revision="1.0" XML_version="1.2" description="«dsp.descCcxml» CPU" id="«dsp.descCcxml»_0" isa="«dsp.familyVersion»">
 		                                <property Type="choicelist" Value="0" id="bypass"/>
 		                                <property Type="filepathfield" Value="../../../evmc6678l.gel" id="GEL File"/>
 		                            </cpu>
 		                        </subpath>
 		                        <subpath id="subpath_1">
-		                            <cpu HW_revision="1.0" XML_version="1.2" description="«dsp.device» CPU" id="«dsp.device»_1" isa="«dsp.familyVersion»">
+		                            <cpu HW_revision="1.0" XML_version="1.2" description="«dsp.descCcxml» CPU" id="«dsp.descCcxml»_1" isa="«dsp.familyVersion»">
 		                                <property Type="filepathfield" Value="../../../evmc6678l.gel" id="GEL File"/>
 		                            </cpu>
 		                        </subpath>
 		                        <subpath id="subpath_2">
-		                            <cpu HW_revision="1.0" XML_version="1.2" description="«dsp.device» CPU" id="«dsp.device»_2" isa="«dsp.familyVersion»">
+		                            <cpu HW_revision="1.0" XML_version="1.2" description="«dsp.descCcxml» CPU" id="«dsp.descCcxml»_2" isa="«dsp.familyVersion»">
 		                                <property Type="choicelist" Value="1" id="bypass"/>
 		                            </cpu>
 		                        </subpath>
 		                        <subpath id="subpath_3">
-		                            <cpu HW_revision="1.0" XML_version="1.2" description="«dsp.device» CPU" id="«dsp.device»_3" isa="«dsp.familyVersion»">
+		                            <cpu HW_revision="1.0" XML_version="1.2" description="«dsp.descCcxml» CPU" id="«dsp.descCcxml»_3" isa="«dsp.familyVersion»">
 		                                <property Type="choicelist" Value="1" id="bypass"/>
 		                            </cpu>
 		                        </subpath>
 		                        <subpath id="subpath_4">
-		                            <cpu HW_revision="1.0" XML_version="1.2" description="«dsp.device» CPU" id="«dsp.device»_4" isa="«dsp.familyVersion»">
+		                            <cpu HW_revision="1.0" XML_version="1.2" description="«dsp.descCcxml» CPU" id="«dsp.descCcxml»_4" isa="«dsp.familyVersion»">
 		                                <property Type="choicelist" Value="1" id="bypass"/>
 		                            </cpu>
 		                        </subpath>
 		                        <subpath id="subpath_5">
-		                            <cpu HW_revision="1.0" XML_version="1.2" description="«dsp.device» CPU" id="«dsp.device»_5" isa="«dsp.familyVersion»">
+		                            <cpu HW_revision="1.0" XML_version="1.2" description="«dsp.descCcxml» CPU" id="«dsp.descCcxml»_5" isa="«dsp.familyVersion»">
 		                                <property Type="choicelist" Value="1" id="bypass"/>
 		                            </cpu>
 		                        </subpath>
 		                        <subpath id="subpath_6">
-		                            <cpu HW_revision="1.0" XML_version="1.2" description="«dsp.device» CPU" id="«dsp.device»_6" isa="«dsp.familyVersion»">
+		                            <cpu HW_revision="1.0" XML_version="1.2" description="«dsp.descCcxml» CPU" id="«dsp.descCcxml»_6" isa="«dsp.familyVersion»">
 		                                <property Type="choicelist" Value="1" id="bypass"/>
 		                            </cpu>
 		                        </subpath>
 		                        <subpath id="subpath_7">
-		                            <cpu HW_revision="1.0" XML_version="1.2" description="«dsp.device» CPU" id="«dsp.device»_7" isa="«dsp.familyVersion»">
+		                            <cpu HW_revision="1.0" XML_version="1.2" description="«dsp.descCcxml» CPU" id="«dsp.descCcxml»_7" isa="«dsp.familyVersion»">
 		                                <property Type="choicelist" Value="1" id="bypass"/>
 		                            </cpu>
 		                        </subpath>

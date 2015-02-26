@@ -69,6 +69,7 @@ public class DSP {
 	private String device;
 	private String familyVersion;
 	private String deviceVersion;
+	private String descCcxml;
 
 	public DSP(Brand brand) {
 		this.brand = brand;
@@ -81,6 +82,7 @@ public class DSP {
 		this.familyVersion = familyVersion;
 		this.deviceVersion = deviceVersion;
 		this.variant = familyVersion + "." + deviceVersion;
+		this.descCcxml = device.substring(0, 3) + "xx";
 	}
 
 	public DSP(Brand brand, String device, Family serie, String familyVersion, String deviceVersion, String endianness) {
@@ -115,5 +117,9 @@ public class DSP {
 	public Family getFamily() {
 		return family;
 	}
-	
+
+	public String getDescCcxml() {
+		return descCcxml;
+	}
+
 }
