@@ -120,6 +120,18 @@ options_t* init_orcc(int argc, char *argv[]) {
     const char *ostr = "i:no:d:m:q:f:w:l:zr:ac:s:v:p:h";
     int c;
 
+        /////////////////////////////////////////////////// MCH
+                char * fichero2;
+                fichero2=(char*)malloc(255);
+                char * fichero3;
+                fichero3=(char*)malloc(255);
+                char * fichero4;
+                fichero4=(char*)malloc(255);
+                strcpy (fichero2,optarg);
+                strcpy (fichero3,optarg);
+                strcpy (fichero4,optarg);
+    ////////////////////////////////////////////////////// MCH
+
     opt = set_default_options();
 
     program = argv[0];
@@ -141,10 +153,12 @@ options_t* init_orcc(int argc, char *argv[]) {
             print_usage();
             exit(ORCC_ERR_BAD_ARGS);
         case 'd':
-            opt->input_directory = strdup(optarg);
+           // opt->input_directory = strdup(optarg); //MCH
             break;
         case 'i':
-            opt->input_file = strdup(optarg);
+            strcpy(fichero2,argv[2]);  //MCH
+            opt->input_file = fichero2;
+            //opt->input_file = strdup(optarg);//MCH
             break;
         case 'l':
             opt->nbLoops = strtoul(optarg, NULL, 10);
@@ -160,10 +174,12 @@ options_t* init_orcc(int argc, char *argv[]) {
             set_mapping_strategy(optarg, opt);
             break;
         case 'm':
-            opt->mapping_input_file = strdup(optarg);
+            strcpy(fichero4,argv[6]);  //MCH
+            opt->mapping_input_file = fichero4;
+           // opt->mapping_input_file = strdup(optarg); //MCH
             break;
         case 'q':
-            opt->mapping_output_file = strdup(optarg);
+            //opt->mapping_output_file = strdup(optarg); //MCH
             break;
         case 'r':
             opt->nbProfiledFrames = strtoul(optarg, NULL, 10);
@@ -175,13 +191,15 @@ options_t* init_orcc(int argc, char *argv[]) {
             opt->display_flags = DISPLAY_DISABLE;
             break;
         case 'o':
-            opt->yuv_file = strdup(optarg);
+            //opt->yuv_file = strdup(optarg); //MCH
             break;
         case 'w':
-            opt->write_file = strdup(optarg);
+            strcpy(fichero3,argv[4]);  //MCH
+            opt->write_file = fichero3;
+           // opt->write_file = strdup(optarg);//MCH
             break;
         case 'p':
-            opt->profiling_file = strdup(optarg);
+            //opt->profiling_file = strdup(optarg); //MCH
             break;
         case 'v':
             set_verbose_level(optarg, opt);

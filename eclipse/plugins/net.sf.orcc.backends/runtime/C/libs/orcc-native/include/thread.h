@@ -85,7 +85,11 @@
 
 
 #else
+    #ifdef MDSP_ENABLE
+        #include <_pthread.h>
+    #else
     #include <pthread.h>
+    #endif
 
     #define orcc_thread_create(thread, function, argument, id) id = pthread_create(&(thread), NULL, function, (void *) &(argument))
     #define orcc_thread_join(thread) pthread_join(thread, NULL);
@@ -112,8 +116,12 @@
     #define orcc_semaphore_t semaphore_t
 
 #else
-    #include <sched.h>
-    #include <semaphore.h>
+    #ifdef MDSP_ENABLE 
+        #include <sem.h>
+    #else
+        #include <sched.h>
+        #include <semaphore.h>
+    #endif
 
     #define orcc_clear_cpu_set(cpuset) CPU_ZERO(&(cpuset))
     #define orcc_set_thread_affinity(cpuset, proc_num, thread) {                    \

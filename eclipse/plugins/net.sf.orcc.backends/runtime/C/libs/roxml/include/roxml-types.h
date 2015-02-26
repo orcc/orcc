@@ -26,7 +26,11 @@
 #ifdef _WIN32
 #include "roxml_win32_native.h"
 #else
-#include <pthread.h>
+  #ifdef MDSP_ENABLE	//MCH 
+ 	#include <_pthread.h>
+ #else
+	#include <pthread.h>
+ #endif
 #endif
 
 /** \typedef roxml_parse_func 

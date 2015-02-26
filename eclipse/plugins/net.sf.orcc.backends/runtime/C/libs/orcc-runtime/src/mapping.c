@@ -798,7 +798,7 @@ int do_KLR_mapping(network_t *network, options_t *opt, idx_t *part) {
 int do_mapping(network_t *network, options_t *opt, mapping_t *mapping) {
     int ret = ORCC_OK;
     idx_t *part;
-    ticks startTime, endTime;
+    //ticks startTime, endTime; //MCH To do, no ticks over DSP
     assert(network != NULL);
     assert(opt != NULL);
     assert(mapping != NULL);
@@ -809,7 +809,7 @@ int do_mapping(network_t *network, options_t *opt, mapping_t *mapping) {
         print_network(network);
     }
 
-    startTime = getticks();
+    //startTime = getticks(); //MCH To do, no ticks over DSP
 
     if (opt->nb_processors != 1) {
         switch (opt->mapping_strategy) {
@@ -849,7 +849,7 @@ int do_mapping(network_t *network, options_t *opt, mapping_t *mapping) {
         }
     }
 
-    endTime = getticks();
+    //endTime = getticks(); //MCH To do, no ticks over DSP
 
     set_mapping_from_partition(network, part, mapping);
 
@@ -857,7 +857,7 @@ int do_mapping(network_t *network, options_t *opt, mapping_t *mapping) {
         print_mapping(mapping);
         print_load_balancing(mapping);
         print_edge_cut(network);
-        print_orcc_trace(ORCC_VL_VERBOSE_2, "Mapping time : %2.lf", elapsed(endTime, startTime));
+        //print_orcc_trace(ORCC_VL_VERBOSE_2, "Mapping time : %2.lf", elapsed(endTime, startTime)); //MCH To do, no ticks over DSP
     }
 
     free(part);

@@ -32,8 +32,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <fcntl.h>
 #include <string.h>
+#ifndef MDSP_ENABLE //MCH
+ #include <fcntl.h>
+#endif
 
 #include "roxml-defines.h"
 #include "roxml-types.h"

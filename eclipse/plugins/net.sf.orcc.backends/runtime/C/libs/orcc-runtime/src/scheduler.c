@@ -41,6 +41,11 @@
 #include <omp.h>
 #endif /* OPENMP_ENABLE */
 
+#ifdef MDSP_ENABLE
+#include <ti/csl/csl_cacheAux.h>
+#include <ti/csl/csl_tsc.h>
+#endif /* MDSP_ENABLE */
+
 ///////////////////////////////////////////////////////////////////////////////
 // Scheduling functions
 ///////////////////////////////////////////////////////////////////////////////
@@ -257,7 +262,14 @@ void *scheduler_routine(void *data) {
     actor_t *my_actor;
     schedinfo_t si;
     int j;
+#ifdef MDSP_ENABLE
+    unsigned int countact = 0;
+    double tick_in, tick_out;
+    // Enable DSP timer
+    CSL_tscEnable();
+#else
     ticks tick_in, tick_out;
+#endif
     double diff_tick;
 
 #ifdef THREADS_ENABLE
@@ -268,14 +280,33 @@ void *scheduler_routine(void *data) {
     while (1) {
         my_actor = sched_get_next_schedulable(sched);
         if(my_actor != NULL){
-            tick_in = getticks();
+            #ifdef MDSP_ENABLE
+                tick_in = CSL_tscRead();
+            #else
+                tick_in = getticks();
+            #endif
             si.num_firings = 0;
 
             my_actor->sched_func(&si);
+            #ifdef MDSP_ENABLE
+                countact++;
 
+                // MCH By the moment, invalidate caches L1 & L2 everytime scheduler ends a loop
+                if (countact == sched->num_actors){
+                    countact=0;
+                    CACHE_invAllL1d(CACHE_NOWAIT);
+                    CACHE_invAllL2(CACHE_NOWAIT);
+                }
+            #endif
+                
             if (si.num_firings != 0) {
-                tick_out = getticks();
-                diff_tick = elapsed(tick_out, tick_in);
+               #ifdef MDSP_ENABLE
+                    tick_out = CSL_tscRead();
+                    diff_tick = tick_out - tick_in;
+                #else
+                    tick_out = getticks();
+                    diff_tick = elapsed(tick_out, tick_in);
+                #endif
                 my_actor->ticks += diff_tick;
             } else {
                 my_actor->misses++;
@@ -307,7 +338,8 @@ void launcher(options_t *opt, network_t *network) {
     orcc_thread_id_t threads_id[MAX_THREAD_NB];
     orcc_thread_t thread_agent;
     orcc_thread_id_t thread_agent_id;
-#elif OPENMP_ENABLE
+#endif
+#ifdef OPENMP_ENABLE
     omp_set_num_threads(nb_threads);
 #endif /* OPENMP_ENABLE */
 
@@ -328,25 +360,8 @@ void launcher(options_t *opt, network_t *network) {
         orcc_thread_join(threads[i]);
     }
     orcc_thread_join(thread_agent);
-#elif OPENMP_ENABLE
-    // 2 cores Hard-coded for OpenMP
-    // Replaced by the next code following
-    // Remove it if it works on DSP
-//    #pragma omp parallel
-//        {
-//        #pragma omp sections
-//            {
-//            #pragma omp section
-//                {
-//                    (*scheduler_routine)((void *) scheduler->schedulers[0]);
-//                }
-//            #pragma omp section
-//                {
-//                    (*scheduler_routine)((void *) scheduler->schedulers[1]);
-//                }
-//            }
-//        }
-
+#endif
+#ifdef OPENMP_ENABLE
     #pragma omp parallel for
     for(i=0 ; i < nb_threads; i++){
         (*scheduler_routine)((void *) scheduler->schedulers[i]);

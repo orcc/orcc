@@ -629,7 +629,7 @@ node_t * ROXML_API roxml_load_fd(int fd)
 	if(fd < 0)	{
 		return NULL;
 	}
-	file = fdopen(fd, "r");
+	file = fopen((const char*)fd, "r"); //MCH no fdopen call for DSP, fopen instead it and casting to fd
 	if(file == NULL)	{
 		return NULL;
 	}
@@ -676,7 +676,8 @@ node_t ** ROXML_API roxml_xpath(node_t *n, char * path, int *nb_ans)
 
 	root = roxml_get_root(n);
 
-	full_path_to_find = strdup(path);
+	//full_path_to_find = strdup(path); //No strdup function in DSP
+	strcpy(full_path_to_find,path); //MCH
 	path_to_find = full_path_to_find;
 
 	index = roxml_parse_xpath(path_to_find, &xpath, 0);
