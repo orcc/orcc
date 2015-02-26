@@ -80,7 +80,7 @@ public class DSP {
 		this.family = serie;
 		this.familyVersion = familyVersion;
 		this.deviceVersion = deviceVersion;
-		this.variant = familyVersion + deviceVersion;
+		this.variant = familyVersion + "." + deviceVersion;
 	}
 
 	public DSP(Brand brand, String device, Family serie, String familyVersion, String deviceVersion, String endianness) {
