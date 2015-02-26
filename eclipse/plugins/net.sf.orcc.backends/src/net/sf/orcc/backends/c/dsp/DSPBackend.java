@@ -28,63 +28,21 @@
  */
 package net.sf.orcc.backends.c.dsp;
 
-import static net.sf.orcc.backends.BackendsConstants.ADDITIONAL_TRANSFOS;
 import static net.sf.orcc.backends.BackendsConstants.BXDF_FILE;
 import static net.sf.orcc.backends.BackendsConstants.IMPORT_BXDF;
 import static net.sf.orcc.backends.BackendsConstants.DSP_CONFIGURATION;
 import static net.sf.orcc.backends.BackendsConstants.DSP_DEFAULT_CONFIGURATION;
+
 import java.io.File;
 
 import net.sf.orcc.backends.c.CBackend;
-import net.sf.orcc.backends.c.TracesPrinter;
-import net.sf.orcc.backends.c.omp.InstancePrinter;
-import net.sf.orcc.backends.c.omp.NetworkPrinter;
-import net.sf.orcc.backends.c.transform.CBroadcastAdder;
-import net.sf.orcc.backends.transform.CastAdder;
-import net.sf.orcc.backends.transform.DeadVariableRemoval;
-import net.sf.orcc.backends.transform.DisconnectedOutputPortRemoval;
-import net.sf.orcc.backends.transform.DivisionSubstitution;
-import net.sf.orcc.backends.transform.EmptyBlockRemover;
-import net.sf.orcc.backends.transform.Inliner;
-import net.sf.orcc.backends.transform.InlinerByAnnotation;
-import net.sf.orcc.backends.transform.InstPhiTransformation;
-import net.sf.orcc.backends.transform.InstTernaryAdder;
-import net.sf.orcc.backends.transform.ListFlattener;
-import net.sf.orcc.backends.transform.LoopUnrolling;
-import net.sf.orcc.backends.transform.Multi2MonoToken;
-import net.sf.orcc.backends.transform.ParameterImporter;
-import net.sf.orcc.backends.transform.StoreOnceTransformation;
 import net.sf.orcc.backends.util.DSP;
 import net.sf.orcc.backends.util.Mapping;
 import net.sf.orcc.df.Network;
-import net.sf.orcc.df.transform.ArgumentEvaluator;
-import net.sf.orcc.df.transform.BroadcastAdder;
-import net.sf.orcc.df.transform.BroadcastRemover;
-import net.sf.orcc.df.transform.FifoSizePropagator;
-import net.sf.orcc.df.transform.Instantiator;
-import net.sf.orcc.df.transform.NetworkFlattener;
-import net.sf.orcc.df.transform.TypeResizer;
-import net.sf.orcc.df.transform.UnitImporter;
-import net.sf.orcc.df.util.DfVisitor;
-import net.sf.orcc.ir.CfgNode;
-import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.transform.BlockCombine;
-import net.sf.orcc.ir.transform.ControlFlowAnalyzer;
-import net.sf.orcc.ir.transform.DeadCodeElimination;
-import net.sf.orcc.ir.transform.DeadGlobalElimination;
-import net.sf.orcc.ir.transform.PhiRemoval;
-import net.sf.orcc.ir.transform.RenameTransformation;
-import net.sf.orcc.ir.transform.SSATransformation;
-import net.sf.orcc.ir.transform.SSAVariableRenamer;
-import net.sf.orcc.ir.transform.TacTransformation;
-import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.tools.mapping.XmlBufferSizeConfiguration;
-import net.sf.orcc.tools.merger.action.ActionMerger;
-import net.sf.orcc.tools.merger.actor.ActorMerger;
 import net.sf.orcc.util.FilesManager;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.Result;
-import net.sf.orcc.util.Void;
 
 /**
  * C backend for DSP
@@ -95,107 +53,23 @@ import net.sf.orcc.util.Void;
  */
 public class DSPBackend extends CBackend {
 	
-	private NetworkPrinter networkPrinter;
-	private InstancePrinter instancePrinter;
-	private TracesPrinter tracesPrinter;
-
 	private CcsProjectPrinter ccsProjectPrinter;
 	private DSP dsp;
 	
 	public DSPBackend() {
-		instancePrinter = new InstancePrinter();
-		networkPrinter = new NetworkPrinter();
-		tracesPrinter = new TracesPrinter();
-
 		ccsProjectPrinter = new CcsProjectPrinter();
 	}
 
 	@Override
 	protected void doInitializeOptions() {
+		super.doInitializeOptions();
+
 		// Configure paths
 		srcPath = outputPath + File.separator + "src";
 
 		// Configure DSP
 		dsp = DSP.builder(getOption(DSP_CONFIGURATION, DSP_DEFAULT_CONFIGURATION));
 		ccsProjectPrinter.setDsp(dsp);
-		
-		// Load options map into code generator instances
-		networkPrinter.setOptions(getOptions());
-		instancePrinter.setOptions(getOptions());
-		tracesPrinter.setOptions(getOptions());
-
-		// -----------------------------------------------------
-		// Transformations that will be applied on the Network
-		// -----------------------------------------------------
-		if (mergeActors) {
-			networkTransfos.add(new FifoSizePropagator(fifoSize));
-			networkTransfos.add(new BroadcastAdder());
-		}
-		networkTransfos.add(new Instantiator(true));
-		networkTransfos.add(new NetworkFlattener());
-		networkTransfos.add(new UnitImporter());
-		networkTransfos.add(new DisconnectedOutputPortRemoval());
-		if (classify) {
-			networkTransfos.add(new Classifier());
-		}
-		if (mergeActors) {
-			networkTransfos.add(new ActorMerger());
-		} else {
-			networkTransfos.add(new CBroadcastAdder());
-		}
-		if (mergeActors) {
-			networkTransfos.add(new BroadcastRemover());
-		}
-		networkTransfos.add(new ArgumentEvaluator());
-		networkTransfos.add(new TypeResizer(true, false, true, false));
-		networkTransfos.add(new RenameTransformation(getRenameMap()));
-
-		// -------------------------------------------------------------------
-		// Transformations that will be applied on children (instances/actors)
-		// -------------------------------------------------------------------
-		if (mergeActions) {
-			childrenTransfos.add(new ActionMerger());
-		}
-		if (convertMulti2Mono) {
-			childrenTransfos.add(new Multi2MonoToken());
-		}
-		childrenTransfos.add(new DfVisitor<Void>(new InlinerByAnnotation()));
-		childrenTransfos.add(new DfVisitor<Void>(new LoopUnrolling()));
-
-		// If "-t" option is passed to command line, apply additional
-		// transformations
-		if (getOption(ADDITIONAL_TRANSFOS, false)) {
-			childrenTransfos.add(new StoreOnceTransformation());
-			childrenTransfos.add(new DfVisitor<Void>(new SSATransformation()));
-			childrenTransfos.add(new DfVisitor<Void>(new PhiRemoval()));
-			childrenTransfos.add(new Multi2MonoToken());
-			childrenTransfos.add(new DivisionSubstitution());
-			childrenTransfos.add(new ParameterImporter());
-			childrenTransfos.add(new DfVisitor<Void>(new Inliner(true, true)));
-
-			// transformations.add(new UnaryListRemoval());
-			// transformations.add(new GlobalArrayInitializer(true));
-
-			childrenTransfos.add(new DfVisitor<Void>(new InstTernaryAdder()));
-			childrenTransfos.add(new DeadGlobalElimination());
-
-			childrenTransfos.add(new DfVisitor<Void>(new DeadVariableRemoval()));
-			childrenTransfos.add(new DfVisitor<Void>(new DeadCodeElimination()));
-			childrenTransfos.add(new DfVisitor<Void>(new DeadVariableRemoval()));
-			childrenTransfos.add(new DfVisitor<Void>(new ListFlattener()));
-			childrenTransfos.add(new DfVisitor<Expression>(
-					new TacTransformation()));
-			childrenTransfos.add(new DfVisitor<CfgNode>(
-					new ControlFlowAnalyzer()));
-			childrenTransfos
-					.add(new DfVisitor<Void>(new InstPhiTransformation()));
-			childrenTransfos.add(new DfVisitor<Void>(new EmptyBlockRemover()));
-			childrenTransfos.add(new DfVisitor<Void>(new BlockCombine()));
-
-			childrenTransfos.add(new DfVisitor<Expression>(new CastAdder(true,
-					true)));
-			childrenTransfos.add(new DfVisitor<Void>(new SSAVariableRenamer()));
-		}
 	}
 	
 	@Override
@@ -271,4 +145,5 @@ public class DSPBackend extends CBackend {
 		
 		return result;
 	}
+		
 }
