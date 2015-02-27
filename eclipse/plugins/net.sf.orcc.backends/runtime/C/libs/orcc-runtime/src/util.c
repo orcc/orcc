@@ -121,7 +121,8 @@ options_t* init_orcc(int argc, char *argv[]) {
     const char *ostr = "i:no:d:m:q:f:w:l:zr:ac:s:v:p:h";
     int c;
 
-        /////////////////////////////////////////////////// MCH
+#ifdef MDSP_ENABLE
+    /////////////////////////////////////////////////// MCH
                 char * fichero2;
                 fichero2=(char*)malloc(255);
                 char * fichero3;
@@ -132,6 +133,7 @@ options_t* init_orcc(int argc, char *argv[]) {
                 strcpy (fichero3,optarg);
                 strcpy (fichero4,optarg);
     ////////////////////////////////////////////////////// MCH
+#endif
 
     opt = set_default_options();
 
@@ -154,12 +156,17 @@ options_t* init_orcc(int argc, char *argv[]) {
             print_usage();
             exit(ORCC_ERR_BAD_ARGS);
         case 'd':
-           // opt->input_directory = strdup(optarg); //MCH
+#ifndef MDSP_ENABLE
+            opt->input_directory = strdup(optarg);
+#endif
             break;
         case 'i':
+#ifdef MDSP_ENABLE
             strcpy(fichero2,argv[2]);  //MCH
             opt->input_file = fichero2;
-            //opt->input_file = strdup(optarg);//MCH
+#else
+            opt->input_file = strdup(optarg);
+#endif
             break;
         case 'l':
             opt->nbLoops = strtoul(optarg, NULL, 10);
@@ -175,12 +182,17 @@ options_t* init_orcc(int argc, char *argv[]) {
             set_mapping_strategy(optarg, opt);
             break;
         case 'm':
+#ifdef MDSP_ENABLE
             strcpy(fichero4,argv[6]);  //MCH
             opt->mapping_input_file = fichero4;
-           // opt->mapping_input_file = strdup(optarg); //MCH
+#else
+            opt->mapping_input_file = strdup(optarg);
+#endif
             break;
         case 'q':
-            //opt->mapping_output_file = strdup(optarg); //MCH
+#ifndef MDSP_ENABLE
+            opt->mapping_output_file = strdup(optarg);
+#endif
             break;
         case 'r':
             opt->nbProfiledFrames = strtoul(optarg, NULL, 10);
@@ -192,15 +204,22 @@ options_t* init_orcc(int argc, char *argv[]) {
             opt->display_flags = DISPLAY_DISABLE;
             break;
         case 'o':
-            //opt->yuv_file = strdup(optarg); //MCH
+#ifndef MDSP_ENABLE
+            opt->yuv_file = strdup(optarg);
+#endif
             break;
         case 'w':
+#ifdef MDSP_ENABLE
             strcpy(fichero3,argv[4]);  //MCH
             opt->write_file = fichero3;
-           // opt->write_file = strdup(optarg);//MCH
+#else
+            opt->write_file = strdup(optarg);
+#endif
             break;
         case 'p':
-            //opt->profiling_file = strdup(optarg); //MCH
+#ifndef MDSP_ENABLE
+            opt->profiling_file = strdup(optarg);
+#endif
             break;
         case 'v':
             set_verbose_level(optarg, opt);
