@@ -92,8 +92,9 @@ static const char *usage =
     "       MKEC : METIS KWay graph partition mapping (Optimize Edge-cut)\n"
 #endif /* METIS_ENABLE */
     "       RR   : A simple Round-Robin mapping\n"
+    "       QM   : Quick Mapping\n"
     "       WLB  : Weighted Load Balancing\n"
-    "       KLR  : Kernighan Lin Refinement Weighted Load Balancing\n"
+    "       COW  : Communication Optimized Weighted Load Balancing\n"
 
     "\nOther specific arguments:\n"
     "Depending on how the application has been designed, one of these arguments can be used.\n"
