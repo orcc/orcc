@@ -58,6 +58,8 @@ public class DALBackend extends CBackend {
 		optimizer.optimizeOutput(network, outputBuffering, fifoSize);
 
 		labelPeekPorts(network);
+		optimizer.computeMaxIter(network, fifoSize);
+		optimizer.computeTokenSizes(network);
 
 		network.computeTemplateMaps();
 

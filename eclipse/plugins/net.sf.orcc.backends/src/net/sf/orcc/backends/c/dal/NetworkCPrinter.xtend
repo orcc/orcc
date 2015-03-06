@@ -100,7 +100,11 @@ class NetworkCPrinter extends CTemplate {
 	}
 	
 	def protected allocateFifo(Connection conn, int nbReaders) '''
-		<sw_channel type="fifo" size="«if (conn.size != null) conn.size*sizeOf(conn.getSourcePort().getType()) else fifoSize»" name="C«conn.<Object>getValueAsObject("idNoBcast")»">
+		«IF conn.hasAttribute("TokenSize")»
+			<sw_channel type="fifo" tokensize="«conn.<Integer>getValueAsObject("TokenSize")»" size="«if (conn.size != null) conn.size*sizeOf(conn.getSourcePort().getType()) else fifoSize*sizeOf(conn.getSourcePort().getType())»" name="C«conn.<Object>getValueAsObject("idNoBcast")»">
+		«ELSE»
+			<sw_channel type="fifo" size="«if (conn.size != null) conn.size*sizeOf(conn.getSourcePort().getType()) else fifoSize*sizeOf(conn.getSourcePort().getType())»" name="C«conn.<Object>getValueAsObject("idNoBcast")»">
+		«ENDIF»
 			<port type="input" name="0"/>
 			<port type="output" name="1"/>
 		</sw_channel>
