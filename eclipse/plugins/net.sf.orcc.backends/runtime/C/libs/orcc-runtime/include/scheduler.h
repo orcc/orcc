@@ -31,7 +31,7 @@
 
 #include "orcc.h"
 
-#ifdef THREADS_ENABLE
+#if defined(THREADS_ENABLE) || defined(OPENMP_ENABLE)
 #include "thread.h"
 #endif
 
@@ -64,7 +64,8 @@ struct local_scheduler_s {
 
     /* Mapping synchronization */
     agent_t *agent;
-#ifdef THREADS_ENABLE
+
+#if defined(THREADS_ENABLE) || defined(OPENMP_ENABLE)
     orcc_semaphore_t sem_thread;
 #endif
 };

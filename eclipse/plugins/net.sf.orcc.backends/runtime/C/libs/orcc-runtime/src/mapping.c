@@ -42,7 +42,7 @@
 #include "cycle.h"
 #include "profiling.h"
 
-#ifdef THREADS_ENABLE
+#if defined(THREADS_ENABLE) || defined(OPENMP_ENABLE)
 #include "thread.h"
 #endif
 #ifdef ROXML_ENABLE
@@ -881,6 +881,10 @@ void *agent_routine(void *data) {
         }
 #endif
 
+#ifdef OPENMP_ENABLE
+        orcc_semaphore_wait(agent->sem_agent);
+#endif
+
         print_orcc_trace(ORCC_VL_VERBOSE_1, "Remap the actors...");
         compute_workloads(agent->network);
         do_mapping(agent->network, agent->options, agent->mapping);
@@ -897,7 +901,7 @@ void *agent_routine(void *data) {
             fpsPrintInit_mapping();
         }
 
-#ifdef THREADS_ENABLE
+#if defined(THREADS_ENABLE) || defined(OPENMP_ENABLE)
         // wakeup all threads
         for (i = 0; i < agent->nb_threads; i++) {
             orcc_semaphore_set(agent->scheduler->schedulers[i]->sem_thread);
@@ -919,8 +923,12 @@ agent_t* agent_init(options_t *options, global_scheduler_t *scheduler, network_t
     agent->network = network;
     agent->mapping = allocate_mapping(nb_threads, network->nb_actors);
     agent->nb_threads = nb_threads;
-#ifdef THREADS_ENABLE
+
+#if defined(THREADS_ENABLE) || defined(OPENMP_ENABLE)
     orcc_semaphore_create(agent->sem_agent, 0);
+#endif
+#ifdef OPENMP_ENABLE
+    orcc_semaphore_wait(agent->sem_agent);
 #endif
     return agent;
 }

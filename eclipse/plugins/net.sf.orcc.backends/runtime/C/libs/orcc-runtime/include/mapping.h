@@ -32,7 +32,7 @@
 
 #include "orcc.h"
 
-#ifdef THREADS_ENABLE
+#if defined(THREADS_ENABLE) || defined(OPENMP_ENABLE)
 #include "thread.h"
 #endif
 
@@ -52,7 +52,8 @@ struct agent_s {
     network_t *network;
     mapping_t *mapping;
     int nb_threads;
-#ifdef THREADS_ENABLE
+
+#if defined(THREADS_ENABLE) || defined(OPENMP_ENABLE)
     orcc_semaphore_t sem_agent;
 #endif
 };

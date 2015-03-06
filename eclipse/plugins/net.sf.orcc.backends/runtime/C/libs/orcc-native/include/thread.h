@@ -37,6 +37,18 @@
 
 #define MAX_THREAD_NB 10
 
+#ifdef OPENMP_ENABLE 
+    #include <omp.h>
+
+    #define orcc_semaphore_create(lock, number) omp_init_lock(&lock)
+    #define orcc_semaphore_wait(lock) omp_set_lock(&lock)
+    #define orcc_semaphore_set(lock) omp_unset_lock(&lock)
+    #define orcc_semaphore_destroy(lock) omp_destroy_lock(&lock)
+    #define orcc_semaphore_t omp_lock_t
+
+#else
+
+
 #ifdef _WIN32
     // ok here is some dark Windows magic
     // we must define WIN32_LEAN_AND_MEAN here so that windows.h will NOT include winsock.h
@@ -142,6 +154,8 @@
 #endif
 
 #endif
+
+#endif  /* OPENMP_ENABLE  */
 
 void set_realtime_priority();
 

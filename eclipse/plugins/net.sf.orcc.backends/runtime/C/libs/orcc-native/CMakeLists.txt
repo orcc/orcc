@@ -15,7 +15,21 @@ set(orcc_native_headers
     include/native_util.h
 )
 
-if(THREADS_FOUND)
+if(USE_OPENMP)
+    find_package(OpenMP REQUIRED)
+    if(OPENMP_FOUND)
+        set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+        list(APPEND extra_definitions -DOPENMP_ENABLE)
+        message(STATUS "Found OpenMP: " ${OpenMP_C_FLAGS})
+    else()
+        message(STATUS "Cannot find OpenMP")
+    endif()
+endif()
+
+if(THREADS_FOUND OR OPENMP_FOUND)
+    message(STATUS "THREADS_FOUND : " ${THREADS_FOUND})
+    message(STATUS "OPENMP_FOUND : " ${OPENMP_FOUND})
     list(APPEND orcc_native_sources src/thread.c)
     list(APPEND orcc_native_headers include/thread.h)
 endif()

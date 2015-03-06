@@ -32,6 +32,7 @@
 #include "trace.h"
 #include "thread.h"
 
+#ifndef OPENMP_ENABLE 
 void set_realtime_priority() {
     #ifdef __linux__
     int ret;
@@ -73,3 +74,4 @@ void set_realtime_priority() {
     print_orcc_trace(ORCC_VL_VERBOSE_2, "Thread priority is %d", params.sched_priority);
     #endif
 }
+#endif

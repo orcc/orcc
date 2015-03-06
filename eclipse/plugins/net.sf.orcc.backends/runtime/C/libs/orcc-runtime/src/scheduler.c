@@ -72,8 +72,11 @@ local_scheduler_t *allocate_local_scheduler(int id, int nb_schedulers) {
         sched->waiting_schedulable[i] = (waiting_t *) malloc(sizeof(waiting_t));
     }
 
-#ifdef THREADS_ENABLE
+#if defined(THREADS_ENABLE) || defined(OPENMP_ENABLE)
     orcc_semaphore_create(sched->sem_thread, 0);
+#endif
+#ifdef OPENMP_ENABLE
+    orcc_semaphore_wait(sched->sem_thread);
 #endif
 
     return sched;
@@ -118,8 +121,12 @@ void local_scheduler_init(local_scheduler_t *sched, int num_actors, actor_t **ac
     }
 
     sched->agent = agent;
-#ifdef THREADS_ENABLE
+
+#if defined(THREADS_ENABLE) || defined(OPENMP_ENABLE)
     orcc_semaphore_create(sched->sem_thread, 0);
+#endif
+#ifdef OPENMP_ENABLE
+    orcc_semaphore_wait(sched->sem_thread);
 #endif
 }
 
@@ -261,6 +268,9 @@ void *scheduler_routine(void *data) {
     local_scheduler_t *sched = (local_scheduler_t *) data;
     actor_t *my_actor;
     schedinfo_t si;
+	//! TODO : Add "semaphore" like instead following code
+	//! ASN : In progress...
+    boolean FLAG = TRUE;
     int j;
 #ifdef MDSP_ENABLE
     unsigned int countact = 0;
@@ -318,10 +328,18 @@ void *scheduler_routine(void *data) {
             }
         }
 
-#ifdef THREADS_ENABLE
+#if defined(THREADS_ENABLE) || defined(OPENMP_ENABLE)
         if(my_actor == NULL || needMapping()) {
-            orcc_semaphore_set(sched->agent->sem_agent);
+			//! TODO : Add "semaphore" like instead following code
+			//! ASN : In progress...
+            printf("ASN LOCK THREAD %d\n", omp_get_thread_num());
+            if (omp_get_thread_num() == 0 && FLAG == TRUE) {
+                FLAG = FALSE;
+                printf("ASN UNLOCK AGENT\n");
+                orcc_semaphore_set(sched->agent->sem_agent);
+            }
             orcc_semaphore_wait(sched->sem_thread);
+            printf("ASN UNLOCK THREAD %d\n", omp_get_thread_num());
         }
 #endif
     }
@@ -340,7 +358,8 @@ void launcher(options_t *opt, network_t *network) {
     orcc_thread_id_t thread_agent_id;
 #endif
 #ifdef OPENMP_ENABLE
-    omp_set_num_threads(nb_threads);
+	// One thread needed for agent
+    omp_set_num_threads(nb_threads+1);
 #endif /* OPENMP_ENABLE */
 
     global_scheduler_t *scheduler = allocate_global_scheduler(nb_threads);
@@ -362,9 +381,17 @@ void launcher(options_t *opt, network_t *network) {
     orcc_thread_join(thread_agent);
 #endif
 #ifdef OPENMP_ENABLE
-    #pragma omp parallel for
-    for(i=0 ; i < nb_threads; i++){
-        (*scheduler_routine)((void *) scheduler->schedulers[i]);
+    #pragma omp parallel
+    {
+        #pragma omp for nowait
+        for(i=0 ; i < nb_threads; i++){
+            (*scheduler_routine)((void *) scheduler->schedulers[i]);
+        }
+
+        #pragma omp single
+        {
+            (*agent_routine)((void *) agent);
+        }
     }
 #else
     (*scheduler_routine)((void *) scheduler->schedulers[i]);
