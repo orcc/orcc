@@ -53,7 +53,7 @@ struct agent_s {
     mapping_t *mapping;
     int nb_threads;
 
-#if defined(THREADS_ENABLE) || defined(OPENMP_ENABLE)
+#ifdef THREADS_ENABLE
     orcc_semaphore_t sem_agent;
 #endif
 };

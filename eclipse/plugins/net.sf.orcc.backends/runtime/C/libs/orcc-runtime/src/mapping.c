@@ -882,7 +882,10 @@ void *agent_routine(void *data) {
 #endif
 
 #ifdef OPENMP_ENABLE
-        orcc_semaphore_wait(agent->sem_agent);
+        // wait threads synchro
+        for (i = 0; i < agent->nb_threads; i++) {
+            orcc_semaphore_wait(agent->scheduler->schedulers[i]->sem_agent);
+        }
 #endif
 
         print_orcc_trace(ORCC_VL_VERBOSE_1, "Remap the actors...");
@@ -924,11 +927,8 @@ agent_t* agent_init(options_t *options, global_scheduler_t *scheduler, network_t
     agent->mapping = allocate_mapping(nb_threads, network->nb_actors);
     agent->nb_threads = nb_threads;
 
-#if defined(THREADS_ENABLE) || defined(OPENMP_ENABLE)
+#ifdef THREADS_ENABLE
     orcc_semaphore_create(agent->sem_agent, 0);
-#endif
-#ifdef OPENMP_ENABLE
-    orcc_semaphore_wait(agent->sem_agent);
 #endif
     return agent;
 }

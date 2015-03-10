@@ -68,6 +68,9 @@ struct local_scheduler_s {
 #if defined(THREADS_ENABLE) || defined(OPENMP_ENABLE)
     orcc_semaphore_t sem_thread;
 #endif
+#ifdef OPENMP_ENABLE
+    orcc_semaphore_t sem_agent;
+#endif
 };
 
 struct waiting_s {

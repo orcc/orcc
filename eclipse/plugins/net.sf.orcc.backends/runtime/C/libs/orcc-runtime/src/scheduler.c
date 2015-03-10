@@ -126,7 +126,9 @@ void local_scheduler_init(local_scheduler_t *sched, int num_actors, actor_t **ac
     orcc_semaphore_create(sched->sem_thread, 0);
 #endif
 #ifdef OPENMP_ENABLE
+    orcc_semaphore_create(sched->sem_agent, 0);
     orcc_semaphore_wait(sched->sem_thread);
+    orcc_semaphore_wait(sched->sem_agent);
 #endif
 }
 
@@ -328,18 +330,16 @@ void *scheduler_routine(void *data) {
             }
         }
 
-#if defined(THREADS_ENABLE) || defined(OPENMP_ENABLE)
+#ifdef THREADS_ENABLE
         if(my_actor == NULL || needMapping()) {
-			//! TODO : Add "semaphore" like instead following code
-			//! ASN : In progress...
-            printf("ASN LOCK THREAD %d\n", omp_get_thread_num());
-            if (omp_get_thread_num() == 0 && FLAG == TRUE) {
-                FLAG = FALSE;
-                printf("ASN UNLOCK AGENT\n");
-                orcc_semaphore_set(sched->agent->sem_agent);
-            }
+            orcc_semaphore_set(sched->agent->sem_agent);
             orcc_semaphore_wait(sched->sem_thread);
-            printf("ASN UNLOCK THREAD %d\n", omp_get_thread_num());
+        }
+#endif
+#ifdef OPENMP_ENABLE
+        if(my_actor == NULL || needMapping()) {
+            orcc_semaphore_set(sched->sem_agent);
+            orcc_semaphore_wait(sched->sem_thread);
         }
 #endif
     }
