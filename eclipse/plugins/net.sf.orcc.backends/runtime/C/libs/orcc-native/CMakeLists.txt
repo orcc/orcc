@@ -63,7 +63,8 @@ if(WIN32)
 endif()
 
 # Try to find SDL on the user system
-find_package(SDL2 QUIET)
+# TODO : Fix SDL2 compatibility 
+#find_package(SDL2 QUIET)
 find_package(SDL QUIET)
 
 if(SDL2_FOUND)
