@@ -257,9 +257,28 @@ int set_mapping_from_partition(network_t *network, idx_t *part, mapping_t *mappi
     int ret = ORCC_OK;
     int i;
     int *counter;
+// On DSP Source actor must be on main thread  
+#ifdef MDSP_ENABLE
+    idx_t sourceProc = part[0];
+#endif
     assert(network != NULL);
     assert(part != NULL);
     assert(mapping != NULL);
+
+    for (i = 0; i < network->nb_actors; i++) {
+// On DSP Source actor must be on main thread  
+#ifdef MDSP_ENABLE
+        if (sourceProc != 0) {
+            if (part[i] == sourceProc) {
+                part[i] = 0;
+            } else if (part[i] == 0) {
+                part[i] = sourceProc;            
+            }
+        }
+#endif
+        // Update network too
+        network->actors[i]->processor_id = part[i];
+    }           
 
     counter = malloc(mapping->number_of_threads * sizeof(counter));
 
@@ -276,11 +295,6 @@ int set_mapping_from_partition(network_t *network, idx_t *part, mapping_t *mappi
     for (i = 0; i < network->nb_actors; i++) {
         mapping->partitions_of_actors[part[i]][counter[part[i]]] = network->actors[i];
         counter[part[i]]++;
-    }
-
-    // Update network too
-    for (i = 0; i < network->nb_actors; i++) {
-        network->actors[i]->processor_id = part[i];
     }
 
     free(counter);
