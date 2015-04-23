@@ -73,5 +73,7 @@ public class BackendsConstants {
 	public static final boolean JIT_BIT_ACCURATE_DEFAULT = false;
 	
 	public static final String PAPIFY = "net.sf.orcc.backends.papify";
+	
+	public static final String GEN_WEIGHTS = "net.sf.orcc.backends.genWeights";
 
 }

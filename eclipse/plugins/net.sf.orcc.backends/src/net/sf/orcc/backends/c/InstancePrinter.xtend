@@ -68,6 +68,7 @@ import net.sf.orcc.util.util.EcoreHelper
 import static net.sf.orcc.OrccLaunchConstants.*
 import static net.sf.orcc.backends.BackendsConstants.*
 import static net.sf.orcc.util.OrccAttributes.*
+import net.sf.orcc.df.Network
 
 /**
  * Generate and print instance source file for C backend.
@@ -103,12 +104,17 @@ class InstancePrinter extends CTemplate {
 	var boolean debugAction = false
 	
 	var boolean papify = false
-
+	
 	// List of actions annotated with @papify
 	var Iterable<Action> papifyActions
 	// List of papi events to register
 	var Iterable<String> papiEvents
 
+	var boolean genWeights = false
+	var boolean genWeightsExit = false
+	var Action genWeightsExitAction = null
+	var String genWeightsExitCond = null	
+	
 	protected val Pattern inputPattern = DfFactory::eINSTANCE.createPattern
 	protected val Map<State, Pattern> transitionPattern = new HashMap<State, Pattern>
 
@@ -140,6 +146,10 @@ class InstancePrinter extends CTemplate {
 		if(options.containsKey(PAPIFY)){
 			papify = options.get(PAPIFY) as Boolean;
 		}
+
+		if(options.containsKey(GEN_WEIGHTS)){
+			genWeights = options.get(GEN_WEIGHTS) as Boolean;
+		}		
 	}
 
 	def getInstanceContent(Instance instance) {
@@ -168,6 +178,7 @@ class InstancePrinter extends CTemplate {
 		buildInputPattern
 		buildTransitionPattern
 		initializePapifyOptions
+		initializeGenWeightsOptions
 	}
 
 	def setActor(Actor actor) {
@@ -181,6 +192,7 @@ class InstancePrinter extends CTemplate {
 		buildInputPattern
 		buildTransitionPattern
 		initializePapifyOptions
+		initializeGenWeightsOptions
 	}
 
 	private def initializePapifyOptions() {
@@ -198,7 +210,25 @@ class InstancePrinter extends CTemplate {
 		}
 	}
 
-	def protected getFileContent() '''
+	private def initializeGenWeightsOptions() {
+		if(genWeights && actor.actions.filter[hasAttribute(GEN_WEIGHTS_EXIT_ATTRIBUTE)].length > 0) {
+			genWeightsExit = true
+			// Using only the very first action with @genWeightsExit tag.			
+			genWeightsExitAction = actor.actions.filter[hasAttribute(GEN_WEIGHTS_EXIT_ATTRIBUTE)].get(0)			
+			genWeightsExitCond	 = genWeightsExitAction.getAttribute(GEN_WEIGHTS_EXIT_ATTRIBUTE)?.getValueAsString("condition")
+			if(genWeightsExitCond == null || genWeightsExitCond == "")
+				genWeightsExitCond = "1"
+		}
+		else
+		{
+			genWeightsExit = false			
+			genWeightsExitAction = null
+			genWeightsExitCond == null
+		}
+	}
+	
+	def protected getFileContent() {
+	'''
 		// Source file is "«actor.file»"
 		
 		#include <stdio.h>
@@ -226,6 +256,9 @@ class InstancePrinter extends CTemplate {
 		«ENDIF»
 		«IF profile»
 			#include "profiling.h"
+		«ENDIF»
+		«IF genWeights»
+			#include "rdtsc.h"
 		«ENDIF»
 
 		#define SIZE «fifoSize»
@@ -336,7 +369,15 @@ class InstancePrinter extends CTemplate {
 			«ENDFOR»
 			
 		«ENDIF»
-		
+
+		«IF genWeights»
+			////////////////////////////////////////////////////////////////////////////////
+			// Data structures for genWeights
+			«printGenWeightsVars»
+			
+			static unsigned int cycles_high, cycles_low, cycles_high1, cycles_low1;
+			
+		«ENDIF»
 		«IF !actor.stateVars.nullOrEmpty»
 			////////////////////////////////////////////////////////////////////////////////
 			// State variables of the actor
@@ -400,7 +441,7 @@ class InstancePrinter extends CTemplate {
 		// Action scheduler
 		«printActorScheduler»
 	'''
-
+}
 	def protected printActorScheduler() '''
 		«IF actor.hasFsm»
 			«printFsm»
@@ -761,14 +802,16 @@ class InstancePrinter extends CTemplate {
 	def private printCore(Action action, boolean isAligned) '''
 		static «IF inlineActions»«inline»«ELSE»«noInline»«ENDIF»void «action.body.name»«IF isAligned»_aligned«ENDIF»() {
 			«action.profileStart»
-
 			«IF action.hasAttribute(PAPIFY_ATTRIBUTE) && papify»
 				papi_«actor.name»_start_usec = PAPI_get_real_usec();
 				event_start(&(papi_«actor.name»_eventset), -1);
-			«ENDIF»
+			«ENDIF»			
 			«FOR variable : action.body.locals»
 				«variable.declare»;
 			«ENDFOR»
+			«IF genWeightsExit && genWeightsExitAction.identityEquals(action)»
+				FILE *fpGenWeightsStats = NULL;
+			«ENDIF»
 			«IF debugActor || debugAction»
 				printf("-- «entityName»: «action.name»«IF isAligned» (aligned)«ENDIF»\n");
 			«ENDIF»
@@ -776,13 +819,13 @@ class InstancePrinter extends CTemplate {
 				«debugTokens(action.inputPattern)»
 			«ENDIF»
 			«writeTraces(action.inputPattern)»
+			«action.genWeightsStart»
 			«beforeActionBody»
-
 			«FOR block : action.body.blocks»
 				«block.doSwitch»
 			«ENDFOR»
-
 			«afterActionBody»
+			«action.genWeightsStop»
 			«IF debugAction»
 				«debugTokens(action.outputPattern)»
 			«ENDIF»
@@ -799,7 +842,7 @@ class InstancePrinter extends CTemplate {
 				«IF action.outputPattern.getNumTokens(port) >= MIN_REPEAT_RWEND»
 					write_end_«port.name»();
 				«ENDIF»
-			«ENDFOR»
+			«ENDFOR»			
 			«IF action.hasAttribute(PAPIFY_ATTRIBUTE) && papify»
 				«val papiStructI = action.papifyStruct»
 				event_stop(&(papi_«actor.name»_eventset), papi_«actor.name»_eventCodeSetSize, «papiStructI».counterValues, -1);
@@ -811,8 +854,11 @@ class InstancePrinter extends CTemplate {
 					«(0..papiEvents.size-1).join(', ')['''«papiStructI».counterValues[«it»]''']»);
 				fclose(papi_output_«actor.name»);
 			«ENDIF»
-
 			«action.profileEnd»
+			«IF genWeightsExit && genWeightsExitAction.identityEquals(action)»
+
+				«printCalcGenWeightsStats»
+			«ENDIF»
 		}
 	'''
 
@@ -856,6 +902,91 @@ class InstancePrinter extends CTemplate {
 		«ENDFOR»
 	'''
 	
+	def protected genWeightsStart(Action action) '''
+		«IF genWeights && !actor.initializes.contains(action)»
+
+			rdtsc_warmup(&cycles_high, &cycles_low, &cycles_high1, &cycles_low1);
+			rdtsc_tick(&cycles_high, &cycles_low);
+			
+		«ENDIF»
+	'''
+
+	def protected genWeightsStop(Action action) '''
+		«IF genWeights && !actor.initializes.contains(action)»
+		
+		rdtsc_tock(&cycles_high1, &cycles_low1);
+		saveNewFiringWeight(rdtsc_data_«actor.name»_«action.name», rdtsc_getTicksCount(cycles_high, cycles_low, cycles_high1, cycles_low1));
+
+		«ENDIF»
+	'''
+	
+	def protected printGenWeightsVars()	{
+		var Network network = null
+		if(genWeightsExit) {
+			if( actor.eContainer() instanceof Network){
+				network = actor.eContainer() as Network
+			}
+		}
+		''' 
+		«IF genWeightsExit && network != null»
+			«FOR child : network.children»
+				«printGenWeightsInstanceVars(child.getAdapter(typeof(Actor)))»
+			«ENDFOR»
+		«ELSE»
+			«printGenWeightsInstanceVars(actor)»
+		«ENDIF»
+		'''
+	}
+	
+	def protected printGenWeightsInstanceVars(Actor actor) '''
+		«FOR action : actor.actions»
+			extern rdtsc_data_t *rdtsc_data_«actor.name»_«action.name»;
+		«ENDFOR»
+	'''
+
+	def protected printCalcGenWeightsStats()	{
+		var Network network = null
+		if( actor.eContainer() instanceof Network){
+			network = actor.eContainer() as Network
+		}
+		''' 
+		«IF network != null»
+			if(«genWeightsExitCond») {
+				fpGenWeightsStats = fopen("«network.simpleName»_rdtsc_weights.xml", "w+");
+				if(fpGenWeightsStats == NULL) {
+					printf("Error opening output file for generation of execution weights.\nExiting...");
+					exit(0);
+				}
+				
+				fprintf(fpGenWeightsStats, "<?xml version=\"1.0\" ?>\n<network name=\"«network.simpleName»\">\n");
+
+				«FOR child : network.children»
+					«printCalcGenWeightsInstanceStats(child.getAdapter(typeof(Actor)))»
+				«ENDFOR»
+
+				fprintf(fpGenWeightsStats, "</network>\n");
+				fclose(fpGenWeightsStats);
+				printf("Execution weights are generated in file: «network.simpleName»_rdtsc_weights.xml\n");
+				exit(1); // Exiting the program after stats calculations & reporting are finished.
+			} // «genWeightsExitCond»
+		«ENDIF»
+		'''
+	}
+	
+	def protected printCalcGenWeightsInstanceStats(Actor actor) '''
+		fprintf(fpGenWeightsStats, "\t<actor id=\"«actor.name»\">\n");
+		«FOR action : actor.actions»
+			calcWeightStats(rdtsc_data_«actor.name»_«action.name»);
+			fprintf(fpGenWeightsStats, "\t\t<action id=\"«action.name»\" clockcycles=\"%Lf\" clockcycles-min=\"%"PRIu64"\" clockcycles-max=\"%"PRIu64"\" firings=\"%"PRIu64"\"/>\n", 
+				rdtsc_data_«actor.name»_«action.name»->_avgWeight, 
+				(rdtsc_data_«actor.name»_«action.name»->_numFirings > 0)?rdtsc_data_«actor.name»_«action.name»->_minWeight:0, 
+				rdtsc_data_«actor.name»_«action.name»->_maxWeight,
+				rdtsc_data_«actor.name»_«action.name»->_numFirings);
+
+		«ENDFOR»
+		fprintf(fpGenWeightsStats, "\t</actor>\n");
+	'''
+
 	def protected profileStart(Action action) '''
 		«IF profile && !actor.initializes.contains(action)»
 			ticks tick_in = getticks();
