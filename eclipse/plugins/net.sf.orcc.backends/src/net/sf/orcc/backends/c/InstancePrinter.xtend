@@ -259,6 +259,8 @@ class InstancePrinter extends CTemplate {
 		«ENDIF»
 		«IF genWeights»
 			#include "rdtsc.h"
+			#include "options.h"
+			#include <libgen.h>
 		«ENDIF»
 
 		#define SIZE «fifoSize»
@@ -811,6 +813,7 @@ class InstancePrinter extends CTemplate {
 			«ENDFOR»
 			«IF genWeightsExit && genWeightsExitAction.identityEquals(action)»
 				FILE *fpGenWeightsStats = NULL;
+				char fnGenWeightsStats[FILENAME_MAX];
 			«ENDIF»
 			«IF debugActor || debugAction»
 				printf("-- «entityName»: «action.name»«IF isAligned» (aligned)«ENDIF»\n");
@@ -952,12 +955,17 @@ class InstancePrinter extends CTemplate {
 		''' 
 		«IF network != null»
 			if(«genWeightsExitCond») {
-				fpGenWeightsStats = fopen("«network.simpleName»_rdtsc_weights.xml", "w+");
+				if(opt->input_file != NULL)
+					sprintf(fnGenWeightsStats, "rdtsc_weights_«network.simpleName»_%s.xml", basename(opt->input_file));
+				else
+					sprintf(fnGenWeightsStats, "rdtsc_weights_«network.simpleName».xml");
+
+				fpGenWeightsStats = fopen(fnGenWeightsStats, "w");
 				if(fpGenWeightsStats == NULL) {
-					printf("Error opening output file for generation of execution weights.\nExiting...");
+					printf("Error opening output file \"%s\" for generation of execution weights.\nExiting...", fnGenWeightsStats);
 					exit(0);
 				}
-				
+
 				fprintf(fpGenWeightsStats, "<?xml version=\"1.0\" ?>\n<network name=\"«network.simpleName»\">\n");
 
 				«FOR child : network.children»
@@ -966,7 +974,7 @@ class InstancePrinter extends CTemplate {
 
 				fprintf(fpGenWeightsStats, "</network>\n");
 				fclose(fpGenWeightsStats);
-				printf("Execution weights are generated in file: «network.simpleName»_rdtsc_weights.xml\n");
+				printf("Execution weights are generated in file: %s\n", fnGenWeightsStats);
 				exit(1); // Exiting the program after stats calculations & reporting are finished.
 			} // «genWeightsExitCond»
 		«ENDIF»
