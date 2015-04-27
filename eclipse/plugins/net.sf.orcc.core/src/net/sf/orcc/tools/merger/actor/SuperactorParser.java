@@ -397,6 +397,9 @@ public class SuperactorParser {
 					guard.setAttribute("actionName", elt.getAttribute("name"));
 					guardList.add(guard);
 				}
+				if (elt.getTagName().equals("regfeedback")) {
+					superActor.addAttribute("RegisterFeedback");
+				}
 			}
 			node = node.getNextSibling();
 		}
