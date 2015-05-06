@@ -81,9 +81,11 @@ public class ActorOptimizer {
 				return;
 			} else {
 				for (Port port : actor.getInputs()) {
-					Integer sz = new Integer(sizeOf(port.getType()));
-					conn.setAttribute("TokenSize", sz);
-					conn.setAttribute("TokenRate", port.getNumTokensConsumed());
+					if (conn.getTargetPort().equals(port)) {
+						Integer sz = new Integer(sizeOf(port.getType()));
+						conn.setAttribute("TokenSize", sz);
+						conn.setAttribute("TokenRate", port.getNumTokensConsumed());
+					}
 				}
 			}
 		}
