@@ -89,7 +89,7 @@ public class DALBackend extends CBackend {
 	@Override
 	protected Result doGenerateNetwork(Network network) {
 
-		networkCPrinter.setNetwork(network);
+		networkCPrinter.setNetwork(network, classify);
 		mappingPrinter.setNetwork(network, fifoSize);
 
 		final Result result = Result.newInstance();

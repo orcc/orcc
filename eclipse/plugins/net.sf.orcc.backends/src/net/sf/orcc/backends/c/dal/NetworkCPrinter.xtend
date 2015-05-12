@@ -18,8 +18,11 @@ class NetworkCPrinter extends CTemplate {
 
 	protected var Network network
 
-	def setNetwork(Network network) {
+	protected var boolean classify;
+
+	def setNetwork(Network network, boolean classify) {
 		this.network = network
+		this.classify = classify
 	}
 
 	def getFifoSizeHeaderContent() '''
@@ -100,7 +103,7 @@ class NetworkCPrinter extends CTemplate {
 	}
 	
 	def protected allocateFifo(Connection conn, int nbReaders) '''
-		«IF conn.hasAttribute("TokenSize")»
+		«IF classify»
 			<sw_channel type="fifo" initialtokens="«if (conn.hasAttribute("InitialTokens")) conn.<Integer>getValueAsObject("InitialTokens") else 0»" tokensize="«conn.<Integer>getValueAsObject("TokenRate")*conn.<Integer>getValueAsObject("TokenSize")»" size="«if (conn.size != null) conn.size else fifoSize»" name="C«conn.<Object>getValueAsObject("idNoBcast")»">
 		«ELSE»
 			<sw_channel type="fifo" size="«if (conn.size != null) conn.size*sizeOf(conn.getSourcePort().getType()) else fifoSize*sizeOf(conn.getSourcePort().getType())»" name="C«conn.<Object>getValueAsObject("idNoBcast")»">

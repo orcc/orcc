@@ -63,63 +63,54 @@ public class ActorOptimizer {
 		"->" + conn.getTarget().getAdapter(Actor.class).getName());
 	}
 
+	private void setTokenSizeAndRate(Connection conn, Port port, int rate) {
+		Integer sz = new Integer(sizeOf(port.getType()));
+		conn.setAttribute("TokenSize", sz);
+		conn.setAttribute("TokenRate", rate);
+	}
+
 	public void computeTokenSizes(Network network) {
 		for (Connection conn : network.getConnections()) {
 			Actor actor = conn.getTarget().getAdapter(Actor.class);
-			if (actor.getMoC() == null) {
-				OrccLogger.traceln("Actor classification has not been done " +
-						"-- mandatory for OpenCL targets");
-				return;
-			} else if (actor.getMoC().isDPN()) {
-				OrccLogger.traceln("Actor " + actor.getName() +
-						" is not deterministic and hence not executable on DAL");
-				return;
-			} else if (!actor.getMoC().isSDF()) {
-				OrccLogger.traceln("Actor " + actor.getName() +
-						" does not appear to be SDF. OpenCL execution not " +
-						"possible");
-				return;
-			} else {
-				for (Port port : actor.getInputs()) {
-					if (conn.getTargetPort().equals(port)) {
-						Integer sz = new Integer(sizeOf(port.getType()));
-						conn.setAttribute("TokenSize", sz);
-						conn.setAttribute("TokenRate", port.getNumTokensConsumed());
-					}
+			for (Port port : actor.getInputs()) {
+				if (conn.getTargetPort().equals(port)) {
+					setTokenSizeAndRate(conn, port, port.getNumTokensConsumed());
 				}
 			}
 		}
-		// The second round is for verification only
+
 		for (Connection conn : network.getConnections()) {
-			Actor actor = conn.getSource().getAdapter(Actor.class);
+			if (!conn.hasAttribute("TokenSize")) {
+				Actor actor = conn.getSource().getAdapter(Actor.class);
+				for (Port port : actor.getOutputs()) {
+					if (conn.getSourcePort().equals(port)) {
+						setTokenSizeAndRate(conn, port, -port.getNumTokensProduced());
+					}
+				}
+			}
 			if (conn.hasAttribute("TokenSize")) {
-				if (actor.getMoC().isSDF()) {
-					for (Port port : actor.getOutputs()) {
-						if (conn.getSourcePort().equals(port)) {
-							int thisTokenSize = sizeOf(port.getType());
-							int initialTokens = getInitialTokens(actor, port) /
-									(-port.getNumTokensProduced());
-							conn.setAttribute("InitialTokens", initialTokens);
-							Integer oldTokenSize = ((Integer)
-									conn.getValueAsObject("TokenSize"));
-							if (oldTokenSize == null) {
-								OrccLogger.warnln("Connection " +
-										printConnection(conn) +
-										" token size is null");
-							} else if (thisTokenSize != oldTokenSize.intValue()) {
-								OrccLogger.warnln("Connection " +
-										printConnection(conn) +
-										" has a r/w data size mismatch: " +
-										thisTokenSize + " vs " +
-										oldTokenSize.intValue());
-							}
+				Actor actor = conn.getSource().getAdapter(Actor.class);
+				for (Port port : actor.getOutputs()) {
+					if (conn.getSourcePort().equals(port)) {
+						int thisTokenSize = sizeOf(port.getType());
+						int initialTokens = getInitialTokens(actor, port) /
+								(-port.getNumTokensProduced());
+						conn.setAttribute("InitialTokens", initialTokens);
+						Integer oldTokenSize = ((Integer)
+								conn.getValueAsObject("TokenSize"));
+						if (oldTokenSize == null) {
+							OrccLogger.warnln("Connection " +
+									printConnection(conn) +
+									" token size is null");
+						} else if (thisTokenSize != oldTokenSize.intValue()) {
+							OrccLogger.warnln("Connection " +
+									printConnection(conn) +
+									" has a r/w data size mismatch: " +
+									thisTokenSize + " vs " +
+									oldTokenSize.intValue());
 						}
 					}
 				}
-			} else {
-				OrccLogger.warnln("Connection " +
-						printConnection(conn) +
-						" does not have TokenSize attribute");
 			}
 		}
 	}
