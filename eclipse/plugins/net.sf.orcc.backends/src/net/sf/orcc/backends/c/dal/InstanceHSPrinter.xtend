@@ -79,9 +79,7 @@ class InstanceHSPrinter extends CTemplate {
 			«ENDFOR»
 			int _count;
 			int _FSM_state;
-		«IF actor.inputs.nullOrEmpty || actor.outputs.nullOrEmpty»
 			void *_io;
-		«ENDIF»
 		} «entityName»_State;
 
 		int «entityName»_init(DALProcess *);

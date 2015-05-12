@@ -140,7 +140,7 @@ class InstanceCSPrinter extends CTemplate {
 		«ENDIF»
 
 		int «entityName»_init(DALProcess *_p) {
-			«IF actor.inputs.nullOrEmpty || actor.outputs.nullOrEmpty»
+			«IF !actor.procs.filter[native].nullOrEmpty»
 				_p->local->_io = NULL;
 			«ENDIF»
 			«IF !actor.stateVars.nullOrEmpty»
@@ -152,7 +152,7 @@ class InstanceCSPrinter extends CTemplate {
 		}
 		
 		int «entityName»_finish(DALProcess *_p) {
-			«IF actor.inputs.nullOrEmpty || actor.outputs.nullOrEmpty»
+			«IF !actor.procs.filter[native].nullOrEmpty»
 				free(_p->local->_io);
 			«ENDIF»
 			return 0;

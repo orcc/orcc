@@ -183,7 +183,7 @@ class InstanceCPrinter extends CTemplate {
 			«IF actor.hasFsm»
 				_p->local->_FSM_state = my_state_«actor.fsm.initialState.name»;
 			«ENDIF»
-			«IF actor.inputs.nullOrEmpty || actor.outputs.nullOrEmpty»
+			«IF !actor.procs.filter[native].nullOrEmpty»
 				_p->local->_io = NULL;
 			«ENDIF»
 			«FOR port : actor.getInputs»
@@ -219,7 +219,7 @@ class InstanceCPrinter extends CTemplate {
 		}
 		
 		int «entityName»_finish(DALProcess *_p) {
-			«IF actor.inputs.nullOrEmpty || actor.outputs.nullOrEmpty»
+			«IF !actor.procs.filter[native].nullOrEmpty»
 				free(_p->local->_io);
 			«ENDIF»
 			return 0;
