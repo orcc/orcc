@@ -451,7 +451,14 @@
                description="Include PAPI code for profiling"
                id="net.sf.orcc.backends.papify"
                name="Papify: profile actors using PAPI">
-            <checkBox></checkBox>
+            <checkBox>
+               <option
+                     defaultValue="false"
+                     description="Use only if there are less counters than events to profile"
+                     id="net.sf.orcc.backends.papify.multiplex"
+                     name="Activate multiplex">
+                  <checkBox></checkBox>
+               </option></checkBox>
          </option>
          <option
                defaultValue="false"
