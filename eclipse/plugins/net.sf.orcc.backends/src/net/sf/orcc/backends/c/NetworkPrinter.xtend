@@ -52,6 +52,7 @@ class NetworkPrinter extends CTemplate {
 	protected var boolean profile = false	
 	protected var boolean newSchedul = false
 	var boolean papify = false
+	var boolean papifyMultiplex = false
 
 	var boolean genWeights = false
 	var int genWeightsDataCounter = 0
@@ -70,6 +71,9 @@ class NetworkPrinter extends CTemplate {
 		}
 		if(options.containsKey(PAPIFY)){
 			papify = options.get(PAPIFY) as Boolean;
+			if(options.containsKey(PAPIFY_MULTIPLEX)){
+				papifyMultiplex = options.get(PAPIFY_MULTIPLEX) as Boolean;
+			}
 		}
 				
 		if(options.containsKey(GEN_WEIGHTS)){
@@ -244,7 +248,11 @@ class NetworkPrinter extends CTemplate {
 	def protected afterMain() ''''''
 	def protected beforeMain() '''
 	«IF papify»
-		event_init();
+		«IF papifyMultiplex»
+			event_init_multiplex();
+		«ELSE»
+			event_init();	
+		«ENDIF»
 	«ENDIF»
 	'''
 
