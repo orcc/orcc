@@ -104,6 +104,7 @@ class InstancePrinter extends CTemplate {
 	var boolean debugAction = false
 	
 	var boolean papify = false
+	var boolean papifyMultiplex = false
 	
 	// List of actions annotated with @papify
 	var Iterable<Action> papifyActions
@@ -145,6 +146,9 @@ class InstancePrinter extends CTemplate {
 
 		if(options.containsKey(PAPIFY)){
 			papify = options.get(PAPIFY) as Boolean;
+			if(options.containsKey(PAPIFY_MULTIPLEX)){
+				papifyMultiplex = options.get(PAPIFY_MULTIPLEX) as Boolean;
+			}
 		}
 
 		if(options.containsKey(GEN_WEIGHTS)){
@@ -667,7 +671,9 @@ class InstancePrinter extends CTemplate {
 				
 				printf("Creating eventlist for actor «actor.name»\n");
 				event_create_eventList(&(papi_«actor.name»_eventset), papi_«actor.name»_eventCodeSetSize, papi_«actor.name»_eventCodeSet, -1);
-
+				«IF papifyMultiplex»
+					eventList_set_multiplex(&(papi_«actor.name»_eventset));
+				«ENDIF»
 				/* End of Papify initialization */
 
 			«ENDIF»
