@@ -456,7 +456,7 @@
                      defaultValue="false"
                      description="Use only if there are less counters than events to profile"
                      id="net.sf.orcc.backends.papify.multiplex"
-                     name="Activate multiplex">
+                     name="Enable multiplex">
                   <checkBox></checkBox>
                </option></checkBox>
          </option>
