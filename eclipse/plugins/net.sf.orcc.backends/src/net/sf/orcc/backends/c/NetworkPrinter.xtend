@@ -37,6 +37,7 @@ import net.sf.orcc.df.Port
 import net.sf.orcc.graph.Vertex
 
 import static net.sf.orcc.backends.BackendsConstants.*
+import static net.sf.orcc.util.OrccAttributes.*
 
 /**
  * Generate and print network source file for C backend.
@@ -51,6 +52,10 @@ class NetworkPrinter extends CTemplate {
 	protected var boolean profile = false	
 	protected var boolean newSchedul = false
 	var boolean papify = false
+	var boolean papifyMultiplex = false
+
+	var boolean genWeights = false
+	var int genWeightsDataCounter = 0
 	
 	def setNetwork(Network network) {
 		this.network = network
@@ -66,7 +71,15 @@ class NetworkPrinter extends CTemplate {
 		}
 		if(options.containsKey(PAPIFY)){
 			papify = options.get(PAPIFY) as Boolean;
-		}		
+			if(options.containsKey(PAPIFY_MULTIPLEX)){
+				papifyMultiplex = options.get(PAPIFY_MULTIPLEX) as Boolean;
+			}
+		}
+				
+		if(options.containsKey(GEN_WEIGHTS)){
+			genWeights = options.get(GEN_WEIGHTS) as Boolean;
+			genWeightsDataCounter = 0;			
+		}
 	}
 
 	def protected getNetworkFileContent() '''
@@ -85,6 +98,11 @@ class NetworkPrinter extends CTemplate {
 		#include "options.h"
 		#include "scheduler.h"
 
+		«IF genWeights»
+			#include "rdtsc.h"
+			#include <stdint.h>
+		«ENDIF»
+		
 		#define SIZE «fifoSize»
 
 		/////////////////////////////////////////////////
@@ -102,10 +120,9 @@ class NetworkPrinter extends CTemplate {
 		«IF profile»
 			/////////////////////////////////////////////////
 			// Declaration of the actions
-			
 			«FOR child : network.children»
 				«FOR action : child.getAdapter(typeof(Actor)).actions»
-					action_t action_«child.label»_«action.name» = {"«action.name»", 0, 0, -1, -1, -1, 0, 0};			
+					action_t action_«child.label»_«action.name» = {"«action.name»", 0, 0, -1, -1, -1, 0, 0};
 				«ENDFOR»
 			«ENDFOR»
 			«FOR child : network.children»
@@ -117,9 +134,15 @@ class NetworkPrinter extends CTemplate {
 				
 			«ENDFOR»
 		«ENDIF»
-
+		«IF genWeights»
+			/////////////////////////////////////////////////
+			// Declare rdtsc_data for the actions			
+			«FOR child : network.children»
+				«child.allocateGenWeightsData»
+			«ENDFOR»
+			
+		«ENDIF»
 		«additionalDeclarations»
-
 		/////////////////////////////////////////////////
 		// Actor functions
 		«FOR child : network.children»
@@ -170,6 +193,7 @@ class NetworkPrinter extends CTemplate {
 			
 			launcher(opt, &network);
 			«afterMain»
+			
 			return compareErrors;
 		}
 	'''
@@ -198,6 +222,18 @@ class NetworkPrinter extends CTemplate {
 		DECLARE_FIFO(«conn.sourcePort.type.doSwitch», «if (conn.size != null) conn.size else "SIZE"», «conn.<Object>getValueAsObject("idNoBcast")», «nbReaders»)
 	'''
 	
+	def protected allocateGenWeightsData(Vertex vertex) '''
+		«FOR action : vertex.getAdapter(typeof(Actor)).actions»
+			DECLARE_RDTSC_DATA(«genWeightsDataCounter»)
+			rdtsc_data_t *rdtsc_data_«vertex.label»_«action.name» = &rdtsc_data_«genWeightsDataCounter»;
+			«incGenWeightsDataCounter»
+		«ENDFOR»
+	'''
+	
+	private def incGenWeightsDataCounter() {
+		genWeightsDataCounter++ ''''''
+	}
+	
 	// This method can be override by other backends to print additional includes
 	def protected printAdditionalIncludes() ''''''
 	
@@ -212,8 +248,12 @@ class NetworkPrinter extends CTemplate {
 	def protected afterMain() ''''''
 	def protected beforeMain() '''
 	«IF papify»
-		event_init();
+		«IF papifyMultiplex»
+			event_init_multiplex();
+		«ELSE»
+			event_init();	
+		«ENDIF»
 	«ENDIF»
 	'''
-	
+
 }

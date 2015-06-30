@@ -15,8 +15,11 @@ class NetworkMPrinter extends CTemplate {
 	
 	Network network
 	
-	def setNetwork(Network network) {
-		this.network = network
+	int fifoSize;
+
+	def setNetwork(Network network, int fifoSize) {
+		this.network = network;
+		this.fifoSize = fifoSize;
 	}
 
 	def protected getMappingFileContent(Map<String, String> mapping) '''
@@ -28,12 +31,15 @@ class NetworkMPrinter extends CTemplate {
 					<process name="«vertex.label»"/>
 					«IF mapping.get(network.name + "_" + vertex.label) != null»
 						«IF mapping.get(network.name + "_" + vertex.label).equals("")»
-							<processor name="core_2"/> 
+							<processor name="core_0"/>
 						«ELSE»
 							<processor name="«mapping.get(network.name + "_" + vertex.label)»"/>
 						«ENDIF»
+						«IF mapping.get(network.name + "_" + vertex.label).startsWith("gpu_")»
+							<target><opencl workgroups="«fifoSize»" workitems="256"/></target>
+						«ENDIF»
 					«ELSE»
-						<processor name="core_2"/> 
+						<processor name="core_0"/>
 					«ENDIF»
 				</binding> 
 			«ENDFOR»

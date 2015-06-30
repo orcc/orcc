@@ -103,8 +103,10 @@ public class KPNValidator {
 				int secondTokenRate = second.getNumTokensMap().get(port);
 				if (firstTokenRate != secondTokenRate) {
 					if (!actorLevel) {
-						OrccLogger.warnln("(" + actor.getName() + ") actions '" + firstAction.getName() + "' and '" + secondAction.getName() +
-								"'\n have different token rate for port '" + port.getName() + "' Application may deadlock.");
+						OrccLogger.warnln("Actor " + actor.getName() + " actions " +
+								firstAction.getName() + " and " + secondAction.getName() +
+								" have different token rate for port " + port.getName() +
+								". Application may deadlock.");
 						port.setNumTokensConsumed(-1);
 					}
 				} 
@@ -115,8 +117,10 @@ public class KPNValidator {
 							actor.addAttribute("variableInputPattern");
 						}
 					} else {
-						OrccLogger.warnln("(" + actor.getName() + ") action '" + firstAction.getName() + "' reads port '"  + port.getName() +
-								"'\n but action '"+ secondAction.getName() + "' does not. Application may deadlock.");
+						OrccLogger.warnln("Actor " + actor.getName() + " action " +
+								firstAction.getName() + " reads port "  +
+								port.getName() + " but action "+ secondAction.getName() +
+								" does not. Application may deadlock.");
 					}
 				}
 			}
@@ -132,9 +136,18 @@ public class KPNValidator {
 			if (second.getNumTokensMap().get(port) != null) {
 				int secondTokenRate = second.getNumTokensMap().get(port);
 				if (firstTokenRate != secondTokenRate) {
-					OrccLogger.traceln("Info: " + actor.getName() + " port " + port.getName() + " has a variable output rate");
+					OrccLogger.warnln("Actor " + actor.getName() + " port " +
+							port.getName() + " has a variable output rate." +
+							" This actor has limited OpenCL compatibility.");
 					port.setNumTokensProduced(-1);
 				} 
+			} else {
+				if (second.getNumTokensMap().size() > 0) {
+					OrccLogger.warnln("Actor " + actor.getName() + " action " +
+							firstAction.getName() + " writes port "  +
+							port.getName() + " but action "+ secondAction.getName() +
+							" does not. This actor has limited OpenCL compatibility.");
+				}
 			}
 		}
 	}

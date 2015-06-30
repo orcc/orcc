@@ -50,4 +50,6 @@ public interface OrccAttributes {
 	public static final String OUTPUT_SCHEDULABLE = "schedule_outputs";
 	
 	public static final String PAPIFY_ATTRIBUTE = "papify";
+	
+	public static final String GEN_WEIGHTS_EXIT_ATTRIBUTE = "genWeightsExit";
 }

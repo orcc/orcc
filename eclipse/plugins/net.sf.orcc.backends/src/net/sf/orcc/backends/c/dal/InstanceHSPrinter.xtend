@@ -1,11 +1,12 @@
 package net.sf.orcc.backends.c.dal
 
 import net.sf.orcc.backends.c.CTemplate
-import net.sf.orcc.df.Action
 import net.sf.orcc.df.Actor
 import net.sf.orcc.df.Port
 import net.sf.orcc.ir.TypeBool
 import net.sf.orcc.ir.Var
+import net.sf.orcc.ir.TypeInt
+import net.sf.orcc.ir.TypeUint
 
 /**
  * Generate and print actor header file for DAL backend.
@@ -14,14 +15,31 @@ import net.sf.orcc.ir.Var
  * 
  * Modified from Orcc C InstancePrinter
  */
-class InstanceHPrinter extends CTemplate {
+class InstanceHSPrinter extends CTemplate {
 
 	private var Actor actor
 
 	private var String entityName
 
-	override caseTypeBool(TypeBool type) 
-		'''u8'''
+	override caseTypeBool(TypeBool type) '''int'''
+
+	override caseTypeInt(TypeInt type) {
+		if (type.size > 16)
+			'''int'''
+		else if (type.size > 8)
+			'''short'''
+		else
+			'''char'''
+	}
+
+	override caseTypeUint(TypeUint type) {
+		if (type.size > 16)
+			'''unsigned int'''
+		else if (type.size > 8)
+			'''unsigned short'''
+		else
+			'''unsigned char'''
+	}
 
 	def setActor(Actor actor) {
 		this.entityName = actor.name
@@ -33,18 +51,17 @@ class InstanceHPrinter extends CTemplate {
 		#define «entityName»_H
 
 		#include <dal.h>
-		#include "global.h"
 
 		#define EVENT_DONE "stop_state1"
 
 		«IF !actor.inputs.nullOrEmpty»
 			«FOR i: 1..actor.inputs.size»
-				«enumerate(actor.getInputs.get(i-1))»
+				«enumerateInput(actor.getInputs.get(i-1))»
 			«ENDFOR»
 		«ENDIF»
 		«IF !actor.outputs.filter[! native].nullOrEmpty»
 			«FOR i: 1..actor.outputs.size»
-				«enumerate(actor.getOutputs.get(i-1))»
+				«enumerateOutput(actor.getOutputs.get(i-1))»
 			«ENDFOR»
 		«ENDIF»
 
@@ -69,10 +86,6 @@ class InstanceHPrinter extends CTemplate {
 		int «entityName»_fire(DALProcess *);
 		int «entityName»_finish(DALProcess *);
 
-		«FOR action : actor.initializes»
-			«action.print»
-		«ENDFOR»
-
 		«IF !actor.parameters.nullOrEmpty»
 			////////////////////////////////////////////////////////////////////////////////
 			// Parameter values of the instance
@@ -84,21 +97,23 @@ class InstanceHPrinter extends CTemplate {
 		#endif
 	'''
 
-	def private print(Action action) '''
-		«IF action.body.name == "fire_terminate"»
-			int «entityName»_fire(DALProcess *);
-		«ELSE»
-			int «entityName»_«action.body.name»(DALProcess *);
-		«ENDIF»
-	'''
-
 	def private declareStateVar(Var variable) '''
 		«IF variable.assignable»
 			«variable.declare»;
 		«ENDIF»
 	'''
 
-	def private enumerate(Port port) '''
+	def private enumerateInput(Port port) '''
 		#define PORT_«port.name» "«port.name»"
+		typedef «port.type.doSwitch» TOKEN_«port.name»_t;
+		#define TOKEN_«port.name»_RATE «port.getNumTokensConsumed()»
+	'''
+	
+	def private enumerateOutput(Port port) '''
+		#define PORT_«port.name» "«port.name»"
+		typedef «port.type.doSwitch» TOKEN_«port.name»_t;
+		#define TOKEN_«port.name»_RATE «-port.getNumTokensProduced()»
+		#define BLOCK_«port.name»_SIZE	1
+		#define BLOCK_«port.name»_COUNT (TOKEN_«port.name»_RATE / BLOCK_«port.name»_SIZE)
 	'''
 }

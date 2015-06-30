@@ -9,6 +9,7 @@ set(orcc_runtime_sources
     src/util.c
     src/mapping.c
     src/profiling.c
+    src/rdtsc.c
     src/getopt.c
 )
 
@@ -23,6 +24,7 @@ set(orcc_runtime_headers
     include/util.h
     include/mapping.h
     include/profiling.h
+    include/rdtsc.h
     include/types.h
     include/orcc.h
 )

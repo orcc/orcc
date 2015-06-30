@@ -43,7 +43,6 @@ class InstanceCPrinter extends CTemplate {
 	
 	protected var Instance instance
 	protected var Actor actor
-	protected var int maxIter
 	protected var int maxOut
 	protected var Map<Port, Connection> incomingPortMap
 	protected var Map<Port, List<Connection>> outgoingPortMap
@@ -58,7 +57,6 @@ class InstanceCPrinter extends CTemplate {
 	protected new() {
 		super()
 		instance = null
-		maxIter = 1
 	}
 	
 	override caseTypeBool(TypeBool type) 
@@ -76,10 +74,6 @@ class InstanceCPrinter extends CTemplate {
 	}
 	
 	def protected getFileContent() {
-		if (actor.getMoC() != null) {
-			isSDF = actor.getMoC().isSDF();
-			maxIter = actor.<Integer>getValueAsObject("MaxIter");
-		}
 	'''
 		#include <stdio.h>
 		#include <string.h>
@@ -87,13 +81,6 @@ class InstanceCPrinter extends CTemplate {
 
 		#include "«entityName».h"
 
-		«IF (!actor.hasAttribute("variableInputPattern") || isSDF)»
-			#ifdef ITER_«actor.getName»
-				#define MAX_ITER ITER_«actor.getName»
-			#else
-				#define MAX_ITER «maxIter»
-			#endif
-		«ENDIF»
 		«IF (!actor.hasAttribute("variableInputPattern"))»
 			«OrccLogger::traceln("Info: actor " + actor.getName + " inputs are buffered")»
 			#define TOKEN_QUANTUM («FOR port : actor.getInputs»«port.getNumTokensConsumed()»+«ENDFOR»0) 
@@ -187,11 +174,16 @@ class InstanceCPrinter extends CTemplate {
 				«FOR init : actor.initializes»
 					«init.printInitializeVars»
 				«ENDFOR»
+				«FOR init : actor.initializes»
+					«FOR variable : init.getOutputPattern().getVariables()»
+						«variable.type.doSwitch» «variable.name»_buffer«variable.type.dimensionsExpr.printArrayIndexes»;
+					«ENDFOR»
+				«ENDFOR»
 			«ENDIF»
 			«IF actor.hasFsm»
 				_p->local->_FSM_state = my_state_«actor.fsm.initialState.name»;
 			«ENDIF»
-			«IF actor.inputs.nullOrEmpty || actor.outputs.nullOrEmpty»
+			«IF !actor.procs.filter[native].nullOrEmpty»
 				_p->local->_io = NULL;
 			«ENDIF»
 			«FOR port : actor.getInputs»
@@ -207,11 +199,27 @@ class InstanceCPrinter extends CTemplate {
 			«FOR variable : actor.stateVars»
 				«variable.declareStateVarInInit»
 			«ENDFOR»
+			«IF !actor.initializes.nullOrEmpty»
+				«FOR init : actor.initializes»
+					«FOR port : init.getOutputPattern.getPorts»
+						«IF isSDF»
+							DAL_write((void*)PORT_«port.name», «port.name»_buffer, sizeof(«port.type.doSwitch»)*«init.outputPattern.getNumTokens(port)», _p);
+						«ELSE»
+							«IF port.getNumTokensProduced() < 0»
+								DAL_write((void*)PORT_«port.name», «port.name»_buffer, sizeof(«port.type.doSwitch»)*«init.outputPattern.getNumTokens(port)», _p);
+							«ELSE»
+								«port.name»_index[0] += «init.outputPattern.getNumTokens(port)»;
+								_DAL_write((void*)PORT_«port.name», «port.name»_buffer, SZ_«port.getName()»*sizeof(«port.type.doSwitch»), «port.name»_index, SZ_«port.getName()», _p);
+							«ENDIF»
+						«ENDIF»
+					«ENDFOR»
+				«ENDFOR»
+			«ENDIF»
 			return 0;
 		}
 		
 		int «entityName»_finish(DALProcess *_p) {
-			«IF actor.inputs.nullOrEmpty || actor.outputs.nullOrEmpty»
+			«IF !actor.procs.filter[native].nullOrEmpty»
 				free(_p->local->_io);
 			«ENDIF»
 			return 0;
@@ -248,14 +256,14 @@ class InstanceCPrinter extends CTemplate {
 				for(iter = 0; iter < ITERATIONS; iter++)
 			«ELSE»
 				«FOR port : actor.getInputs»
-				«port.type.doSwitch» «port.getName()»_buffer[MAX_ITER*«port.getNumTokensConsumed()»];
+				«port.type.doSwitch» «port.getName()»_buffer[«port.getNumTokensConsumed()»];
 				int «port.getName()»_index = 0;
 				«ENDFOR»
 	
 				«FOR port : actor.getInputs»
-				buffer_input((void*)PORT_«port.getName()», «port.getName()»_buffer, sizeof(«port.type.doSwitch»)*MAX_ITER*«port.getNumTokensConsumed()», _p);
+				buffer_input((void*)PORT_«port.getName()», «port.getName()»_buffer, sizeof(«port.type.doSwitch»)*«port.getNumTokensConsumed()», _p);
 				«ENDFOR»
-				while(MAX_ITER*TOKEN_QUANTUM - iter >= TOKEN_QUANTUM)		
+				while(TOKEN_QUANTUM - iter >= TOKEN_QUANTUM)
 			«ENDIF»
 				{
 					«actor.actionsOutsideFsm.printActionLoop»
@@ -306,17 +314,17 @@ class InstanceCPrinter extends CTemplate {
 			«ENDIF»
 		«ENDFOR»
 		«IF (actor.hasAttribute("variableInputPattern"))»
-			for(iter = 0; iter < ITERATIONS; iter++)			
+			for(iter = 0; iter < ITERATIONS; iter++)
 		«ELSE»
 			«FOR port : actor.getInputs»
-				«port.type.doSwitch» «port.getName()»_buffer[MAX_ITER*«port.getNumTokensConsumed()»];
+				«port.type.doSwitch» «port.getName()»_buffer[«port.getNumTokensConsumed()»];
 				int «port.getName()»_index = 0;
 			«ENDFOR»
 
 			«FOR port : actor.getInputs»
-				buffer_input((void*)PORT_«port.getName()», «port.getName()»_buffer, sizeof(«port.type.doSwitch»)*MAX_ITER*«port.getNumTokensConsumed()», _p);
+				buffer_input((void*)PORT_«port.getName()», «port.getName()»_buffer, sizeof(«port.type.doSwitch»)*«port.getNumTokensConsumed()», _p);
 			«ENDFOR»
-				while(MAX_ITER*TOKEN_QUANTUM - iter >= TOKEN_QUANTUM)			
+				while(TOKEN_QUANTUM - iter >= TOKEN_QUANTUM)
 		«ENDIF»
 		{
 		«IF ! actor.actionsOutsideFsm.empty»
@@ -324,7 +332,7 @@ class InstanceCPrinter extends CTemplate {
 				«entityName»_outside_FSM_scheduler(_p«FOR port : actor.getOutputs»«IF port.getNumTokensProduced() > 0», «port.getName()»_buffer, &«port.getName()»_index«ENDIF»«ENDFOR»);
 			«ELSE»
 				«entityName»_outside_FSM_scheduler(_p«FOR port : actor.getInputs», «port.getName()»_buffer, &«port.getName()»_index«ENDFOR»«FOR port : actor.getOutputs»«IF port.getNumTokensProduced() > 0», «port.getName()»_buffer, &«port.getName()»_index«ENDIF»«ENDFOR», &iter);
-				if(MAX_ITER*TOKEN_QUANTUM - iter < TOKEN_QUANTUM) goto flush;			
+				if(TOKEN_QUANTUM - iter < TOKEN_QUANTUM) goto flush;
 			«ENDIF»
 		«ENDIF»
 				switch (_p->local->_FSM_state) {
@@ -420,7 +428,7 @@ class InstanceCPrinter extends CTemplate {
 
 	def private printOutsideFSMActionLoop(List<Action> actions) '''
 		«IF !actor.hasAttribute("variableInputPattern")» 
-			while (MAX_ITER*TOKEN_QUANTUM - iter[0] >= TOKEN_QUANTUM) {
+			while (TOKEN_QUANTUM - iter[0] >= TOKEN_QUANTUM) {
 				«actions.printOutsideFSMActions»
 			}
 		«ELSE»
@@ -473,7 +481,7 @@ class InstanceCPrinter extends CTemplate {
 			«ENDIF»
 				«FOR port : action.getInputPattern.getPorts»
 					«IF isSDF»
-						«port.type.doSwitch» «port.name»_buffer[MAX_ITER*«action.inputPattern.getNumTokens(port)»];
+						«port.type.doSwitch» «port.name»_buffer[«action.inputPattern.getNumTokens(port)»];
 					«ELSE»
 						«IF !(port.hasAttribute("peekPort")) && actor.hasAttribute("variableInputPattern")»
 							«port.type.doSwitch» «port.name»_buffer[«action.inputPattern.getNumTokens(port)»];
@@ -482,7 +490,7 @@ class InstanceCPrinter extends CTemplate {
 				«ENDFOR»
 				«FOR port : action.getOutputPattern.getPorts»
 					«IF isSDF»
-						«port.type.doSwitch» «port.name»_buffer[MAX_ITER*«action.outputPattern.getNumTokens(port)»];
+						«port.type.doSwitch» «port.name»_buffer[«action.outputPattern.getNumTokens(port)»];
 					«ELSE»
 						«IF port.getNumTokensProduced() < 0»
 							«port.type.doSwitch» «port.name»_buffer[«action.outputPattern.getNumTokens(port)»];
@@ -492,30 +500,21 @@ class InstanceCPrinter extends CTemplate {
 				«FOR variable : action.body.locals»
 					«variable.declare»;
 				«ENDFOR»
-				«IF isSDF»
-					int _i;
-				«ENDIF»
 				«FOR port : action.getInputPattern.getPorts»
 					«IF isSDF»
-						DAL_read((void*)PORT_«port.name», «port.name»_buffer, MAX_ITER*sizeof(«port.type.doSwitch»)*«action.inputPattern.getNumTokens(port)», _p);
+						DAL_read((void*)PORT_«port.name», «port.name»_buffer, sizeof(«port.type.doSwitch»)*«action.inputPattern.getNumTokens(port)», _p);
 					«ELSE»
 						«IF !(port.hasAttribute("peekPort")) && actor.hasAttribute("variableInputPattern")»
 							DAL_read((void*)PORT_«port.name», «port.name»_buffer, sizeof(«port.type.doSwitch»)*«action.inputPattern.getNumTokens(port)», _p);
 						«ENDIF»
 					«ENDIF»
 				«ENDFOR»
-				«IF isSDF»
-					for (_i = 0; _i < MAX_ITER; _i++) {
-				«ENDIF»
 				«FOR block : action.body.blocks»
 					«block.doSwitch»
 				«ENDFOR»
-				«IF isSDF»
-					}
-				«ENDIF»
 				«FOR port : action.getOutputPattern.getPorts»
 					«IF isSDF»
-						DAL_write((void*)PORT_«port.name», «port.name»_buffer, MAX_ITER*sizeof(«port.type.doSwitch»)*«action.outputPattern.getNumTokens(port)», _p);
+						DAL_write((void*)PORT_«port.name», «port.name»_buffer, sizeof(«port.type.doSwitch»)*«action.outputPattern.getNumTokens(port)», _p);
 					«ELSE»
 						«IF port.getNumTokensProduced() < 0»
 							DAL_write((void*)PORT_«port.name», «port.name»_buffer, sizeof(«port.type.doSwitch»)*«action.outputPattern.getNumTokens(port)», _p);
@@ -757,19 +756,15 @@ class InstanceCPrinter extends CTemplate {
 						_DAL_peek_«srcPort.name»((void*)PORT_«srcPort.name», &«load.target.variable.name», _p);
 					«ENDIF»
 				«ELSE»
-					«IF isSDF»
-						«load.target.variable.name» = «srcPort.name»_buffer[(_i*«srcPort.getNumTokensConsumed()»)+«load.indexes.head.doSwitch»];
+					«IF !(actor.hasAttribute("variableInputPattern"))»
+						«load.target.variable.name» = «srcPort.name»_buffer[«srcPort.name»_index[0]];
+						«srcPort.name»_index[0] ++;
+						iter[0] ++;
 					«ELSE»
-						«IF !(actor.hasAttribute("variableInputPattern"))»
-							«load.target.variable.name» = «srcPort.name»_buffer[«srcPort.name»_index[0]];
-							«srcPort.name»_index[0] ++;
-							iter[0] ++;
+						«IF (srcPort.hasAttribute("peekPort"))»
+							_DAL_read_«srcPort.name»((void*)PORT_«srcPort.name», &«load.target.variable.name», _p);
 						«ELSE»
-							«IF (srcPort.hasAttribute("peekPort"))»
-								_DAL_read_«srcPort.name»((void*)PORT_«srcPort.name», &«load.target.variable.name», _p);
-							«ELSE»
-								«load.target.variable.name» = «srcPort.name»_buffer[«load.indexes.head.doSwitch»];
-							«ENDIF»
+							«load.target.variable.name» = «srcPort.name»_buffer[«load.indexes.head.doSwitch»];
 						«ENDIF»
 					«ENDIF»
 				«ENDIF»
@@ -790,14 +785,10 @@ class InstanceCPrinter extends CTemplate {
 			«IF currentAction.outputPattern.varToPortMap.get(store.target.variable).native»
 				printf("«trgtPort.name» = %i\n", «store.value.doSwitch»);
 			«ELSE»
-				«IF isSDF»
-					«trgtPort.name»_buffer[(_i*«Math.abs(trgtPort.getNumTokensProduced())»)+«store.indexes.head.doSwitch»] = «store.value.doSwitch»;
+				«IF trgtPort.getNumTokensProduced() > 0»
+					«trgtPort.name»_buffer[«trgtPort.name»_index[0] + «store.indexes.head.doSwitch»] = «store.value.doSwitch»;
 				«ELSE»
-					«IF trgtPort.getNumTokensProduced() > 0»
-						«trgtPort.name»_buffer[«trgtPort.name»_index[0] + «store.indexes.head.doSwitch»] = «store.value.doSwitch»;
-					«ELSE»
-						«trgtPort.name»_buffer[«store.indexes.head.doSwitch»] = «store.value.doSwitch»;
-					«ENDIF»
+					«trgtPort.name»_buffer[«store.indexes.head.doSwitch»] = «store.value.doSwitch»;
 				«ENDIF»
 			«ENDIF»
 		«ELSE»

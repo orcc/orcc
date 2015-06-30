@@ -93,6 +93,24 @@ void event_init(void) {
     if ( retval != PAPI_VER_CURRENT )
         test_fail( __FILE__, __LINE__, "PAPI_library_init", retval );
 
+    // place for initialization in case one makes use of threads
+    retval = PAPI_thread_init((unsigned long (*)(void))(pthread_self));
+    if ( retval != PAPI_OK )
+        test_fail( __FILE__, __LINE__, "PAPI_thread_init", retval );
+
+    printf("event_init done \n");
+
+}
+
+void event_init_multiplex(void) {
+
+    int retval;
+
+    // library initialization
+    retval = PAPI_library_init( PAPI_VER_CURRENT );
+    if ( retval != PAPI_VER_CURRENT )
+        test_fail( __FILE__, __LINE__, "PAPI_library_init", retval );
+
     // multiplex initialization
     init_multiplex(  );
 
@@ -103,7 +121,15 @@ void event_init(void) {
 
     printf("event_init done \n");
 
+}
 
+
+void eventList_set_multiplex(int *eventSet){
+	int retval;
+
+    retval = PAPI_set_multiplex( *eventSet );
+    if ( retval != PAPI_OK )
+        test_fail( __FILE__, __LINE__, "PAPI_set_multiplex", retval );
 }
 
 void event_create_eventList(int *eventSet, int eventCodeSetSize, int *eventCodeSet, int threadID) {
@@ -131,10 +157,6 @@ void event_create_eventList(int *eventSet, int eventCodeSetSize, int *eventCodeS
     retval = PAPI_assign_eventset_component( *eventSet, 0 );
     if ( retval != PAPI_OK )
         test_fail( __FILE__, __LINE__, "PAPI_assign_eventset_component", retval );
-
-    retval = PAPI_set_multiplex( *eventSet );
-    if ( retval != PAPI_OK )
-        test_fail( __FILE__, __LINE__, "PAPI_set_multiplex", retval );
 
     for (i = 0; i < eventCodeSetSize; i++) {
         retval = PAPI_get_event_info(eventCodeSet[i], &info);

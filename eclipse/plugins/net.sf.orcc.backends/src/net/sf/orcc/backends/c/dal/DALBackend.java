@@ -23,12 +23,16 @@ public class DALBackend extends CBackend {
 	private NetworkCPrinter networkCPrinter;
 	private NetworkMPrinter mappingPrinter;
 
+	private InstanceHSPrinter instanceHSPrinter;
+	private InstanceCSPrinter instanceCSPrinter;
 	private InstanceCPrinter instanceCPrinter;
 	private InstanceHPrinter instanceHPrinter;
 
 	public DALBackend() {
 		networkCPrinter = new NetworkCPrinter();
 		mappingPrinter = new NetworkMPrinter();
+		instanceHSPrinter = new InstanceHSPrinter();
+		instanceCSPrinter = new InstanceCSPrinter();
 		instanceCPrinter = new InstanceCPrinter();
 		instanceHPrinter = new InstanceHPrinter();
 	}
@@ -58,24 +62,9 @@ public class DALBackend extends CBackend {
 		optimizer.optimizeOutput(network, outputBuffering, fifoSize);
 
 		labelPeekPorts(network);
-		optimizer.computeMaxIter(network, fifoSize);
 		optimizer.computeTokenSizes(network);
 
 		network.computeTemplateMaps();
-
-		enumeratePorts(network);
-	}
-
-	private void enumeratePorts(Network network) {
-		int index = 0;
-		for (Actor actor : network.getAllActors()) {
-			for (Port port : actor.getInputs()) {
-				port.setNumber(index++);
-			}
-			for (Port port : actor.getOutputs()) {
-				port.setNumber(index++);
-			}
-		}
 	}
 
 	private void labelPeekPorts(Network network) {
@@ -100,8 +89,8 @@ public class DALBackend extends CBackend {
 	@Override
 	protected Result doGenerateNetwork(Network network) {
 
-		networkCPrinter.setNetwork(network);
-		mappingPrinter.setNetwork(network);
+		networkCPrinter.setNetwork(network, classify);
+		mappingPrinter.setNetwork(network, fifoSize);
 
 		final Result result = Result.newInstance();
 		result.merge(FilesManager.writeFile(networkCPrinter.getNetworkFileContent(),
@@ -116,14 +105,29 @@ public class DALBackend extends CBackend {
 
 	@Override
 	protected Result doGenerateActor(Actor actor) {
-
-		instanceCPrinter.setActor(actor);
-		instanceHPrinter.setActor(actor);
+		boolean printSDF = false;
+		CharSequence headerFile;
+		CharSequence sourceFile;
+		if (actor.getMoC() != null) {
+			if (actor.getMoC().isSDF() && actor.getInputs().size() > 0 && actor.getOutputs().size() > 0) {
+				printSDF = true;
+			}
+		}
+		if (printSDF) {
+			instanceHSPrinter.setActor(actor);
+			instanceCSPrinter.setActor(actor);
+			headerFile = instanceHSPrinter.getFileContent();
+			sourceFile = instanceCSPrinter.getFileContent();
+		} else {
+			instanceHPrinter.setActor(actor);
+			instanceCPrinter.setActor(actor);
+			headerFile = instanceHPrinter.getFileContent();
+			sourceFile = instanceCPrinter.getFileContent();
+		}
 
 		final Result result = Result.newInstance();
-		result.merge(FilesManager.writeFile(instanceCPrinter.getFileContent(), srcPath, actor.getName() + ".c"));
-		result.merge(FilesManager.writeFile(instanceHPrinter.getFileContent(), srcPath, actor.getName() + ".h"));
-
+		result.merge(FilesManager.writeFile(sourceFile, srcPath, actor.getName() + ".c"));
+		result.merge(FilesManager.writeFile(headerFile, srcPath, actor.getName() + ".h"));
 		return result;
 	}
 }

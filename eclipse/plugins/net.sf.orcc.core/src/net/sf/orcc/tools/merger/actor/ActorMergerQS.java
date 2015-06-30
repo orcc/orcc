@@ -269,10 +269,10 @@ public class ActorMergerQS extends ActorMergerBase {
 	 * @return the body of the static action
 	 */
 	private void elaborateSuperaction(Action superaction) {
-		
-		// TODO: make useFullFifos accessible from GUI
-		
 		boolean useFullFifos = true;
+		if (superActor.hasAttribute("RegisterFeedback")) {
+			useFullFifos = false;
+		}
 		String actionName = superaction.getName();
 		BufferSizer bufferSizer = new BufferSizer(network);
 		Schedule schedule = getSchedule(scheduleList, network.getName(), actionName);

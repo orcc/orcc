@@ -37,6 +37,9 @@
          <option
                id="net.sf.orcc.backends.papify">
          </option>
+         <option
+               id="net.sf.orcc.backends.genWeights">
+         </option>
       </backend>
       <backend
             class="net.sf.orcc.backends.c.compa.COMPABackend"
@@ -448,6 +451,20 @@
                description="Include PAPI code for profiling"
                id="net.sf.orcc.backends.papify"
                name="Papify: profile actors using PAPI">
+            <checkBox>
+               <option
+                     defaultValue="false"
+                     description="Use only if there are less counters than events to profile"
+                     id="net.sf.orcc.backends.papify.multiplex"
+                     name="Enable multiplex">
+                  <checkBox></checkBox>
+               </option></checkBox>
+         </option>
+         <option
+               defaultValue="false"
+               description="A xml file is generated giving the min, max and average weights (as number of clock cycles) for each action. These weights are calculated by profiling only computational part of each action using Intel RDTSC/RDTSCP instructions. This output file can be used as weights file needed for various automated analysis options provided by TURNUS."
+               id="net.sf.orcc.backends.genWeights"
+               name="genWeights: Generate execution based weights on Intel platforms.">
             <checkBox></checkBox>
          </option>
    </extension>

@@ -18,8 +18,11 @@ class NetworkCPrinter extends CTemplate {
 
 	protected var Network network
 
-	def setNetwork(Network network) {
+	protected var boolean classify;
+
+	def setNetwork(Network network, boolean classify) {
 		this.network = network
+		this.classify = classify
 	}
 
 	def getFifoSizeHeaderContent() '''
@@ -37,10 +40,10 @@ class NetworkCPrinter extends CTemplate {
 				«val actorType = if(actor.inputs.size > 0 && actor.outputs.size > 0) '''local''' else '''io'''»
 				<process name="«actor.name»" type="«actorType»"> 
 				«FOR port : actor.inputs»
-					<port type="input" name="«port.getNumber»"/>
+					<port type="input" name="«port.getName»"/>
 				«ENDFOR»
 				«FOR port : actor.outputs»
-					<port type="output" name="«port.getNumber»"/>
+					<port type="output" name="«port.getName»"/>
 				«ENDFOR»
 				<source type="c" location="«actor.name».c"/>
 				</process>
@@ -57,20 +60,20 @@ class NetworkCPrinter extends CTemplate {
 	
 	def protected assignFifo(Vertex vertex) '''
 		«FOR inList : vertex.getAdapter(typeof(Entity)).incomingPortMap.values»
-			<connection name="C«inList.<Integer>getValueAsObject("idNoBcast")»-«inList.targetPort.getNumber»">
+			<connection name="C«inList.<Integer>getValueAsObject("idNoBcast")»-«inList.targetPort.getName»">
 				<origin name="C«inList.<Integer>getValueAsObject("idNoBcast")»">
 					<port name="1"/>
 				</origin>
 				<target name="«inList.target.label»">
-					<port name="«inList.targetPort.getNumber»"/>
+					<port name="«inList.targetPort.getName»"/>
 				</target>
 			</connection>
 		«ENDFOR»
 
 		«FOR outList : vertex.getAdapter(typeof(Entity)).outgoingPortMap.values»
-			<connection name="«outList.get(0).sourcePort.getNumber»-C«outList.head.<Integer>getValueAsObject("idNoBcast")»">
+			<connection name="«outList.get(0).sourcePort.getName»-C«outList.head.<Integer>getValueAsObject("idNoBcast")»">
 				<origin name="«vertex.label»">
-					<port name="«outList.get(0).sourcePort.getNumber»"/>
+					<port name="«outList.get(0).sourcePort.getName»"/>
 				</origin>
 				<target name="C«outList.head.<Integer>getValueAsObject("idNoBcast")»">
 					<port name="0"/>
@@ -100,8 +103,8 @@ class NetworkCPrinter extends CTemplate {
 	}
 	
 	def protected allocateFifo(Connection conn, int nbReaders) '''
-		«IF conn.hasAttribute("TokenSize")»
-			<sw_channel type="fifo" tokensize="«conn.<Integer>getValueAsObject("TokenSize")»" size="«if (conn.size != null) conn.size*sizeOf(conn.getSourcePort().getType()) else fifoSize*sizeOf(conn.getSourcePort().getType())»" name="C«conn.<Object>getValueAsObject("idNoBcast")»">
+		«IF classify»
+			<sw_channel type="fifo" initialtokens="«if (conn.hasAttribute("InitialTokens")) conn.<Integer>getValueAsObject("InitialTokens") else 0»" tokensize="«conn.<Integer>getValueAsObject("TokenRate")*conn.<Integer>getValueAsObject("TokenSize")»" size="«if (conn.size != null) conn.size else fifoSize»" name="C«conn.<Object>getValueAsObject("idNoBcast")»">
 		«ELSE»
 			<sw_channel type="fifo" size="«if (conn.size != null) conn.size*sizeOf(conn.getSourcePort().getType()) else fifoSize*sizeOf(conn.getSourcePort().getType())»" name="C«conn.<Object>getValueAsObject("idNoBcast")»">
 		«ENDIF»

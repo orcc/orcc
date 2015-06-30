@@ -1,7 +1,9 @@
 package net.sf.orcc.backends.c.dal;
 
+import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
+import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.ir.Type;
@@ -61,37 +63,39 @@ public class ActorOptimizer {
 		"->" + conn.getTarget().getAdapter(Actor.class).getName());
 	}
 
+	private void setTokenSizeAndRate(Connection conn, Port port, int rate) {
+		Integer sz = new Integer(sizeOf(port.getType()));
+		conn.setAttribute("TokenSize", sz);
+		conn.setAttribute("TokenRate", rate);
+	}
+
 	public void computeTokenSizes(Network network) {
 		for (Connection conn : network.getConnections()) {
 			Actor actor = conn.getTarget().getAdapter(Actor.class);
-			if (actor.getMoC() == null) {
-				OrccLogger.traceln("Actor classification has not been done " +
-						"-- mandatory for OpenCL targets");
-				return;
-			} else if (!actor.getMoC().isSDF()) {
-				OrccLogger.traceln("Actor " + actor.getName() +
-						" does not appear to be SDF. OpenCL execution not " +
-						"possible");
-				return;
-			} else {
-				for (Port port : actor.getInputs()) {
-					Integer maxIter = actor.getValueAsObject("MaxIter");
-					Integer sz = new Integer(port.getNumTokensConsumed() *
-							sizeOf(port.getType()) * maxIter.intValue());
-					conn.setAttribute("TokenSize", sz);
+			for (Port port : actor.getInputs()) {
+				if (conn.getTargetPort().equals(port)) {
+					setTokenSizeAndRate(conn, port, port.getNumTokensConsumed());
 				}
 			}
 		}
-		// The second round is for verification only
+
 		for (Connection conn : network.getConnections()) {
-			Actor actor = conn.getSource().getAdapter(Actor.class);
+			if (!conn.hasAttribute("TokenSize")) {
+				Actor actor = conn.getSource().getAdapter(Actor.class);
+				for (Port port : actor.getOutputs()) {
+					if (conn.getSourcePort().equals(port)) {
+						setTokenSizeAndRate(conn, port, -port.getNumTokensProduced());
+					}
+				}
+			}
 			if (conn.hasAttribute("TokenSize")) {
-				if (actor.getMoC().isSDF()) {
-					for (Port port : actor.getOutputs()) {
-						Integer maxIter = actor.getValueAsObject("MaxIter");
-						int thisTokenSize = Math.abs(
-								port.getNumTokensProduced()) *
-								sizeOf(port.getType()) * maxIter;
+				Actor actor = conn.getSource().getAdapter(Actor.class);
+				for (Port port : actor.getOutputs()) {
+					if (conn.getSourcePort().equals(port)) {
+						int thisTokenSize = sizeOf(port.getType());
+						int initialTokens = getInitialTokens(actor, port) /
+								(-port.getNumTokensProduced());
+						conn.setAttribute("InitialTokens", initialTokens);
 						Integer oldTokenSize = ((Integer)
 								conn.getValueAsObject("TokenSize"));
 						if (oldTokenSize == null) {
@@ -107,57 +111,23 @@ public class ActorOptimizer {
 						}
 					}
 				}
-			} else {
-				OrccLogger.warnln("Connection " +
-						printConnection(conn) +
-						" does not have TokenSize attribute");
 			}
 		}
 	}
 
-	private int updateMaxIter(int defaultSize, Integer size, int maxIter, int rate) {
-		if (size == null) {
-			size = new Integer(defaultSize);
+	private int getInitialTokens(Actor actor, Port port) {
+		if (actor.getInitializes() != null) {
+			for (Action i : actor.getInitializes()) {
+				Pattern pat = i.getOutputPattern();
+				if (pat.getNumTokensMap().containsKey(port)) {
+					int tokens = pat.getNumTokensMap().get(port).intValue();
+					OrccLogger.traceln(tokens + " initial samples detected in "
+							+ actor.getName() + "_" + port.getName());
+					return tokens;
+				}
+			}
 		}
-		int tmpIter =  size.intValue() / rate;
-		if (tmpIter < maxIter) {
-			return tmpIter;
-		}
-		return maxIter;
+		return 0;
 	}
 
-	public void computeMaxIter(Network network, int fifoSize) {
-		for (Actor actor : network.getAllActors()) {
-			if (actor.getMoC() == null) {
-				continue;
-			}
-			int maxIter = 1000000;
-			if (actor.getMoC().isSDF()) {
-				if (actor.getInputs().size() > 0) {
-					for (Port port : actor.getInputs()) {
-						maxIter = updateMaxIter(fifoSize,
-								actor.getIncomingPortMap().get(port).getSize(),
-								maxIter, port.getNumTokensConsumed());
-					}
-				}
-				if (actor.getOutputs().size() > 0) {
-					for (Port port : actor.getOutputs()) {
-						maxIter = updateMaxIter(fifoSize,
-								actor.getOutgoingPortMap().get(port).get(0).getSize(),
-								maxIter, Math.abs(port.getNumTokensProduced()));
-					}
-				}
-				actor.setAttribute("MaxIter", new Integer(maxIter));
-			} else if (!actor.hasAttribute("variableInputPattern")) {
-				if (actor.getInputs().size() > 0) {
-					for (Port port : actor.getInputs()) {
-						maxIter = updateMaxIter(fifoSize,
-								actor.getIncomingPortMap().get(port).getSize(),
-								maxIter, port.getNumTokensConsumed());
-					}
-				}
-				actor.setAttribute("MaxIter", new Integer(maxIter));
-			}
-		}
-	}
 }
