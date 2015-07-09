@@ -46,6 +46,7 @@ import net.sf.orcc.ir.ArgByVal;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprInt;
+import net.sf.orcc.ir.ExprString;
 import net.sf.orcc.ir.ExprUnary;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
@@ -61,6 +62,7 @@ import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeBool;
 import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeList;
+import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
@@ -202,6 +204,11 @@ public class GuardSatChecker {
 		@Override
 		public Object caseExprInt(ExprInt expr) {
 			return getStringOfInt(expr.getValue());
+		}
+
+		@Override
+		public Object caseExprString(ExprString expr) {
+			return getStringOfInt(expr.getValue().hashCode());
 		}
 
 		@Override
@@ -533,6 +540,12 @@ public class GuardSatChecker {
 		public String caseTypeList(TypeList type) {
 			// (Array indexType valueType)
 			return "(Array (_ BitVec 32) " + doSwitch(type.getType()) + ")";
+		}
+
+		@Override
+		public String caseTypeString(TypeString type) {
+			int size = 32; // type.getSizeInBits()
+			return "(_ BitVec " + size + ")";
 		}
 
 		@Override
