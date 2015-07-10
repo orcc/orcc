@@ -71,6 +71,8 @@ import org.eclipse.core.resources.IFolder;
  */
 public class SmtSolver {
 
+	static boolean hasFailed;
+
 	private class SmtSolverOutputProcessor implements Runnable {
 
 		private Reader reader;
@@ -109,6 +111,7 @@ public class SmtSolver {
 
 		@Override
 		public void run() {
+			hasFailed = false;
 			StringBuilder builder = new StringBuilder();
 			try {
 				char[] cbuf = new char[8192];
@@ -128,6 +131,7 @@ public class SmtSolver {
 
 			if (builder.toString().contains("error")) {
 				OrccLogger.warnln("Solving of actor " + actor.getName() + ":");
+				hasFailed = true;
 				String error[] = builder.toString().split("\n");
 				for (int i = 0; i < error.length; i++) {
 					if (!error[i].equals("sat")) {
@@ -235,6 +239,10 @@ public class SmtSolver {
 	 */
 	public boolean checkSat(SmtScript script) {
 		return checkSat(script, null, null);
+	}
+
+	public boolean hasFailed() {
+		return hasFailed;
 	}
 
 	/**

@@ -107,6 +107,8 @@ public class GuardSatChecker {
 
 		private SmtScript script;
 
+		private boolean translatorFailure;
+
 		/**
 		 * Creates a new constraint expression visitor.
 		 * 
@@ -474,6 +476,14 @@ public class GuardSatChecker {
 			return name;
 		}
 
+		public void resetFailure() {
+			translatorFailure = false;
+		}
+
+		public boolean hasFailed() {
+			return translatorFailure;
+		}
+
 	}
 
 	/**
@@ -486,6 +496,8 @@ public class GuardSatChecker {
 	private static class SmtTranslator extends DfVisitor<Object> {
 
 		private SmtIrTranslator irTranslator;
+
+		private boolean translatorFailure;
 
 		public SmtTranslator() {
 			irTranslator = new SmtIrTranslator();
@@ -512,7 +524,10 @@ public class GuardSatChecker {
 				irTranslator.script.addCommand(command);
 			}
 
+			translatorFailure = false;
+			irTranslator.resetFailure();
 			irTranslator.doSwitch(action.getScheduler());
+			translatorFailure = irTranslator.hasFailed();
 
 			return null;
 		}
@@ -535,6 +550,10 @@ public class GuardSatChecker {
 		 */
 		public SmtScript getScript() {
 			return irTranslator.script;
+		}
+
+		public boolean hasFailed() {
+			return translatorFailure;
 		}
 
 	}
@@ -587,6 +606,8 @@ public class GuardSatChecker {
 
 	private Actor actor;
 
+	private boolean hasFailed;
+
 	public GuardSatChecker(Actor actor) {
 		this.actor = actor;
 	}
@@ -617,7 +638,17 @@ public class GuardSatChecker {
 				+ " " + action2.getScheduler().getName() + "))");
 		script.addCommand("(check-sat)");
 
-		return new SmtSolver(actor).checkSat(script);
+		hasFailed = false;
+		if (!translator.hasFailed()) {
+			SmtSolver solver = new SmtSolver(actor);
+			boolean result = solver.checkSat(script);
+			hasFailed = solver.hasFailed();
+			// for SmtTranslator debugging, print script.getCommands() here
+			return result;
+		} else {
+			hasFailed = true;
+		}
+		return false;
 	}
 
 	/**
@@ -668,6 +699,10 @@ public class GuardSatChecker {
 
 		// fills the map
 		return solver.getAssertions();
+	}
+
+	public boolean hasFailed() {
+		return hasFailed;
 	}
 
 }
