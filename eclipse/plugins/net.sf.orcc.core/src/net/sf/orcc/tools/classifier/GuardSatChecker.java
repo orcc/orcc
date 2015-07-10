@@ -325,6 +325,15 @@ public class GuardSatChecker {
 
 		@Override
 		public Object caseProcedure(Procedure procedure) {
+			if (procedure.isNative()) {
+				if (isAlreadyDeclared(procedure.getName(), "declare-fun")) {
+					return null;
+				}
+			} else {
+				if (isAlreadyDeclared(procedure.getName(), "define-fun")) {
+					return null;
+				}
+			}
 			// add procedure to list of procedures
 			procs.add(procedure);
 
@@ -380,6 +389,25 @@ public class GuardSatChecker {
 		}
 
 		/**
+		 * Check whether this variable already exists.
+		 *
+		 * @param name
+		 *            name of the object
+		 * @param prefix
+		 *            the type of the declaration
+		 * @return a boolean value
+		 */
+		private boolean isAlreadyDeclared(String name, String prefix) {
+			for (String defined : script.getCommands()) {
+				String cmp = new String("(" + prefix + " " + name + " ");
+				if (defined.startsWith(cmp)) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		/**
 		 * Declares the variable with the given name.
 		 * 
 		 * @param variable
@@ -387,6 +415,9 @@ public class GuardSatChecker {
 		 */
 		private void declareVar(Var variable) {
 			String name = getUniqueName(variable);
+			if (isAlreadyDeclared(name, "declare-fun")) {
+				return;
+			}
 			String type = new TypeSwitchBitVec().doSwitch(variable.getType());
 			script.addCommand("(declare-fun " + name + " () " + type + ")");
 			script.getVariables().add(variable);
@@ -437,9 +468,7 @@ public class GuardSatChecker {
 		private String getUniqueName(Var variable) {
 			String name = variable.getName();
 			EObject cter = variable.eContainer();
-			if (cter instanceof Pattern) {
-				return ((Action) cter.eContainer()).getName() + "_" + name;
-			} else if (cter instanceof Procedure && variable.getType().isList()) {
+			if (cter instanceof Procedure && variable.getType().isList()) {
 				return ((Procedure) cter).getName() + "_" + name;
 			}
 			return name;
