@@ -164,6 +164,14 @@ public class ActionSorter {
 					for (Action source : sources) {
 						for (Action target : targets) {
 							graph.addEdge(source, target);
+							if (target.hasAttribute("IsPrecededBy")) {
+								String oldStr = target.getValueAsString("IsPrecededBy");
+								String newStr = oldStr.concat("-" + source.getName());
+								target.setAttribute("IsPrecededBy", newStr);
+							} else {
+								target.addAttribute("IsPrecededBy");
+								target.setAttribute("IsPrecededBy", source.getName());
+							}
 						}
 					}
 
