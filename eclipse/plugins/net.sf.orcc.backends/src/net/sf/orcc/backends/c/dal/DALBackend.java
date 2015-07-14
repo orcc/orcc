@@ -24,6 +24,7 @@ import net.sf.orcc.df.transform.TypeResizer;
 import net.sf.orcc.df.transform.UnitImporter;
 import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.ir.transform.RenameTransformation;
+import net.sf.orcc.tools.classifier.Classifier;
 import net.sf.orcc.tools.merger.action.ActionMerger;
 import net.sf.orcc.tools.merger.actor.ActorMerger;
 import net.sf.orcc.util.FilesManager;
@@ -42,6 +43,7 @@ public class DALBackend extends CBackend {
 
 	protected boolean outputBuffering;
 	protected boolean inputBuffering;
+	protected boolean KPNValidation;
 
 	private NetworkCPrinter networkCPrinter;
 	private NetworkMPrinter mappingPrinter;
@@ -65,6 +67,8 @@ public class DALBackend extends CBackend {
 		// Configure paths
 		srcPath = outputPath + File.separator + "src";
 
+		KPNValidation = getOption("net.sf.orcc.backends.c.dal.KPNvalidation",
+				false);
 		// -----------------------------------------------------
 		// Transformations that will be applied on the Network
 		// -----------------------------------------------------
@@ -77,6 +81,9 @@ public class DALBackend extends CBackend {
 		networkTransfos.add(new UnitImporter());
 		networkTransfos.add(new GlobalConstantPropagator());
 		networkTransfos.add(new DisconnectedOutputPortRemoval());
+		if (!KPNValidation && classify) {
+			networkTransfos.add(new Classifier());
+		}
 		if (mergeActors) {
 			networkTransfos.add(new ActorMerger());
 		} else {
@@ -86,7 +93,9 @@ public class DALBackend extends CBackend {
 			networkTransfos.add(new BroadcastRemover());
 		}
 		networkTransfos.add(new ArgumentEvaluator());
-		networkTransfos.add(new LoadRewriter());
+		if (KPNValidation) {
+			networkTransfos.add(new LoadRewriter());
+		}
 		networkTransfos.add(new TypeResizer(true, false, true, false));
 		networkTransfos.add(new RenameTransformation(getRenameMap()));
 
@@ -114,7 +123,7 @@ public class DALBackend extends CBackend {
 	@Override
 	protected void beforeGeneration(Network network) {
 		KPNValidator validator = new KPNValidator(srcPath);
-		if (classify) {
+		if (KPNValidation) {
 			OrccLogger.traceln("Evaluating KPNness of actors...");
 			validator.validate(network);
 		}
