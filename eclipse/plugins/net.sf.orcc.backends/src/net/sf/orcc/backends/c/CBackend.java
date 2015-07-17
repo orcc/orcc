@@ -56,6 +56,7 @@ import net.sf.orcc.backends.transform.Multi2MonoToken;
 import net.sf.orcc.backends.transform.ParameterImporter;
 import net.sf.orcc.backends.transform.StoreOnceTransformation;
 import net.sf.orcc.backends.util.Alignable;
+import net.sf.orcc.backends.util.BroadcastMapper;
 import net.sf.orcc.backends.util.Mapping;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
@@ -298,6 +299,11 @@ public class CBackend extends AbstractBackend {
 
 		result.merge(FilesManager.writeFile(statsPrinter.getContent(network),
 				srcPath, network.getSimpleName() + ".csv"));
+
+		if (mergeActors) {
+			BroadcastMapper broadcastMapper = new BroadcastMapper();
+			broadcastMapper.prepareBroadcastMapping(network);
+		}
 
 		final Mapping mapper = new Mapping(network, mapping);
 		result.merge(FilesManager.writeFile(mapper.getContentFile(), srcPath,

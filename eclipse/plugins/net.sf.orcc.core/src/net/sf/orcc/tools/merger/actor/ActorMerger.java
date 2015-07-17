@@ -216,6 +216,11 @@ public class ActorMerger extends DfVisitor<Void> {
 			}
 			// update the main network
 			network.add(superActor);
+			List<String> mergedList = new ArrayList<String>();
+			for (Vertex v : subNetwork.getAllActors()) {
+				mergedList.add(v.getLabel());
+			}
+			superActor.setAttribute("mergedActors", mergedList);
 
 			List<Connection> newConnections = new ArrayList<Connection>();
 			for (Connection connection : network.getConnections()) {

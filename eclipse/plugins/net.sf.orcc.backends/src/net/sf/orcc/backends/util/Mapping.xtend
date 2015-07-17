@@ -70,8 +70,26 @@ class Mapping extends CommonPrinter {
 				// FIXME: There is probably a better way to do this
 				if (actor.hasAttribute("mergedActors")) {
 					val clusteredActors = actor.<List<String>>getValueAsObject("mergedActors")
-					actor.tryToMap(clusteredActors.map(a|map.get(a)).findFirst[!nullOrEmpty])
-				} else {
+					for (actorName : clusteredActors) {
+						val aTarget = map.get(network.name + "_" + actorName)
+						if (aTarget != null) {
+							if (!vertexExists(actor as Vertex)) {
+								actor.tryToMap(aTarget)
+								map.put(network.name + "_" + actor.name, aTarget)
+							}
+						}
+					}
+				}
+			}
+			for (actor : network.children.filter(typeof(Actor))) {
+
+				// In case of a composite actor, try to map it on a component referenced by its children
+				// FIXME: There is probably a better way to do this
+				if (actor.hasAttribute("broadcastOrigin")) {
+					val origin = actor.getValueAsString("broadcastOrigin")
+					val originTarget = map.get(network.name + "_" + origin)
+					actor.tryToMap(originTarget)
+				} else if (!actor.hasAttribute("mergedActors")) {
 					actor.tryToMap(map.get(network.name + "_" + actor.name))
 				}
 			}
@@ -82,6 +100,17 @@ class Mapping extends CommonPrinter {
 				unmapped.add(instance)
 			}
 		}
+	}
+
+	private def vertexExists(Vertex newVertex) {
+		for (List<Vertex> vertexList: mapping.values()) {
+			for (Vertex v: vertexList) {
+				if (v.equals(newVertex)) {
+					return true
+				}
+			}
+		}
+		return false
 	}
 
 	public new(Network network, File xcfFile) {
