@@ -53,8 +53,8 @@ inline void printFiringcWeights(rdtsc_data_t *x, FILE *fp) {
 }
 
 /*--------------------------------------------------------------------------------------------------*/
-
 inline void rdtsc_func(unsigned int *cycles_high, unsigned int *cycles_low) {
+#if defined(__GNUC__) || defined(__GNUG__) // gcc/g++ compilers.
 	asm volatile (
 	 "CPUID\n\t"
 	 "RDTSC\n\t"
@@ -64,9 +64,13 @@ inline void rdtsc_func(unsigned int *cycles_high, unsigned int *cycles_low) {
 	 "=r" (*cycles_high), "=r" (*cycles_low)
 	::
 	 "%rax", "%rbx", "%rcx", "%rdx");
+#else // Non-gcc/g++ compilers.
+	*cycles_high = *cycles_low = 0;
+#endif
 }
 
 inline void rdtscp_func(unsigned int *cycles_high, unsigned int *cycles_low) {
+#if defined(__GNUC__) || defined(__GNUG__) // gcc/g++ compilers.
 	#if IF_RDTSCP
 		asm volatile(
 		 "RDTSCP\n\t"
@@ -91,6 +95,9 @@ inline void rdtscp_func(unsigned int *cycles_high, unsigned int *cycles_low) {
 		::
 		 "%rax", "%rdx");*/
 	#endif
+#else // Non-gcc/g++ compilers.
+	*cycles_high = *cycles_low = 0;
+#endif
 }
 
 inline void rdtsc_warmup(unsigned int *cycles_high, unsigned int *cycles_low, unsigned int *cycles_high1, unsigned int *cycles_low1) {

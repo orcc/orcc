@@ -32,7 +32,7 @@ inline void printFiringcWeights(rdtsc_data_t *x, FILE *fp);
 
 /*--------------------------------------------------------------------------------------------------*/
 
-#define IF_RDTSCP 1
+#define IF_RDTSCP 0
 
 inline void rdtsc_func(unsigned int *cycles_high, unsigned int *cycles_low);
 
