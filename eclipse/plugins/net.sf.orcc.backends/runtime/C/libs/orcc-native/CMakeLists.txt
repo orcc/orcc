@@ -24,7 +24,7 @@ endif()
 find_package(OpenCV QUIET)
 if(OpenCV_FOUND)
     list(APPEND orcc_native_sources src/source_camera.c)
-    # Add 2 needed imported targets to extra libraries variable 
+    list(APPEND extra_includes ${OpenCV_INCLUDE_DIRS})
     list(APPEND extra_libraries ${OpenCV_LIBS})
 else()
     message(STATUS "Cannot find OpenCV")

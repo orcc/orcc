@@ -98,6 +98,9 @@
                id="net.sf.orcc.core.classify">
          </option>
          <option
+               id="net.sf.orcc.backends.c.dal.KPNvalidation">
+         </option>
+         <option
                id="net.sf.orcc.backends.c.dal.inputBuffering">
          </option>
          <option
@@ -431,6 +434,13 @@
          </option>
          <option
                defaultValue="false"
+               description="Validate actors for Kahn process compatibility"
+               id="net.sf.orcc.backends.c.dal.KPNvalidation"
+               name="KPN validation">
+            <checkBox></checkBox>
+         </option>
+         <option
+               defaultValue="false"
                description="Whether Orcc should import the given xml buffer size configuration file"
                id="net.sf.orcc.backends.importBXDF"
                name="Import the BXDF Mapping">
@@ -451,7 +461,14 @@
                description="Include PAPI code for profiling"
                id="net.sf.orcc.backends.papify"
                name="Papify: profile actors using PAPI">
-            <checkBox></checkBox>
+            <checkBox>
+               <option
+                     defaultValue="false"
+                     description="Use only if there are less counters than events to profile"
+                     id="net.sf.orcc.backends.papify.multiplex"
+                     name="Enable multiplex">
+                  <checkBox></checkBox>
+               </option></checkBox>
          </option>
          <option
                defaultValue="false"

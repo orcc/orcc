@@ -1,12 +1,36 @@
 package net.sf.orcc.backends.c.dal;
 
+import java.io.File;
+
 import net.sf.orcc.backends.c.CBackend;
+import net.sf.orcc.backends.c.dal.transform.GlobalConstantPropagator;
+import net.sf.orcc.backends.c.dal.transform.LoadRewriter;
+import net.sf.orcc.backends.c.transform.CBroadcastAdder;
+import net.sf.orcc.backends.transform.DisconnectedOutputPortRemoval;
+import net.sf.orcc.backends.transform.InlinerByAnnotation;
+import net.sf.orcc.backends.transform.LoopUnrolling;
+import net.sf.orcc.backends.transform.Multi2MonoToken;
 import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.df.transform.ArgumentEvaluator;
+import net.sf.orcc.df.transform.BroadcastAdder;
+import net.sf.orcc.df.transform.BroadcastRemover;
+import net.sf.orcc.df.transform.FifoSizePropagator;
+import net.sf.orcc.df.transform.Instantiator;
+import net.sf.orcc.df.transform.NetworkFlattener;
+import net.sf.orcc.df.transform.TypeResizer;
+import net.sf.orcc.df.transform.UnitImporter;
+import net.sf.orcc.df.util.DfVisitor;
+import net.sf.orcc.ir.transform.RenameTransformation;
+import net.sf.orcc.tools.classifier.Classifier;
+import net.sf.orcc.tools.merger.action.ActionMerger;
+import net.sf.orcc.tools.merger.actor.ActorMerger;
 import net.sf.orcc.util.FilesManager;
+import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.Result;
+import net.sf.orcc.util.Void;
 
 /**
  * DAL C backend targeting ETHZ Distributed Application Layer
@@ -19,6 +43,7 @@ public class DALBackend extends CBackend {
 
 	protected boolean outputBuffering;
 	protected boolean inputBuffering;
+	protected boolean KPNValidation;
 
 	private NetworkCPrinter networkCPrinter;
 	private NetworkMPrinter mappingPrinter;
@@ -39,7 +64,52 @@ public class DALBackend extends CBackend {
 
 	@Override
 	protected void doInitializeOptions() {
-		super.doInitializeOptions();
+		// Configure paths
+		srcPath = outputPath + File.separator + "src";
+
+		KPNValidation = getOption("net.sf.orcc.backends.c.dal.KPNvalidation",
+				false);
+		// -----------------------------------------------------
+		// Transformations that will be applied on the Network
+		// -----------------------------------------------------
+		if (mergeActors) {
+			networkTransfos.add(new FifoSizePropagator(fifoSize));
+			networkTransfos.add(new BroadcastAdder());
+		}
+		networkTransfos.add(new Instantiator(true));
+		networkTransfos.add(new NetworkFlattener());
+		networkTransfos.add(new UnitImporter());
+		networkTransfos.add(new GlobalConstantPropagator());
+		networkTransfos.add(new DisconnectedOutputPortRemoval());
+		if (!KPNValidation && classify) {
+			networkTransfos.add(new Classifier());
+		}
+		if (mergeActors) {
+			networkTransfos.add(new ActorMerger());
+		} else {
+			networkTransfos.add(new CBroadcastAdder());
+		}
+		if (mergeActors) {
+			networkTransfos.add(new BroadcastRemover());
+		}
+		networkTransfos.add(new ArgumentEvaluator());
+		if (KPNValidation) {
+			networkTransfos.add(new LoadRewriter());
+		}
+		networkTransfos.add(new TypeResizer(true, false, true, false));
+		networkTransfos.add(new RenameTransformation(getRenameMap()));
+
+		// -------------------------------------------------------------------
+		// Transformations that will be applied on children (instances/actors)
+		// -------------------------------------------------------------------
+		if (mergeActions) {
+			childrenTransfos.add(new ActionMerger());
+		}
+		if (convertMulti2Mono) {
+			childrenTransfos.add(new Multi2MonoToken());
+		}
+		childrenTransfos.add(new DfVisitor<Void>(new InlinerByAnnotation()));
+		childrenTransfos.add(new DfVisitor<Void>(new LoopUnrolling()));
 
 		networkCPrinter.setOptions(getOptions());
 		instanceCPrinter.setOptions(getOptions());
@@ -52,8 +122,11 @@ public class DALBackend extends CBackend {
 
 	@Override
 	protected void beforeGeneration(Network network) {
-		KPNValidator validator = new KPNValidator();
-		validator.validate(network);
+		KPNValidator validator = new KPNValidator(srcPath);
+		if (KPNValidation) {
+			OrccLogger.traceln("Evaluating KPNness of actors...");
+			validator.validate(network);
+		}
 		validator.analyzeInputs(network);
 		validator.analyzeOutputs(network);
 

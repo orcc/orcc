@@ -211,7 +211,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	/**
 	 * the progress monitor
 	 */
-	private IProgressMonitor monitor;
+	protected IProgressMonitor monitor;
 
 	/**
 	 * Construct a new standard back-end.

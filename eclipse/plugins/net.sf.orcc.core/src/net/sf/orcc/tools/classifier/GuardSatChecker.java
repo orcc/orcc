@@ -46,6 +46,7 @@ import net.sf.orcc.ir.ArgByVal;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprInt;
+import net.sf.orcc.ir.ExprString;
 import net.sf.orcc.ir.ExprUnary;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
@@ -61,6 +62,7 @@ import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeBool;
 import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeList;
+import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
@@ -104,6 +106,8 @@ public class GuardSatChecker {
 		private List<Procedure> procs;
 
 		private SmtScript script;
+
+		private boolean translatorFailure;
 
 		/**
 		 * Creates a new constraint expression visitor.
@@ -202,6 +206,11 @@ public class GuardSatChecker {
 		@Override
 		public Object caseExprInt(ExprInt expr) {
 			return getStringOfInt(expr.getValue());
+		}
+
+		@Override
+		public Object caseExprString(ExprString expr) {
+			return getStringOfInt(expr.getValue().hashCode());
 		}
 
 		@Override
@@ -318,6 +327,15 @@ public class GuardSatChecker {
 
 		@Override
 		public Object caseProcedure(Procedure procedure) {
+			if (procedure.isNative()) {
+				if (isAlreadyDeclared(procedure.getName(), "declare-fun")) {
+					return null;
+				}
+			} else {
+				if (isAlreadyDeclared(procedure.getName(), "define-fun")) {
+					return null;
+				}
+			}
 			// add procedure to list of procedures
 			procs.add(procedure);
 
@@ -373,6 +391,25 @@ public class GuardSatChecker {
 		}
 
 		/**
+		 * Check whether this variable already exists.
+		 *
+		 * @param name
+		 *            name of the object
+		 * @param prefix
+		 *            the type of the declaration
+		 * @return a boolean value
+		 */
+		private boolean isAlreadyDeclared(String name, String prefix) {
+			for (String defined : script.getCommands()) {
+				String cmp = new String("(" + prefix + " " + name + " ");
+				if (defined.startsWith(cmp)) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		/**
 		 * Declares the variable with the given name.
 		 * 
 		 * @param variable
@@ -380,6 +417,9 @@ public class GuardSatChecker {
 		 */
 		private void declareVar(Var variable) {
 			String name = getUniqueName(variable);
+			if (isAlreadyDeclared(name, "declare-fun")) {
+				return;
+			}
 			String type = new TypeSwitchBitVec().doSwitch(variable.getType());
 			script.addCommand("(declare-fun " + name + " () " + type + ")");
 			script.getVariables().add(variable);
@@ -430,12 +470,18 @@ public class GuardSatChecker {
 		private String getUniqueName(Var variable) {
 			String name = variable.getName();
 			EObject cter = variable.eContainer();
-			if (cter instanceof Pattern) {
-				return ((Action) cter.eContainer()).getName() + "_" + name;
-			} else if (cter instanceof Procedure && variable.getType().isList()) {
+			if (cter instanceof Procedure && variable.getType().isList()) {
 				return ((Procedure) cter).getName() + "_" + name;
 			}
 			return name;
+		}
+
+		public void resetFailure() {
+			translatorFailure = false;
+		}
+
+		public boolean hasFailed() {
+			return translatorFailure;
 		}
 
 	}
@@ -450,6 +496,8 @@ public class GuardSatChecker {
 	private static class SmtTranslator extends DfVisitor<Object> {
 
 		private SmtIrTranslator irTranslator;
+
+		private boolean translatorFailure;
 
 		public SmtTranslator() {
 			irTranslator = new SmtIrTranslator();
@@ -476,7 +524,10 @@ public class GuardSatChecker {
 				irTranslator.script.addCommand(command);
 			}
 
+			translatorFailure = false;
+			irTranslator.resetFailure();
 			irTranslator.doSwitch(action.getScheduler());
+			translatorFailure = irTranslator.hasFailed();
 
 			return null;
 		}
@@ -499,6 +550,10 @@ public class GuardSatChecker {
 		 */
 		public SmtScript getScript() {
 			return irTranslator.script;
+		}
+
+		public boolean hasFailed() {
+			return translatorFailure;
 		}
 
 	}
@@ -536,6 +591,12 @@ public class GuardSatChecker {
 		}
 
 		@Override
+		public String caseTypeString(TypeString type) {
+			int size = 32; // type.getSizeInBits()
+			return "(_ BitVec " + size + ")";
+		}
+
+		@Override
 		public String caseTypeUint(TypeUint type) {
 			int size = 32; // type.getSizeInBits()
 			return "(_ BitVec " + size + ")";
@@ -544,6 +605,8 @@ public class GuardSatChecker {
 	}
 
 	private Actor actor;
+
+	private boolean hasFailed;
 
 	public GuardSatChecker(Actor actor) {
 		this.actor = actor;
@@ -575,7 +638,51 @@ public class GuardSatChecker {
 				+ " " + action2.getScheduler().getName() + "))");
 		script.addCommand("(check-sat)");
 
-		return new SmtSolver(actor).checkSat(script);
+		hasFailed = false;
+		if (!translator.hasFailed()) {
+			SmtSolver solver = new SmtSolver(actor);
+			boolean result = solver.checkSat(script);
+			hasFailed = solver.hasFailed();
+			// for SmtTranslator debugging, print script.getCommands() here
+			return result;
+		} else {
+			hasFailed = true;
+		}
+		return false;
+	}
+
+	/**
+	 * Returns <code>true</code> if the guard of action can be satisfied and
+	 * <code>false</code> if the guard can never be satisfied.
+	 *
+	 * @param action
+	 *            action
+	 * @return <code>true</code> if the guards of action can be satisfied
+	 */
+	public boolean checkSat(Action action) {
+		SmtTranslator translator = new SmtTranslator();
+		for (Port port : actor.getInputs()) {
+			translator.doSwitch(port);
+		}
+		translator.doSwitch(action);
+
+		SmtScript script = translator.getScript();
+
+		// check whether the guard is satisfiable or not
+		script.addCommand("(assert " + action.getScheduler().getName() + ")");
+		script.addCommand("(check-sat)");
+
+		hasFailed = false;
+		if (!translator.hasFailed()) {
+			SmtSolver solver = new SmtSolver(actor);
+			boolean result = solver.checkSat(script);
+			hasFailed = solver.hasFailed();
+			// for SmtTranslator debugging, print script.getCommands() here
+			return result;
+		} else {
+			hasFailed = true;
+		}
+		return false;
 	}
 
 	/**
@@ -626,6 +733,10 @@ public class GuardSatChecker {
 
 		// fills the map
 		return solver.getAssertions();
+	}
+
+	public boolean hasFailed() {
+		return hasFailed;
 	}
 
 }

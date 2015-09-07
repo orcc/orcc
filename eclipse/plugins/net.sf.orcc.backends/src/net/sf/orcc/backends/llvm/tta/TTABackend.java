@@ -51,12 +51,14 @@ import net.sf.orcc.backends.transform.ShortCircuitTransformation;
 import net.sf.orcc.backends.transform.ssa.ConstantPropagator;
 import net.sf.orcc.backends.transform.ssa.CopyPropagator;
 import net.sf.orcc.backends.util.Alignable;
+import net.sf.orcc.backends.util.BroadcastMapper;
 import net.sf.orcc.backends.util.FPGA;
 import net.sf.orcc.backends.util.Mapping;
 import net.sf.orcc.backends.util.Validator;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.transform.BroadcastAdder;
+import net.sf.orcc.df.transform.BroadcastRemover;
 import net.sf.orcc.df.transform.FifoSizePropagator;
 import net.sf.orcc.df.transform.Instantiator;
 import net.sf.orcc.df.transform.NetworkFlattener;
@@ -173,6 +175,9 @@ public class TTABackend extends LLVMBackend {
 
 		networkTransfos.add(new DisconnectedOutputPortRemoval());
 
+		if (mergeActors) {
+			networkTransfos.add(new BroadcastRemover());
+		}
 		networkTransfos.add(new DfVisitor<Expression>(
 				new ShortCircuitTransformation()));
 		networkTransfos.add(new TypeResizer(true, true, false, true));
@@ -211,6 +216,10 @@ public class TTABackend extends LLVMBackend {
 		// Validator.checkTopLevel(network);
 		Validator.checkMinimalFifoSize(network, fifoSize);
 
+		if (mergeActors) {
+			BroadcastMapper broadcastMapper = new BroadcastMapper();
+			broadcastMapper.prepareBroadcastMapping(network);
+		}
 		// Configuration before the code generation
 		// FIXME: Make it in better place
 

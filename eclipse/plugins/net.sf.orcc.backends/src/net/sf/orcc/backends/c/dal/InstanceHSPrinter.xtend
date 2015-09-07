@@ -79,7 +79,6 @@ class InstanceHSPrinter extends CTemplate {
 			«ENDFOR»
 			int _count;
 			int _FSM_state;
-			void *_io;
 		} «entityName»_State;
 
 		int «entityName»_init(DALProcess *);
