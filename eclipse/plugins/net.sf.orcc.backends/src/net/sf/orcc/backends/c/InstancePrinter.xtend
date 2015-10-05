@@ -69,6 +69,7 @@ import static net.sf.orcc.OrccLaunchConstants.*
 import static net.sf.orcc.backends.BackendsConstants.*
 import static net.sf.orcc.util.OrccAttributes.*
 import net.sf.orcc.df.Network
+import net.sf.orcc.ir.ExprBinary
 
 /**
  * Generate and print instance source file for C backend.
@@ -1086,7 +1087,6 @@ class InstancePrinter extends CTemplate {
 			val dims = variable.type.dimensionsExpr.printArrayIndexes
 			val init = if(variable.initialized) " = " + variable.initialValue.doSwitch
 			val end = if(variable.global) ";"
-			
 			'''«global»«const»«type.doSwitch» «variable.name»«dims»«init»«end»'''
 		}
 	}
@@ -1169,9 +1169,29 @@ class InstancePrinter extends CTemplate {
 	//========================================
 	//            Instructions
 	//========================================
-	override caseInstAssign(InstAssign inst) '''
-		«inst.target.variable.name» = «inst.value.doSwitch»;
+	override caseInstAssign(InstAssign inst) {
+		// if the expression being assigned is a binary expression
+		// and it contains sub-expressions of different bit sizes e.g.
+		// one of the two sub-expressions is an unsigned 32bit expression
+		// and the outermost binary expression a 64bit expression, then
+		// we add explicit type casting to the outer most expression before
+		// assigning its value to the left hand side target variable.
+		var typeCast = ""
+		if (inst.getValue instanceof ExprBinary) {
+          val exprBinary  = inst.getValue as ExprBinary
+          val binExprBitSize = exprBinary.getType.getSizeInBits
+          val subExpr1 = exprBinary.getE1
+          val subExpr2 = exprBinary.getE2
+          var targetVarBitSize = inst.getTarget.getVariable.getType.getSizeInBits
+		  typeCast = if (subExpr1.getType.getSizeInBits != targetVarBitSize
+		   	          || subExpr2.getType.getSizeInBits != targetVarBitSize)
+			          '''(u«targetVarBitSize»)'''
+		}
+		
 	'''
+		«inst.target.variable.name» = «typeCast» «inst.value.doSwitch»;
+	'''
+	}
 
 	/**
 	 * Print extra code for array inbounds checking (ex: C assert) at each usage (load/store)
