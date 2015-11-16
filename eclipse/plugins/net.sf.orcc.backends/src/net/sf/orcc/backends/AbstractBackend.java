@@ -136,12 +136,16 @@ import org.osgi.framework.Bundle;
  * <ol>
  * <li>{@link #doValidate(Network)} checks some constraints on the given network
  * </li>
- * <li>{@link #beforeGeneration(Network)} can be used to perform some additional operations</li>
- * <li>{@link #doGenerateNetwork(Network)} produces code from the given network</li>
+ * <li>{@link #beforeGeneration(Network)} can be used to perform some additional
+ * operations</li>
+ * <li>{@link #doGenerateNetwork(Network)} produces code from the given network
+ * </li>
  * <li>{@link #doAdditionalGeneration(Network)} can be used to generate other
  * files from the given network</li>
- * <li>{@link #beforeGeneration(Actor)} or {@link #beforeGeneration(Instance)}</li>
- * <li>{@link #doGenerateActor(Actor)} or {@link #doGenerateInstance(Instance)}</li>
+ * <li>{@link #beforeGeneration(Actor)} or {@link #beforeGeneration(Instance)}
+ * </li>
+ * <li>{@link #doGenerateActor(Actor)} or {@link #doGenerateInstance(Instance)}
+ * </li>
  * <li>{@link #doAdditionalGeneration(Actor)} or
  * {@link #doAdditionalGeneration(Instance)}</li>
  * </ol>
@@ -267,8 +271,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 		String backendName = getOption(BACKEND, "<unknown>");
 
-		OrccLogger.traceln("*********************************************"
-				+ "************************************");
+		OrccLogger.traceln("*********************************************" + "************************************");
 		OrccLogger.traceln("* Orcc version:   " + orccVersion);
 		OrccLogger.traceln("* Backend:        " + backendName);
 		OrccLogger.traceln("* Project:        " + project.getName());
@@ -277,8 +280,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			OrccLogger.traceln("* Network:        " + topNetwork);
 		}
 		OrccLogger.traceln("* Output folder:  " + outputPath);
-		OrccLogger.traceln("*********************************************"
-				+ "************************************");
+		OrccLogger.traceln("*********************************************" + "************************************");
 
 		// -----------------------------------------------------
 		// Libraries files export
@@ -289,7 +291,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			stopIfRequested();
 			final long t0 = System.currentTimeMillis();
 			final Result result = doLibrariesExtraction();
-			if(!result.isEmpty()) {
+			if (!result.isEmpty()) {
 				OrccLogger.traceln("Library export done in " + getDuration(t0) + "s");
 			}
 		}
@@ -299,19 +301,17 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		// -----------------------------------------------------
 		final Network network;
 		final String networkQName = getOption(XDF_FILE, "");
-		final IFile xdfFile = getFile(project, networkQName,
-				OrccUtil.NETWORK_SUFFIX);
+		final IFile xdfFile = getFile(project, networkQName, OrccUtil.NETWORK_SUFFIX);
 		if (xdfFile == null) {
-			throw new OrccRuntimeException("Unable to find the XDF file "
-					+ "corresponding to the network " + networkQName + ".");
+			throw new OrccRuntimeException(
+					"Unable to find the XDF file " + "corresponding to the network " + networkQName + ".");
 		} else {
 			network = EcoreHelper.getEObject(currentResourceSet, xdfFile);
 		}
 
 		if (compileXdf) {
 			if (network == null) {
-				throw new OrccRuntimeException(
-						"The input file seems to not contains any network");
+				throw new OrccRuntimeException("The input file seems to not contains any network");
 			}
 
 			if (!networkTransfos.isEmpty()) {
@@ -344,20 +344,18 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			stopIfRequested();
 			OrccLogger.traceln("Compute the list of actors to generate");
 			List<IFolder> projectsFolders = OrccUtil.getOutputFolders(project);
-			List<IFile> irFiles = OrccUtil.getAllFiles(OrccUtil.IR_SUFFIX,
-					projectsFolders);
+			List<IFile> irFiles = OrccUtil.getAllFiles(OrccUtil.IR_SUFFIX, projectsFolders);
 
 			OrccLogger.traceln("Parsing " + irFiles.size() + " IR files");
 			List<Actor> actors = new ArrayList<Actor>();
 			for (IFile file : irFiles) {
-				final EObject eObject = EcoreHelper.getEObject(
-						currentResourceSet, file);
+				final EObject eObject = EcoreHelper.getEObject(currentResourceSet, file);
 				// do not add units
 				if (eObject instanceof Actor) {
 					actors.add((Actor) eObject);
 				}
 			}
-			OrccLogger.traceln(actors.size()  + " actors will be added to the VTL (other IR files are units)");
+			OrccLogger.traceln(actors.size() + " actors will be added to the VTL (other IR files are units)");
 
 			if (!childrenTransfos.isEmpty()) {
 				stopIfRequested();
@@ -413,6 +411,11 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			OrccLogger.traceln("Done in " + getDuration(t0) + "s. " + result);
 		}
 
+		// -----------------------------------------------------
+		// After Code generation for Network
+		// -----------------------------------------------------
+		afterGeneration(network);
+	
 		OrccLogger.traceln("Orcc backend done.");
 	}
 
@@ -445,6 +448,16 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 * @param network
 	 */
 	protected void beforeGeneration(final Network network) {
+		// Does nothing by default
+	}
+
+	/**
+	 * Callback called after network and instance/actor generation. It can be
+	 * used to perform additional code generation.
+	 * 
+	 * @param network
+	 */
+	protected void afterGeneration(final Network network) {
 		// Does nothing by default
 	}
 
@@ -498,9 +511,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 * @param validate
 	 *            Indicates that transformation result must be validated
 	 */
-	final protected <T extends EObject> void applyTransformations(
-			Iterable<T> objects, Iterable<DfVisitor<?>> transformations,
-			boolean validate) {
+	final protected <T extends EObject> void applyTransformations(Iterable<T> objects,
+			Iterable<DfVisitor<?>> transformations, boolean validate) {
 		for (final T object : objects) {
 			applyTransformations(object, transformations, validate);
 		}
@@ -514,13 +526,12 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 * @param validate
 	 *            Indicates that transformation result must be validated
 	 */
-	final protected void applyTransformations(EObject object,
-			Iterable<DfVisitor<?>> transformations, boolean validate) {
+	final protected void applyTransformations(EObject object, Iterable<DfVisitor<?>> transformations,
+			boolean validate) {
 		for (final DfVisitor<?> transformation : transformations) {
 			transformation.doSwitch(object);
 			if (validate) {
-				OrccUtil.validateObject(transformation + " on " + object,
-						object);
+				OrccUtil.validateObject(transformation + " on " + object, object);
 			}
 		}
 	}
@@ -574,8 +585,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 * @return the value or the fallback default value
 	 */
 	@SuppressWarnings("unchecked")
-	final public Map<String, String> getOption(String optionName,
-			Map<String, String> defaultValue) {
+	final public Map<String, String> getOption(String optionName, Map<String, String> defaultValue) {
 		Object obj = options.get(optionName);
 		if (obj instanceof Map<?, ?>) {
 			return (Map<String, String>) obj;
@@ -719,9 +729,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 		HelpFormatter helpFormatter = new HelpFormatter();
 		helpFormatter.setWidth(80);
-		helpFormatter.printHelp(getClass().getSimpleName()
-				+ " [options] <network.qualified.name>", "Valid options are :",
-				options, footer);
+		helpFormatter.printHelp(getClass().getSimpleName() + " [options] <network.qualified.name>",
+				"Valid options are :", options, footer);
 	}
 
 	@Override
@@ -745,8 +754,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 		String outputFolder = getOption(OUTPUT_FOLDER, "");
 		if (outputFolder.isEmpty()) {
-			File tempOrccDir = new File(System.getProperty("java.io.tmpdir"),
-					"orcc");
+			File tempOrccDir = new File(System.getProperty("java.io.tmpdir"), "orcc");
 			tempOrccDir.mkdir();
 			outputFolder = tempOrccDir.getAbsolutePath();
 		} else {
@@ -784,50 +792,40 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 		// Optional command line arguments
 		options.addOption("d", "debug", false, "Enable debug mode");
-		options.addOption("s", "fifo-size", true,
-				"Default size of the FIFO channels");
+		options.addOption("s", "fifo-size", true, "Default size of the FIFO channels");
 
 		options.addOption("c", "classify", false, "Classify the given network");
-		options.addOption("smt", "smt-solver", true,
-				"Set path to the binary of the SMT solver (Z3 v4.12+)");
-		options.addOption("m", "merge", true, "Merge (1) static actions "
-				+ "(2) static actors (3) both");
-		options.addOption("as", "advanced-scheduler", false, "(C) Use the "
-				+ "data-driven/demand-driven strategy for the actor-scheduler");
-		options.addOption("m2m", "multi2mono", false,
-				"Transform high-level actors with multi-tokens actions"
-						+ " in low-level actors with mono-token actions");
+		options.addOption("smt", "smt-solver", true, "Set path to the binary of the SMT solver (Z3 v4.12+)");
+		options.addOption("m", "merge", true, "Merge (1) static actions " + "(2) static actors (3) both");
+		options.addOption("as", "advanced-scheduler", false,
+				"(C) Use the " + "data-driven/demand-driven strategy for the actor-scheduler");
+		options.addOption("m2m", "multi2mono", false, "Transform high-level actors with multi-tokens actions"
+				+ " in low-level actors with mono-token actions");
 		options.addOption("prof", "profile", false, "(C) Enable profiling");
 		options.addOption("papify", false, "(C) Enable papi performance tool analyzer code printing.");
-		options.addOption("et", "enable-traces", true,
-				"(C) Enable tracing of the FIFOs in the given directory");
-		options.addOption(
-				"ttapc",
-				"tta-processorconf",
-				true,
+		options.addOption("et", "enable-traces", true, "(C) Enable tracing of the FIFOs in the given directory");
+		options.addOption("ttapc", "tta-processorconf", true,
 				"(TTA) Predefined configurations for the processors (Standard|Custom|Fast|Huge)");
 
 		options.addOption("dt", "data-layout", true, "(LLVM) Configure the DataLayout printed in generated files");
 		options.addOption("tt", "target-triple", true, "(LLVM) Configure the target triple printed in generated files");
 
 		// FIXME: choose independently the transformation to apply
-		options.addOption("t", "transfo_add", false,
-				"Execute additional transformations before generate code");
+		options.addOption("t", "transfo_add", false, "Execute additional transformations before generate code");
 
 		try {
 			CommandLineParser parser = new PosixParser();
 
-			String cliOpts = StringUtils.join((Object[]) context.getArguments()
-					.get(IApplicationContext.APPLICATION_ARGS), " ");
+			String cliOpts = StringUtils
+					.join((Object[]) context.getArguments().get(IApplicationContext.APPLICATION_ARGS), " ");
 			OrccLogger.traceln("Command line arguments: " + cliOpts);
 
 			// parse the command line arguments
-			CommandLine line = parser.parse(options, (String[]) context
-					.getArguments().get(IApplicationContext.APPLICATION_ARGS));
+			CommandLine line = parser.parse(options,
+					(String[]) context.getArguments().get(IApplicationContext.APPLICATION_ARGS));
 
 			if (line.getArgs().length != 1) {
-				throw new ParseException(
-						"Expected network name as last argument");
+				throw new ParseException("Expected network name as last argument");
 			}
 			String networkName = line.getArgs()[0];
 
@@ -872,10 +870,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 			if (line.hasOption('m')) {
 				String type = line.getOptionValue('m');
-				optionMap.put(MERGE_ACTIONS,
-						type.equals("1") || type.equals("3"));
-				optionMap.put(MERGE_ACTORS,
-						type.equals("2") || type.equals("3"));
+				optionMap.put(MERGE_ACTIONS, type.equals("1") || type.equals("3"));
+				optionMap.put(MERGE_ACTORS, type.equals("2") || type.equals("3"));
 			}
 
 			if (line.hasOption("et")) {
@@ -885,8 +881,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 			if (line.hasOption("ttapc")) {
 				String pc = line.getOptionValue("ttapc");
-				if (pc.equals("Standard") || pc.equals("Custom")
-						|| pc.equals("Fast") || pc.equals("Huge")) {
+				if (pc.equals("Standard") || pc.equals("Custom") || pc.equals("Fast") || pc.equals("Huge")) {
 					optionMap.put(TTA_PROCESSORS_CONFIGURATION, pc);
 				} else {
 					OrccLogger
@@ -910,8 +905,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			// Set back-end name in options map
 			String backend = this.getClass().getName();
 			IConfigurationElement[] elements = Platform.getExtensionRegistry()
-					.getConfigurationElementsFor(
-							Activator.PLUGIN_ID + ".backends");
+					.getConfigurationElementsFor(Activator.PLUGIN_ID + ".backends");
 			for (IConfigurationElement element : elements) {
 				if (backend.equals(element.getAttribute("class"))) {
 					backend = element.getAttribute("name");
@@ -929,18 +923,15 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				if (e.getMessage() != null && !e.getMessage().isEmpty()) {
 					OrccLogger.severeln(e.getMessage());
 				}
-				OrccLogger.severeln(backend
-						+ " backend could not generate code (" + e.getCause()
-						+ ")[OrccRuntimeException]");
+				OrccLogger.severeln(
+						backend + " backend could not generate code (" + e.getCause() + ")[OrccRuntimeException]");
 
 			} catch (Exception e) {
 
 				if (e.getMessage() != null && !e.getMessage().isEmpty()) {
 					OrccLogger.severeln(e.getMessage());
 				}
-				OrccLogger.severeln(backend
-						+ " backend could not generate code (" + e.getCause()
-						+ ")[Exception]");
+				OrccLogger.severeln(backend + " backend could not generate code (" + e.getCause() + ")[Exception]");
 
 				e.printStackTrace();
 			}
