@@ -457,8 +457,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 * 
 	 * @param network
 	 */
-	protected void afterGeneration(final Network network) {
-		// Does nothing by default
+	protected Result afterGeneration(final Network network) {
+		return Result.newInstance();
 	}
 
 	/**
