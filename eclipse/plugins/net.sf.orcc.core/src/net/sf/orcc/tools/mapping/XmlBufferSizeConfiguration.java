@@ -10,7 +10,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
@@ -21,8 +23,10 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.Network;
+import net.sf.orcc.df.Port;
 import net.sf.orcc.df.transform.NetworkFlattener;
 import net.sf.orcc.df.util.DfVisitor;
+import net.sf.orcc.ir.util.ValueUtil;
 import net.sf.orcc.util.OrccLogger;
 import net.sf.orcc.util.OrccUtil;
 
@@ -49,8 +53,7 @@ public class XmlBufferSizeConfiguration {
 		@Override
 		public Void caseConnection(Connection connection) {
 
-			if (connection.getSource() instanceof Actor
-					&& connection.getTarget() instanceof Actor
+			if (connection.getSource() instanceof Actor && connection.getTarget() instanceof Actor
 					&& connection.getSize() != null) {
 
 				String sourceActor = ((Actor) connection.getSource()).getName();
@@ -59,8 +62,7 @@ public class XmlBufferSizeConfiguration {
 				String targetPort = connection.getTargetPort().getName();
 				int size = connection.getSize();
 
-				XmlConnection xmlConnection = new XmlConnection(sourceActor,
-						sourcePort, targetActor, targetPort, size);
+				XmlConnection xmlConnection = new XmlConnection(sourceActor, sourcePort, targetActor, targetPort, size);
 				connections.add(xmlConnection);
 			}
 
@@ -73,13 +75,17 @@ public class XmlBufferSizeConfiguration {
 		@Override
 		public Void caseConnection(Connection connection) {
 
-			if (connection.getSource() instanceof Actor
-					&& connection.getTarget() instanceof Actor) {
+			if (connection.getSource() instanceof Actor && connection.getTarget() instanceof Actor) {
 
 				int size = defaultSize;
 				for (XmlConnection c : connections) {
 					if (c.equal(connection)) {
 						size = c.size;
+						if (forcePow2 && !ValueUtil.isPowerOfTwo(size)) {
+							OrccLogger
+									.warnln("Buffer size of " + connection + " is not pow of two. It will be rounded");
+							size = roundPow2(size);
+						}
 						break;
 					}
 				}
@@ -87,6 +93,42 @@ public class XmlBufferSizeConfiguration {
 				connection.setSize(size);
 			}
 
+			return null;
+		}
+
+		public Void caseNetwork(Network network) {
+			super.caseNetwork(network);
+
+			if (brodcast) {
+				Map<Port, List<Connection>> portsMap = new HashMap<Port, List<Connection>>();
+				for (Connection c : network.getConnections()) {
+					Port port = c.getSourcePort();
+					List<Connection> pConns = portsMap.get(port);
+					if (pConns == null) {
+						pConns = new ArrayList<Connection>();
+						portsMap.put(port, pConns);
+					}
+					pConns.add(c);
+				}
+
+				for (List<Connection> portConns : portsMap.values()) {
+					if (portConns.size() > 1) {
+						// compute the maximal size
+						int maxSize = 0;
+						for (Connection c : portConns) {
+							Integer value = c.getSize();
+							if (value != null) {
+								maxSize = Math.max(maxSize, value.intValue());
+							}
+						}
+						if (maxSize != 0) {
+							for (Connection c : portConns) {
+								c.setSize(maxSize);
+							}
+						}
+					}
+				}
+			}
 			return null;
 		}
 	}
@@ -99,8 +141,7 @@ public class XmlBufferSizeConfiguration {
 		private final String targetPort;
 		private final int size;
 
-		private XmlConnection(String sourceActor, String sourcePort,
-				String targetActor, String targetPort, int size) {
+		private XmlConnection(String sourceActor, String sourcePort, String targetActor, String targetPort, int size) {
 			this.sourceActor = sourceActor;
 			this.sourcePort = sourcePort;
 			this.targetActor = targetActor;
@@ -114,10 +155,8 @@ public class XmlBufferSizeConfiguration {
 		}
 
 		private boolean equal(Connection connection) {
-			if (connection.getSource() instanceof Actor
-					&& connection.getTarget() instanceof Actor) {
-				if (!((Actor) connection.getSource()).getName().equals(
-						sourceActor)) {
+			if (connection.getSource() instanceof Actor && connection.getTarget() instanceof Actor) {
+				if (!((Actor) connection.getSource()).getName().equals(sourceActor)) {
 					return false;
 				}
 
@@ -125,8 +164,7 @@ public class XmlBufferSizeConfiguration {
 					return false;
 				}
 
-				if (!((Actor) connection.getTarget()).getName().equals(
-						targetActor)) {
+				if (!((Actor) connection.getTarget()).getName().equals(targetActor)) {
 					return false;
 				}
 
@@ -156,21 +194,43 @@ public class XmlBufferSizeConfiguration {
 	}
 
 	private static final String XML_BXDF = "bxdf";
+
 	private static final String XML_NETWORK = "network";
+
 	private static final String XML_DEFAULT_SIZE = "default-size";
+
 	private static final String XML_CONNECTION = "connection";
 	private static final String XML_SOURCE_ACTOR = "source-actor";
 	private static final String XML_TARGET_ACTOR = "target-actor";
-
 	private static final String XML_SOURCE_PORT = "source-port";
-
 	private static final String XML_TARGET_PORT = "target-port";
-
 	private static final String XML_SIZE = "size";
 
+	private final boolean forcePow2, brodcast;
+
 	private List<XmlConnection> connections;
+
 	private int defaultSize;
+
 	private String networkName;
+
+	/**
+	 * Create a new loader
+	 * 
+	 * @param forcePow2
+	 *            <code>true</code> if all the sizes should be with a pow of 2
+	 *            size. When parsing, if the value is not a pow of 2, then the
+	 *            value is rounded to the next biggest pow of 2 value
+	 * @param broadcast
+	 *            <code>true</code> if for broadcast ports (with 1:N
+	 *            connections) the size should be different. In this case the
+	 *            biggest will be used for all the outgoing connections of an
+	 *            output port
+	 */
+	public XmlBufferSizeConfiguration(boolean forcePow2, boolean broadcast) {
+		this.forcePow2 = forcePow2;
+		this.brodcast = broadcast;
+	}
 
 	/**
 	 * Load the buffer size configuration contained in this file. If there are
@@ -188,6 +248,7 @@ public class XmlBufferSizeConfiguration {
 
 		loadXmlConnections(file);
 		new BufferSizeAttributeWriter().doSwitch(network);
+
 	}
 
 	private void loadXmlConnections(File file) {
@@ -203,23 +264,16 @@ public class XmlBufferSizeConfiguration {
 				if (reader.getEventType() == XMLStreamReader.START_ELEMENT) {
 					if (reader.getLocalName().equals(XML_CONNECTION)) {
 						try {
-							String source = reader.getAttributeValue("",
-									XML_SOURCE_ACTOR);
-							String target = reader.getAttributeValue("",
-									XML_TARGET_ACTOR);
-							String sourcePort = reader.getAttributeValue("",
-									XML_SOURCE_PORT);
-							String targetPort = reader.getAttributeValue("",
-									XML_TARGET_PORT);
-							String size = reader
-									.getAttributeValue("", XML_SIZE);
+							String source = reader.getAttributeValue("", XML_SOURCE_ACTOR);
+							String target = reader.getAttributeValue("", XML_TARGET_ACTOR);
+							String sourcePort = reader.getAttributeValue("", XML_SOURCE_PORT);
+							String targetPort = reader.getAttributeValue("", XML_TARGET_PORT);
+							String size = reader.getAttributeValue("", XML_SIZE);
 
-							if (source != null && target != null
-									&& sourcePort != null && targetPort != null
+							if (source != null && target != null && sourcePort != null && targetPort != null
 									&& OrccUtil.isNumeric(size)) {
 								// it seams ok: add it to the list
-								XmlConnection c = new XmlConnection(source,
-										sourcePort, target, targetPort,
+								XmlConnection c = new XmlConnection(source, sourcePort, target, targetPort,
 										Integer.parseInt(size));
 								connections.add(c);
 							}
@@ -231,18 +285,22 @@ public class XmlBufferSizeConfiguration {
 					} else if (reader.getLocalName().equals(XML_BXDF)) {
 						String name = reader.getAttributeValue("", XML_NETWORK);
 						if (name == null || !name.equals(networkName)) {
-							OrccLogger
-									.warn("The network name of the configuration does not match with the network you are using");
+							OrccLogger.warn(
+									"The network name of the configuration does not match with the network you are using");
 						}
 
-						String size = reader.getAttributeValue("",
-								XML_DEFAULT_SIZE);
+						String size = reader.getAttributeValue("", XML_DEFAULT_SIZE);
 						if (!OrccUtil.isNumeric(size)) {
-							OrccLogger
-									.warn("The default buffer size value is not valid: 512 will be assigned by default");
+							OrccLogger.warn(
+									"The default buffer size value is not valid: 512 will be assigned by default");
 							defaultSize = 512;
 						} else {
 							defaultSize = Integer.parseInt(size);
+							if (forcePow2 && !ValueUtil.isPowerOfTwo(defaultSize)) {
+								OrccLogger.warn(
+										"The default buffer size value is not a pow of two value. It will be rounded");
+								defaultSize = roundPow2(defaultSize);
+							}
 						}
 					}
 
@@ -253,13 +311,15 @@ public class XmlBufferSizeConfiguration {
 			}
 
 		} catch (FileNotFoundException e) {
-			OrccLogger.severeln("Buffer size configuration file not found: "
-					+ e.getMessage());
+			OrccLogger.severeln("Buffer size configuration file not found: " + e.getMessage());
 		} catch (Exception e) {
-			OrccLogger
-					.severeln("Error parsing the buffer size configuration file: "
-							+ e.getMessage());
+			OrccLogger.severeln("Error parsing the buffer size configuration file: " + e.getMessage());
 		}
+	}
+
+	private int roundPow2(int value) {
+		double tmp = Math.log(value) / Math.log(2.0);
+		return (int) Math.pow(2, Math.ceil(tmp));
 	}
 
 	/**
@@ -291,8 +351,7 @@ public class XmlBufferSizeConfiguration {
 
 			writer.writeStartElement(XML_BXDF);
 			writer.writeAttribute(XML_NETWORK, networkName);
-			writer.writeAttribute(XML_DEFAULT_SIZE,
-					Integer.toString(defaultSize));
+			writer.writeAttribute(XML_DEFAULT_SIZE, Integer.toString(defaultSize));
 
 			// sort the xml connections
 			Collections.sort(connections);

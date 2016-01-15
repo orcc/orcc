@@ -191,17 +191,13 @@ public class CBackend extends AbstractBackend {
 			childrenTransfos.add(new DfVisitor<Void>(new DeadCodeElimination()));
 			childrenTransfos.add(new DfVisitor<Void>(new DeadVariableRemoval()));
 			childrenTransfos.add(new DfVisitor<Void>(new ListFlattener()));
-			childrenTransfos.add(new DfVisitor<Expression>(
-					new TacTransformation()));
-			childrenTransfos.add(new DfVisitor<CfgNode>(
-					new ControlFlowAnalyzer()));
-			childrenTransfos
-					.add(new DfVisitor<Void>(new InstPhiTransformation()));
+			childrenTransfos.add(new DfVisitor<Expression>(new TacTransformation()));
+			childrenTransfos.add(new DfVisitor<CfgNode>(new ControlFlowAnalyzer()));
+			childrenTransfos.add(new DfVisitor<Void>(new InstPhiTransformation()));
 			childrenTransfos.add(new DfVisitor<Void>(new EmptyBlockRemover()));
 			childrenTransfos.add(new DfVisitor<Void>(new BlockCombine()));
 
-			childrenTransfos.add(new DfVisitor<Expression>(new CastAdder(true,
-					true)));
+			childrenTransfos.add(new DfVisitor<Expression>(new CastAdder(true, true)));
 			childrenTransfos.add(new DfVisitor<Void>(new SSAVariableRenamer()));
 		}
 	}
@@ -229,8 +225,7 @@ public class CBackend extends AbstractBackend {
 
 		// Copy specific windows batch file
 		if (Platform.OS_WIN32.equals(Platform.getOS())) {
-			result.merge(FilesManager.extract(
-					"/runtime/C/run_cmake_with_VS_env.bat", outputPath));
+			result.merge(FilesManager.extract("/runtime/C/run_cmake_with_VS_env.bat", outputPath));
 		}
 
 		result.merge(FilesManager.extract("/runtime/C/libs", outputPath));
@@ -242,10 +237,8 @@ public class CBackend extends AbstractBackend {
 		result.merge(FilesManager.extract("/runtime/C/scripts", outputPath));
 
 		// Fix some permissions on scripts
-		new File(scriptsPath + File.separator + "profilingAnalyse.py")
-				.setExecutable(true);
-		new File(scriptsPath + File.separator + "benchAutoMapping.py")
-				.setExecutable(true);
+		new File(scriptsPath + File.separator + "profilingAnalyse.py").setExecutable(true);
+		new File(scriptsPath + File.separator + "benchAutoMapping.py").setExecutable(true);
 
 		return result;
 	}
@@ -260,10 +253,10 @@ public class CBackend extends AbstractBackend {
 		// if required, load the buffer size from the mapping file
 		if (getOption(IMPORT_BXDF, false)) {
 			File f = new File(getOption(BXDF_FILE, ""));
-			new XmlBufferSizeConfiguration().load(f, network);
+			new XmlBufferSizeConfiguration(true, true).load(f, network);
 		}
 
-		if(network.getVertex(network.getSimpleName()) != null) {
+		if (network.getVertex(network.getSimpleName()) != null) {
 			final StringBuilder warnMsg = new StringBuilder();
 			warnMsg.append('"').append(network.getSimpleName()).append('"');
 			warnMsg.append(" is the name of both the network you want to generate");
@@ -278,27 +271,22 @@ public class CBackend extends AbstractBackend {
 	@Override
 	protected Result doGenerateNetwork(Network network) {
 		networkPrinter.setNetwork(network);
-		return FilesManager.writeFile(networkPrinter.getNetworkFileContent(),
-				srcPath, network.getSimpleName() + ".c");
+		return FilesManager.writeFile(networkPrinter.getNetworkFileContent(), srcPath, network.getSimpleName() + ".c");
 	}
 
 	@Override
 	protected Result doAdditionalGeneration(Network network) {
 		cmakePrinter.setNetwork(network);
 		final Result result = Result.newInstance();
-		result.merge(FilesManager.writeFile(cmakePrinter.rootCMakeContent(),
-				outputPath, "CMakeLists.txt"));
-		result.merge(FilesManager.writeFile(cmakePrinter.srcCMakeContent(),
-				srcPath, "CMakeLists.txt"));
+		result.merge(FilesManager.writeFile(cmakePrinter.rootCMakeContent(), outputPath, "CMakeLists.txt"));
+		result.merge(FilesManager.writeFile(cmakePrinter.srcCMakeContent(), srcPath, "CMakeLists.txt"));
 
 		if (getOption(ENABLE_TRACES, true)) {
-			result.merge(FilesManager.writeFile(
-					tracesPrinter.getTracesFileContent(network), srcPath,
-					"traces.txt"));
+			result.merge(FilesManager.writeFile(tracesPrinter.getTracesFileContent(network), srcPath, "traces.txt"));
 		}
 
-		result.merge(FilesManager.writeFile(statsPrinter.getContent(network),
-				srcPath, network.getSimpleName() + ".csv"));
+		result.merge(
+				FilesManager.writeFile(statsPrinter.getContent(network), srcPath, network.getSimpleName() + ".csv"));
 
 		if (mergeActors) {
 			BroadcastMapper broadcastMapper = new BroadcastMapper();
@@ -306,8 +294,7 @@ public class CBackend extends AbstractBackend {
 		}
 
 		final Mapping mapper = new Mapping(network, mapping);
-		result.merge(FilesManager.writeFile(mapper.getContentFile(), srcPath,
-				network.getSimpleName() + ".xcf"));
+		result.merge(FilesManager.writeFile(mapper.getContentFile(), srcPath, network.getSimpleName() + ".xcf"));
 
 		return result;
 	}
@@ -321,8 +308,7 @@ public class CBackend extends AbstractBackend {
 	@Override
 	protected Result doGenerateInstance(Instance instance) {
 		instancePrinter.setInstance(instance);
-		return FilesManager.writeFile(instancePrinter.getFileContent(), srcPath,
-				instance.getSimpleName() + ".c");
+		return FilesManager.writeFile(instancePrinter.getFileContent(), srcPath, instance.getSimpleName() + ".c");
 	}
 
 	@Override
@@ -334,7 +320,6 @@ public class CBackend extends AbstractBackend {
 	@Override
 	protected Result doGenerateActor(Actor actor) {
 		instancePrinter.setActor(actor);
-		return FilesManager.writeFile(instancePrinter.getFileContent(), srcPath,
-				actor.getSimpleName() + ".c");
+		return FilesManager.writeFile(instancePrinter.getFileContent(), srcPath, actor.getSimpleName() + ".c");
 	}
 }
