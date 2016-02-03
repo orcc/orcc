@@ -32,6 +32,10 @@ import static net.sf.orcc.OrccLaunchConstants.MAPPING;
 import static net.sf.orcc.OrccLaunchConstants.PROJECT;
 import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -41,13 +45,10 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
-import net.sf.orcc.df.Instance;
-import net.sf.orcc.df.Network;
-import net.sf.orcc.df.transform.Instantiator;
-import net.sf.orcc.graph.Vertex;
-import net.sf.orcc.ui.OrccUiActivator;
-import net.sf.orcc.util.OrccUtil;
-import net.sf.orcc.util.util.EcoreHelper;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.events.XMLEvent;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -72,20 +73,39 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
+
+import net.sf.orcc.OrccException;
+import net.sf.orcc.df.Instance;
+import net.sf.orcc.df.Network;
+import net.sf.orcc.df.transform.Instantiator;
+import net.sf.orcc.graph.Vertex;
+import net.sf.orcc.ui.OrccUiActivator;
+import net.sf.orcc.util.OrccLogger;
+import net.sf.orcc.util.OrccUtil;
+import net.sf.orcc.util.util.EcoreHelper;
 
 /**
  * This class defines a tab for mapping a network onto an architecture.
  * 
  * @author Matthieu Wipliez
  * @author Herve Yviquel
+ * @author Endri Bezati
  * 
  */
 public class MappingTab extends AbstractLaunchConfigurationTab {
@@ -112,8 +132,7 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 		public Object[] getElements(Object inputElement) {
 			if (inputElement instanceof Network) {
 				Network network = (Network) inputElement;
-				EList<Vertex> vertices = new BasicEList<Vertex>(
-						network.getChildren());
+				EList<Vertex> vertices = new BasicEList<Vertex>(network.getChildren());
 				return vertices.toArray();
 			}
 			return new Object[0];
@@ -209,8 +228,7 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 	 * @author Matthieu Wipliez
 	 * 
 	 */
-	private class TreeLabelProvider extends LabelProvider implements
-			ITableLabelProvider {
+	private class TreeLabelProvider extends LabelProvider implements ITableLabelProvider {
 
 		@Override
 		public Image getColumnImage(Object element, int columnIndex) {
@@ -252,8 +270,7 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 					Network subNetwork = entity.getAdapter(Network.class);
 					getComponents(components, subNetwork);
 				} else {
-					String component = mapping.get(instance
-							.getHierarchicalName());
+					String component = mapping.get(instance.getHierarchicalName());
 					if (component != null) {
 						components.add(component);
 					}
@@ -269,15 +286,156 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 
 	}
 
+	/**
+	 * This class defines an XCF XML parser
+	 * 
+	 * @author Endri Bezati
+	 *
+	 */
+	private static class XcfParser {
+		public static final String ACTOR = "Instance";
+		public static final String ACTOR_ID = "id";
+		public static final String PARTITION = "Partition";
+		public static final String PARTITION_ID = "id";
+
+		Map<String, String> parse(String fileName) {
+			Map<String, String> xcfMapping = new HashMap<String, String>();
+			File file = new File(fileName);
+			XMLStreamReader reader = null;
+			try {
+				InputStream stream = new BufferedInputStream(new FileInputStream(file));
+				reader = XMLInputFactory.newInstance().createXMLStreamReader(stream);
+			} catch (Exception e) {
+				// Do nothing
+			}
+
+			String component = null;
+			String actor = null;
+			try {
+				try {
+					while (reader.hasNext()) {
+						reader.next();
+						switch (reader.getEventType()) {
+						case XMLEvent.START_ELEMENT: {
+							String xmlElement = reader.getName().toString();
+							if (xmlElement.equals(PARTITION)) {
+								component = reader.getAttributeValue("", PARTITION_ID);
+								if (component == null) {
+									throw new OrccException("Parsing error in \"" + file.getAbsolutePath()
+											+ "\": component name specified. Line "
+											+ reader.getLocation().getLineNumber());
+								}
+							} else if (xmlElement.equals(ACTOR)) {
+								actor = reader.getAttributeValue("", ACTOR_ID);
+								if (actor == null) {
+									throw new OrccException("Parsing error in \"" + file.getAbsolutePath()
+											+ "\": actor name not specified. Line "
+											+ reader.getLocation().getLineNumber());
+								}
+
+								xcfMapping.put(actor, component);
+							}
+							break;
+						}
+						case XMLEvent.END_ELEMENT: {
+							String xmlElement = reader.getName().toString();
+							if (xmlElement.equals(PARTITION)) {
+								component = null;
+							} else if (xmlElement.equals(ACTOR)) {
+								actor = null;
+							}
+							break;
+						}
+						}
+					}
+				} catch (XMLStreamException e1) {
+					e1.printStackTrace();
+				}
+				try {
+					reader.close();
+				} catch (Exception e) {
+					OrccLogger.warnln("File \"%s\" has not been properly closed" + file);
+				}
+			} catch (OrccException e) {
+				OrccLogger.warnln("Error parsing the XML file");
+
+			}
+
+			// Give the hierarchical name
+			Map<String, String> hierarchicalMapping = new HashMap<String, String>();
+			for (Vertex child : network.getChildren()) {
+				Instance instance = child.getAdapter(Instance.class);
+				if (instance != null) {
+					for (String key : xcfMapping.keySet()) {
+						if (instance.getHierarchicalName().contains(key)) {
+							hierarchicalMapping.put(instance.getHierarchicalName(), xcfMapping.get(key));
+						}
+					}
+				}
+			}
+
+			for (Network subNetwork : network.getAllNetworks()) {
+				for (Vertex child : subNetwork.getChildren()) {
+					Instance instance = child.getAdapter(Instance.class);
+					if (instance != null) {
+						for (String key : xcfMapping.keySet()) {
+							if (instance.getHierarchicalName().contains(key)) {
+								hierarchicalMapping.put(instance.getHierarchicalName(), xcfMapping.get(key));
+							}
+						}
+					}
+				}
+			}
+
+			return hierarchicalMapping;
+		}
+
+	}
+
+	private static Network network;
+
 	private IContentProvider contentProvider;
 
 	private ITableLabelProvider labelProvider;
 
 	private Map<String, String> mapping;
 
-	private Network network;
+	private Text text;
+
+	private String value;
 
 	private TreeViewer viewer;
+
+	/**
+	 * Browses the file system.
+	 * 
+	 * @param shell
+	 *            a shell
+	 */
+	private void browseFileSystem(Shell shell) {
+		String file;
+
+		FileDialog dialog = new FileDialog(shell, SWT.OPEN);
+
+		String extension = "*.xcf";
+		if (extension != null) {
+			dialog.setFilterExtensions(new String[] { extension });
+		}
+
+		// set initial directory
+		dialog.setFilterPath(value);
+
+		file = dialog.open();
+
+		if (file != null) {
+			text.setText(file);
+		}
+		XcfParser parser = new XcfParser();
+		mapping = parser.parse(file);
+
+		viewer.refresh();
+		updateLaunchConfigurationDialog();
+	}
 
 	@Override
 	public void createControl(Composite parent) {
@@ -295,13 +453,13 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 
 		createLabel(composite);
 		createTreeViewer(composite);
+		createXCFInputFile(composite);
 	}
 
 	private void createLabel(Composite composite) {
 		String html = "Warning: the mapping feature is experimental and likely to evolve.\n"
 				+ "Furthermore, the name of the components is implementation-specific, "
-				+ "and is likely to change in the future.\n"
-				+ "A component should be named like an identifier"
+				+ "and is likely to change in the future.\n" + "A component should be named like an identifier"
 				+ " (only letters, digits, underscore allowed).\n\n";
 
 		Label label = new Label(composite, SWT.NONE);
@@ -318,8 +476,7 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 	 * @param composite
 	 */
 	private void createTreeViewer(Composite composite) {
-		Tree tree = new Tree(composite, SWT.BORDER | SWT.SINGLE | SWT.H_SCROLL
-				| SWT.V_SCROLL);
+		Tree tree = new Tree(composite, SWT.BORDER | SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL);
 		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
 		tree.setLayoutData(data);
 
@@ -344,6 +501,47 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 		viewer.setLabelProvider(labelProvider);
 	}
 
+	private void createXCFInputFile(Composite composite) {
+		Composite comp = new Composite(composite, SWT.NONE);
+		comp.setLayout(new GridLayout(3, false));
+		GridData data = new GridData(SWT.FILL, SWT.TOP, true, false);
+		data.horizontalSpan = 3;
+		comp.setLayoutData(data);
+
+		Font font = composite.getFont();
+		Label lbl = new Label(comp, SWT.NONE);
+		lbl.setFont(font);
+		lbl.setText("XCF Mapping File" + ":");
+		lbl.setToolTipText("An XCF Mapping file containing the mapping configuration.");
+		data = new GridData(SWT.LEFT, SWT.CENTER, false, false);
+		lbl.setLayoutData(data);
+
+		text = new Text(comp, SWT.BORDER | SWT.SINGLE);
+		text.setFont(font);
+		data = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		text.setLayoutData(data);
+		text.setText("");
+		text.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent e) {
+				value = text.getText();
+
+			}
+		});
+
+		Button buttonBrowse = new Button(comp, SWT.PUSH);
+		buttonBrowse.setFont(font);
+		data = new GridData(SWT.FILL, SWT.CENTER, false, false);
+		buttonBrowse.setLayoutData(data);
+		buttonBrowse.setText("&Browse...");
+		buttonBrowse.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				browseFileSystem(composite.getShell());
+			}
+		});
+	}
+
 	@Override
 	public Image getImage() {
 		return OrccUiActivator.getImage("icons/orcc.png");
@@ -359,16 +557,14 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 	public void initializeFrom(ILaunchConfiguration configuration) {
 		IFile xdfFile = null;
 		try {
-			mapping = new HashMap<String, String>(configuration.getAttribute(
-					MAPPING, Collections.EMPTY_MAP));
+			mapping = new HashMap<String, String>(configuration.getAttribute(MAPPING, Collections.EMPTY_MAP));
 
 			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 			String name = configuration.getAttribute(PROJECT, "");
 			if (root.getFullPath().isValidSegment(name)) {
 				IProject project = root.getProject(name);
 				if (project.exists()) {
-					xdfFile = OrccUtil.getFile(project,
-							configuration.getAttribute(XDF_FILE, ""),
+					xdfFile = OrccUtil.getFile(project, configuration.getAttribute(XDF_FILE, ""),
 							OrccUtil.NETWORK_SUFFIX);
 				}
 			}
@@ -420,8 +616,7 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 	@Override
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
 		if (isValid(configuration)) {
-			configuration.setAttribute(MAPPING, new HashMap<String, String>(
-					mapping));
+			configuration.setAttribute(MAPPING, new HashMap<String, String>(mapping));
 		}
 	}
 
