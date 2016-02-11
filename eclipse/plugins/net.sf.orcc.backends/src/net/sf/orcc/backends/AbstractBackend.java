@@ -313,6 +313,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			if (network == null) {
 				throw new OrccRuntimeException("The input file seems to not contains any network");
 			}
+			
+			beforeTransformations(network);
 
 			if (!networkTransfos.isEmpty()) {
 				stopIfRequested();
@@ -415,7 +417,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		// After Code generation for Network
 		// -----------------------------------------------------
 		afterGeneration(network);
-	
+
 		OrccLogger.traceln("Orcc backend done.");
 	}
 
@@ -448,6 +450,16 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 * @param network
 	 */
 	protected void beforeGeneration(final Network network) {
+		// Does nothing by default
+	}
+
+	/**
+	 * Callback called before network transformations. It can be used to perform
+	 * initial validations, or other operations at network level.
+	 * 
+	 * @param network
+	 */
+	protected void beforeTransformations(final Network network) {
 		// Does nothing by default
 	}
 
