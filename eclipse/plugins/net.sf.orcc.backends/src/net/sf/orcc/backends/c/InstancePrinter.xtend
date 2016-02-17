@@ -325,7 +325,6 @@ class InstancePrinter extends CTemplate {
 			// Output Fifo control variables
 			«FOR port : actor.outputs.filter[! native]»
 				static unsigned int index_«port.name»;
-				static unsigned int numFree_«port.name»;
 				#define NUM_READERS_«port.name» «outgoingPortMap.get(port).size»
 				#define SIZE_«port.name» «outgoingPortMap.get(port).get(0).sizeOrDefaultSize»
 				#define tokens_«port.name» «port.fullName»->contents
@@ -778,7 +777,6 @@ class InstancePrinter extends CTemplate {
 	def protected writeTokensFunctions(Port port) '''
 		static void write_«port.name»() {
 			index_«port.name» = «port.fullName»->write_ind;
-			numFree_«port.name» = index_«port.name» + fifo_«port.type.doSwitch»_get_room(«port.fullName», NUM_READERS_«port.name», SIZE_«port.name»);
 		}
 
 		static void write_end_«port.name»() {
