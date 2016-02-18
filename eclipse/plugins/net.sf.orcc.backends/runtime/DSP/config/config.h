@@ -16,4 +16,10 @@
 #define HAVE_SSE42   OFF
 #define HAVE_SSSE3   OFF
 
+#define OPENHEVC_ENABLE 0
+
+#define NMETODO_ENABLE
+
+#define XPFCMD (*(volatile unsigned int*)0x08000300)
+
 #endif /* ORCC_CONFIG_H */
