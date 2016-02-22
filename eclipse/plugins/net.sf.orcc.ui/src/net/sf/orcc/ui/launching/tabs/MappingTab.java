@@ -501,7 +501,7 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 		viewer.setLabelProvider(labelProvider);
 	}
 
-	private void createXCFInputFile(Composite composite) {
+	private void createXCFInputFile(final Composite composite) {
 		Composite comp = new Composite(composite, SWT.NONE);
 		comp.setLayout(new GridLayout(3, false));
 		GridData data = new GridData(SWT.FILL, SWT.TOP, true, false);
