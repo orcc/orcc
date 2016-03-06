@@ -24,4 +24,5 @@ Export-Package: net.sf.orcc.cal.ui,
  net.sf.orcc.cal.ui.contentassist.antlr,
  net.sf.orcc.cal.ui.internal,
  net.sf.orcc.cal.ui.contentassist,
- net.sf.orcc.cal.ui.quickfix
+ net.sf.orcc.cal.ui.quickfix,
+ net.sf.orcc.cal.ui.contentassist.antlr.internal
