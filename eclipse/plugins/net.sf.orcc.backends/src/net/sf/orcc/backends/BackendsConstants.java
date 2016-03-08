@@ -76,5 +76,6 @@ public class BackendsConstants {
 	public static final String PAPIFY_MULTIPLEX = "net.sf.orcc.backends.papify.multiplex";
 	
 	public static final String GEN_WEIGHTS = "net.sf.orcc.backends.genWeights";
+	public static final String GEN_WEIGHTS_LSQR = "net.sf.orcc.backends.genWeightsLSQR";
 
 }

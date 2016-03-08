@@ -112,6 +112,7 @@ class InstancePrinter extends CTemplate {
 	var Iterable<String> papiEvents
 
 	var boolean genWeights = false
+	var boolean genWeightsLSQR = false
 	var boolean genWeightsExit = false
 	var Action genWeightsExitAction = null
 	var String genWeightsExitCond = null	
@@ -153,7 +154,11 @@ class InstancePrinter extends CTemplate {
 
 		if(options.containsKey(GEN_WEIGHTS)){
 			genWeights = options.get(GEN_WEIGHTS) as Boolean;
-		}		
+		}
+		
+		if(options.containsKey(GEN_WEIGHTS_LSQR)){
+			genWeightsLSQR = options.get(GEN_WEIGHTS_LSQR) as Boolean;
+		}
 	}
 
 	def getInstanceContent(Instance instance) {
@@ -818,6 +823,8 @@ class InstancePrinter extends CTemplate {
 			«IF genWeightsExit && genWeightsExitAction.identityEquals(action)»
 				FILE *fpGenWeightsStats = NULL;
 				char fnGenWeightsStats[FILENAME_MAX];
+				int useLSQR = «IF genWeightsLSQR»1«ELSE»0«ENDIF»;
+				char varianceOrRcc[10] = "«IF genWeightsLSQR»rcc«ELSE»var«ENDIF»";
 			«ENDIF»
 			«IF debugActor || debugAction»
 				printf("-- «entityName»: «action.name»«IF isAligned» (aligned)«ENDIF»\n");
@@ -988,11 +995,13 @@ class InstancePrinter extends CTemplate {
 	def protected printCalcGenWeightsInstanceStats(Actor actor) '''
 		fprintf(fpGenWeightsStats, "\t<actor id=\"«actor.name»\">\n");
 		«FOR action : actor.actions»
-			calcWeightStats(rdtsc_data_«actor.name»_«action.name»);
-			fprintf(fpGenWeightsStats, "\t\t<action id=\"«action.name»\" clockcycles=\"%Lf\" clockcycles-min=\"%"PRIu64"\" clockcycles-max=\"%"PRIu64"\" firings=\"%"PRIu64"\"/>\n", 
+			calcWeightStats(rdtsc_data_«actor.name»_«action.name», useLSQR);
+			fprintf(fpGenWeightsStats, "\t\t<action id=\"«action.name»\" clockcycles=\"%Lf\" clockcycles-min=\"%Lf\" clockcycles-max=\"%Lf\" clockcycles-%s=\"%Lf\" firings=\"%"PRIu64"\"/>\n", 
 				rdtsc_data_«actor.name»_«action.name»->_avgWeight, 
 				(rdtsc_data_«actor.name»_«action.name»->_numFirings > 0)?rdtsc_data_«actor.name»_«action.name»->_minWeight:0, 
 				rdtsc_data_«actor.name»_«action.name»->_maxWeight,
+				varianceOrRcc,
+				rdtsc_data_«actor.name»_«action.name»->_variance, 
 				rdtsc_data_«actor.name»_«action.name»->_numFirings);
 
 		«ENDFOR»

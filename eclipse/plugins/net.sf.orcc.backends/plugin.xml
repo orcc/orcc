@@ -475,7 +475,14 @@
                description="A xml file is generated giving the min, max and average weights (as number of clock cycles) for each action. These weights are calculated by profiling only computational part of each action using Intel RDTSC/RDTSCP instructions. This output file can be used as weights file needed for various automated analysis options provided by TURNUS."
                id="net.sf.orcc.backends.genWeights"
                name="genWeights: Generate execution based weights on Intel platforms.">
-            <checkBox></checkBox>
+            <checkBox>
+               <option
+                     defaultValue="false"
+                     description="Apply LSQR filter to eliminate the lay-overs in profiling results of each action."
+                     id="net.sf.orcc.backends.genWeightsLSQR"
+                     name="Apply LSQR filtering to profiling results.">
+                  <checkBox></checkBox>
+               </option></checkBox>
          </option>
    </extension>
    <extension

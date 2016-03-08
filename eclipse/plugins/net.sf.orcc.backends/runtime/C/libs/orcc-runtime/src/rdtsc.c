@@ -1,34 +1,106 @@
 #include <stdlib.h>
 #include <inttypes.h>
 #include <stdint.h>
+#include <math.h>
 #include "rdtsc.h"
 
-inline void saveNewFiringWeight(rdtsc_data_t *x, uint64_t weight) {
+inline void saveNewFiringWeight(rdtsc_data_t *llist, uint64_t weight) {
 	rdtsc_node_t *y = (rdtsc_node_t *) malloc(sizeof(rdtsc_node_t *));
 	y->_weight = weight;
 	y->_next = NULL;
 
-	if(x->_head == NULL)
-		x->_head = x->_currNode = y;
+	if(llist->_head == NULL)
+		llist->_head = llist->_currNode = y;
 	else
-		x->_currNode = x->_currNode->_next = y;
+		llist->_currNode = llist->_currNode->_next = y;
 
-	x->_numFirings++;
+	llist->_numFirings++;
 }
 
-inline void calcWeightStats(rdtsc_data_t *x) {
-	rdtsc_node_t *y = x->_head;
+inline static uint64_t sqr(uint64_t x) {
+	return x*x;
+}
+
+inline void calVariance(rdtsc_data_t *llist) {
+	rdtsc_node_t *y = llist->_head;
+	uint64_t counter = 0;
+	long double tmp = 0.0, variance = 0.0;
+
+	while(y != NULL) {
+		tmp = y->_weight - llist->_avgWeight;
+		variance += tmp * tmp;
+
+		y = y->_next;
+		counter++;
+	}
+
+	// Variance
+	llist->_variance = variance / counter;
+}
+
+inline void calcWeightLSQR(rdtsc_data_t *llist)
+{
+	rdtsc_node_t *y = llist->_head;
+	uint64_t i = 0;
+
+	long double slope = 0.0, intercept = 0.0, rcc = 0.0, d1 = 0.0, d2 = 0.0;
+
+	long double sumx = 0.0; /* sum of x                      */
+	long double sumx2 = 0.0; /* sum of x**2                   */
+	long double sumxy = 0.0; /* sum of x * y                  */
+	long double sumy = 0.0; /* sum of y                      */
+	long double sumy2 = 0.0; /* sum of y**2                   */
+	long double denom;
+
+	while(y != NULL) {
+		sumx += i;
+		sumx2 += sqr(i);
+		sumxy += i * y->_weight;
+		sumy += y->_weight;
+		sumy2 += sqr(y->_weight);
+
+		y = y->_next;
+		i++;
+	}
+
+	denom = (i * sumx2 - sqr(sumx));
+	if (denom == 0.0) {
+		// singular matrix. can't solve the problem.
+		slope = 0;
+		intercept = 0;
+		rcc = 0;
+		return;
+	}
+
+	slope = (i * sumxy - sumx * sumy) / denom;
+	intercept = (sumy * sumx2 - sumx * sumxy) / denom;
+
+	rcc = (sumxy - sumx * sumy / i) / /* compute correlation coeff */
+	sqrt((sumx2 - sqr(sumx)/i) * (sumy2 - sqr(sumy)/i));
+
+	d1 = intercept;
+	d2 = intercept + slope*(i - 1);
+
+	llist->_maxWeight = d1 > d2 ? d1 : d2;
+	llist->_minWeight = d1 < d2 ? d1 : d2;
+	llist->_avgWeight = intercept + slope*(i-1)/2.0;
+	llist->_variance = rcc;
+}
+
+inline void calcWeightSimple(rdtsc_data_t *llist) {
+	rdtsc_node_t *y = llist->_head;
 	uint64_t counter = 0;
 	uint64_t sumWeights = 0;
+	long double variance = 0.0;
 
 	while(y != NULL) {
 		// Minimum
-		if(y->_weight < x->_minWeight)
-			x->_minWeight = y->_weight;
+		if(y->_weight < llist->_minWeight)
+			llist->_minWeight = (long double) y->_weight;
 
 		// Maximum
-		if(y->_weight > x->_maxWeight)
-			x->_maxWeight = y->_weight;
+		if(y->_weight > llist->_maxWeight)
+			llist->_maxWeight = (long double) y->_weight;
 
 		// Sum up for average.
 		sumWeights += y->_weight;
@@ -38,11 +110,24 @@ inline void calcWeightStats(rdtsc_data_t *x) {
 	}
 
 	// Average
-	x->_avgWeight = ((counter > 0) ? sumWeights / (long double) counter : 0.0);
+	llist->_avgWeight = ((counter > 0) ? sumWeights / (long double) counter : 0.0);
+
+	if(counter > 1)
+		calVariance(llist);
+	else
+		llist->_variance = 0.0;
 }
 
-inline void printFiringcWeights(rdtsc_data_t *x, FILE *fp) {
-	rdtsc_node_t *y = x->_head;
+
+inline void calcWeightStats(rdtsc_data_t *llist, int useLSQR) {
+	if(useLSQR)
+		calcWeightLSQR(llist);
+	else
+		calcWeightSimple(llist);
+}
+
+inline void printFiringcWeights(rdtsc_data_t *llist, FILE *fp) {
+	rdtsc_node_t *y = llist->_head;
 	uint64_t counter = 0;
 
 	while(y != NULL) {
