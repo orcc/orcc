@@ -28,12 +28,13 @@
  */
 package net.sf.orcc.cal.ui.builder;
 
-import net.sf.orcc.cal.generator.CalGenerator;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.xtext.builder.BuilderParticipant;
+import org.eclipse.xtext.generator.GeneratorDelegate;
 import org.eclipse.xtext.generator.IGenerator;
+
+import net.sf.orcc.cal.generator.CalGenerator;
 
 /**
  * Hack the default BuilderParticipant to call methods at the beginning and the
@@ -45,18 +46,27 @@ import org.eclipse.xtext.generator.IGenerator;
 public class CalBuilder extends BuilderParticipant {
 
 	@Override
-	public void build(IBuildContext context, IProgressMonitor monitor)
-			throws CoreException {
+	public void build(IBuildContext context, IProgressMonitor monitor) throws CoreException {
 
 		final IGenerator generator = getGenerator();
-		if (generator instanceof CalGenerator) {
-			((CalGenerator) generator).beforeBuild(context.getBuiltProject(),
-					context.getResourceSet());
+		if (generator instanceof GeneratorDelegate) {
+			GeneratorDelegate generatorDelegate = (GeneratorDelegate) generator;
+			if (generatorDelegate.getLegacyGenerator() instanceof CalGenerator) {
+				((CalGenerator) generatorDelegate.getLegacyGenerator()).beforeBuild(context.getBuiltProject(),
+						context.getResourceSet());
+			}
+		} else if (generator instanceof CalGenerator) {
+			((CalGenerator) generator).beforeBuild(context.getBuiltProject(), context.getResourceSet());
 		}
 
 		super.build(context, monitor);
 
-		if (generator instanceof CalGenerator) {
+		if (generator instanceof GeneratorDelegate) {
+			GeneratorDelegate generatorDelegate = (GeneratorDelegate) generator;
+			if (generatorDelegate.getLegacyGenerator() instanceof CalGenerator) {
+				((CalGenerator) generatorDelegate.getLegacyGenerator()).afterBuild();
+			}
+		} else if (generator instanceof CalGenerator) {
 			((CalGenerator) generator).afterBuild();
 		}
 	}
