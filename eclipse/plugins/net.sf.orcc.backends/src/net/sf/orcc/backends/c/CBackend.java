@@ -67,6 +67,7 @@ import net.sf.orcc.df.transform.BroadcastRemover;
 import net.sf.orcc.df.transform.FifoSizePropagator;
 import net.sf.orcc.df.transform.Instantiator;
 import net.sf.orcc.df.transform.NetworkFlattener;
+import net.sf.orcc.df.transform.SharedVarsDetection;
 import net.sf.orcc.df.transform.TypeResizer;
 import net.sf.orcc.df.transform.UnitImporter;
 import net.sf.orcc.df.util.DfVisitor;
@@ -156,7 +157,8 @@ public class CBackend extends AbstractBackend {
 		}
 		networkTransfos.add(new ArgumentEvaluator());
 		networkTransfos.add(new TypeResizer(true, false, true, false));
-		networkTransfos.add(new RenameTransformation(getRenameMap()));
+		networkTransfos.add(new RenameTransformation(getRenameMap()));		
+		networkTransfos.add(new SharedVarsDetection());
 
 		// -------------------------------------------------------------------
 		// Transformations that will be applied on children (instances/actors)

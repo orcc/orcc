@@ -38,6 +38,8 @@ import net.sf.orcc.graph.Vertex
 
 import static net.sf.orcc.backends.BackendsConstants.*
 import static net.sf.orcc.util.OrccAttributes.*
+import java.util.HashSet
+import net.sf.orcc.ir.Var
 
 /**
  * Generate and print network source file for C backend.
@@ -182,7 +184,14 @@ class NetworkPrinter extends CTemplate {
 		// Declaration of the network
 		network_t network = {"«network.name»", actors, connections, «network.allActors.size», «network.connections.size»};
 		
-		
+		«IF network.hasAttribute("network_shared_variables")»
+			/////////////////////////////////////////////////
+			// Shared Variables
+			«FOR v : network.getAttribute("network_shared_variables").objectValue as HashSet<Var>»
+				«v.type.doSwitch» «v.name»«FOR dim : v.type.dimensions»[«dim»]«ENDFOR»;
+			«ENDFOR»
+
+		«ENDIF»
 		////////////////////////////////////////////////////////////////////////////////
 		// Main
 		int main(int argc, char *argv[]) {

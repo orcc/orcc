@@ -69,6 +69,7 @@ import static net.sf.orcc.OrccLaunchConstants.*
 import static net.sf.orcc.backends.BackendsConstants.*
 import static net.sf.orcc.util.OrccAttributes.*
 import net.sf.orcc.df.Network
+import java.util.HashSet
 
 /**
  * Generate and print instance source file for C backend.
@@ -283,6 +284,14 @@ class InstancePrinter extends CTemplate {
 		// Instance
 		extern actor_t «entityName»;
 
+		«IF actor.hasAttribute("actor_shared_variables")»
+			////////////////////////////////////////////////////////////////////////////////
+			// Shared Variables
+			«FOR v : actor.getAttribute("actor_shared_variables").objectValue as HashSet<Var>»
+				extern «v.type.doSwitch» «v.name»«FOR dim : v.type.dimensions»[«dim»]«ENDFOR»;
+			«ENDFOR»
+			
+		«ENDIF»
 		«IF !actor.inputs.nullOrEmpty»
 			////////////////////////////////////////////////////////////////////////////////
 			// Input FIFOs
@@ -391,7 +400,7 @@ class InstancePrinter extends CTemplate {
 		«IF !actor.stateVars.nullOrEmpty»
 			////////////////////////////////////////////////////////////////////////////////
 			// State variables of the actor
-			«FOR variable : actor.stateVars»
+			«FOR variable : actor.stateVars.filter[!hasAttribute("shared")]»
 				«variable.declare»
 			«ENDFOR»
 
