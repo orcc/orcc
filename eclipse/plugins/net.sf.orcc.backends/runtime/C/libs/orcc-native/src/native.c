@@ -28,17 +28,8 @@
  */
 
 #include "native.h"
-#include "openhevc_sse.h"
-#include "hevc_sse.h"
-
 
 int init_native_context()
 {
-#ifdef OPENHEVC_ENABLE
-    openhevc_init_context();
-#endif
-#if defined (SSE_ENABLE) && defined (__SSE2__)
-    sse_init_context();
-#endif // SSE_ENABLE
     return 0;
 }

@@ -107,18 +107,9 @@ option(USE_SSE "Use SSE native functions if available" 0)
 if(USE_SSE)
     message(STATUS "Enable SSE optimizations")
     list(APPEND extra_definitions -DSSE_ENABLE)
-    list(APPEND orcc_native_sources
-        src/hevc_sse.c
-        src/hevc_idct_sse4.c
-        src/hevc_intra_pred_sse.c
-        src/hevc_mc_sse.c
-    )
-    list(APPEND orcc_native_headers include/hevc_sse.h)
 
     if(OPENHEVC_FOUND)
         list(APPEND extra_definitions -DOPENHEVC_ENABLE)
-        list(APPEND orcc_native_sources src/openhevc_sse.c)
-    	list(APPEND orcc_native_headers include/openhevc_sse.h)
     endif()
 endif()
 
