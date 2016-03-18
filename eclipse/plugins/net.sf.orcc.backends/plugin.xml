@@ -477,10 +477,17 @@
                name="genWeights: Generate execution based weights on Intel platforms.">
             <checkBox>
                <option
+                     defaultValue="true"
+                     description="Remove outliers (with a Gaussian filter) from profiling results of each action."
+                     id="net.sf.orcc.backends.genWeightsFltr"
+                     name="Remove outliers (with a Gaussian filter).">
+                  <checkBox></checkBox>
+               </option>
+               <option
                      defaultValue="false"
-                     description="Apply LSQR filter to eliminate the lay-overs in profiling results of each action."
-                     id="net.sf.orcc.backends.genWeightsLSQR"
-                     name="Apply LSQR filtering to profiling results.">
+                     description="Dump individual weights for all firings. of all actors/actions."
+                     id="net.sf.orcc.backends.genWeightsDump"
+                     name="Dump individual weights for all firings.">
                   <checkBox></checkBox>
                </option></checkBox>
          </option>
