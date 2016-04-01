@@ -191,4 +191,14 @@ abstract class CTemplate extends CommonPrinter {
 	def protected toExpression(Instruction instruction) {
 		instruction.doSwitch.toString.replaceAll("([^;]+);(\\s+)?", "$1")
 	}
+	
+	def protected printNativeLibHeaders(String linkNativeLibHeaders) {
+	'''
+		// -- Native lib headers
+		«FOR header : linkNativeLibHeaders.split(";")»
+			#include "«header.trim()»"
+		«ENDFOR»
+		
+	'''
+	}	
 }

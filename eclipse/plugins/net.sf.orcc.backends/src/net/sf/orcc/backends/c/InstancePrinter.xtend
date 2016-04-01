@@ -119,6 +119,9 @@ class InstancePrinter extends CTemplate {
 	var Action genWeightsExitAction = null
 	var String genWeightsExitCond = null	
 	
+	var boolean linkNativeLib
+	var String linkNativeLibHeaders
+
 	protected val Pattern inputPattern = DfFactory::eINSTANCE.createPattern
 	protected val Map<State, Pattern> transitionPattern = new HashMap<State, Pattern>
 
@@ -157,13 +160,16 @@ class InstancePrinter extends CTemplate {
 		if(options.containsKey(GEN_WEIGHTS)){
 			genWeights = options.get(GEN_WEIGHTS) as Boolean;
 		}
-		
 		if(options.containsKey(GEN_WEIGHTS_FILTER)){
 			genWeightsFilter = options.get(GEN_WEIGHTS_FILTER) as Boolean;
 		}
-
 		if(options.containsKey(GEN_WEIGHTS_DUMP)){
 			genWeightsDump = options.get(GEN_WEIGHTS_DUMP) as Boolean;
+		}
+
+		if(options.containsKey(LINK_NATIVE_LIBRARY)) {
+			linkNativeLib = options.get(LINK_NATIVE_LIBRARY) as Boolean;
+			linkNativeLibHeaders = options.get(LINK_NATIVE_LIBRARY_HEADERS) as String;
 		}
 	}
 
@@ -252,7 +258,7 @@ class InstancePrinter extends CTemplate {
 		«IF checkArrayInbounds»
 			#include <assert.h>
 		«ENDIF»
-		#include "config.h"
+		#include "orcc_config.h"
 
 		#include "types.h"
 		#include "fifo.h"
@@ -272,12 +278,17 @@ class InstancePrinter extends CTemplate {
 		«IF profile»
 			#include "profiling.h"
 		«ENDIF»
+		
 		«IF genWeights»
 			#include "rdtsc.h"
 			#include "options.h"
 			#include <libgen.h>
-		«ENDIF»
 
+		«ENDIF»
+		«IF linkNativeLib && linkNativeLibHeaders != ""»
+		«printNativeLibHeaders(linkNativeLibHeaders)»
+
+		«ENDIF»
 		#define SIZE «fifoSize»
 		«IF instance != null»
 			«instance.printAttributes»

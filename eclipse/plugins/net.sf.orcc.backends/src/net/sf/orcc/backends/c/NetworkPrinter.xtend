@@ -113,7 +113,7 @@ class NetworkPrinter extends CTemplate {
 			
 		«ENDIF»
 		«IF linkNativeLib && linkNativeLibHeaders != ""»
-		«nativeLibHeaders»
+		«printNativeLibHeaders(linkNativeLibHeaders)»
 
 		«ENDIF»
 		
@@ -276,15 +276,4 @@ class NetworkPrinter extends CTemplate {
 		«ENDIF»
 	«ENDIF»
 	'''
-
-	def getNativeLibHeaders() {
-	'''
-		// -- Native lib headers
-		«FOR header : linkNativeLibHeaders.split(";")»
-			#include "«header.trim()»"
-		«ENDFOR»
-		
-	'''
-	}
-
 }
