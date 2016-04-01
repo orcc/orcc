@@ -100,7 +100,7 @@ inline void calcWeightStats(rdtsc_data_t *llist, int useFilter) {
 	{
 		calcMean(llist);
 		calcVariance(llist);
-		threshold = llist->_avgWeight + 2 * sqr(llist->_variance);
+		threshold = llist->_avgWeight + 2 * sqrt(llist->_variance);
 	}
 
 	calcWeightSimple(llist, threshold);
