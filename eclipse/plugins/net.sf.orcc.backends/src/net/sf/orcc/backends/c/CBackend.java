@@ -279,6 +279,7 @@ public class CBackend extends AbstractBackend {
 	@Override
 	protected Result doAdditionalGeneration(Network network) {
 		cmakePrinter.setNetwork(network);
+		cmakePrinter.setOptions(getOptions());
 		final Result result = Result.newInstance();
 		result.merge(FilesManager.writeFile(cmakePrinter.rootCMakeContent(), outputPath, "CMakeLists.txt"));
 		result.merge(FilesManager.writeFile(cmakePrinter.srcCMakeContent(), srcPath, "CMakeLists.txt"));

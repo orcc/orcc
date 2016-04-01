@@ -40,6 +40,9 @@
          <option
                id="net.sf.orcc.backends.genWeights">
          </option>
+         <option
+               id="net.sf.orcc.backends.linkNativeLibrary">
+         </option>
       </backend>
       <backend
             class="net.sf.orcc.backends.c.compa.COMPABackend"
@@ -489,6 +492,30 @@
                      id="net.sf.orcc.backends.genWeightsDump"
                      name="Dump individual weights for all firings.">
                   <checkBox></checkBox>
+               </option></checkBox>
+         </option>
+         <option
+               defaultValue="false"
+               description="Link with a native library containing native functions"
+               id="net.sf.orcc.backends.linkNativeLibrary"
+               name="Link with a native library containing native functions">
+            <checkBox>
+               <option
+                     description="Path to native library folder containing CMakeLists.txt."
+                     id="net.sf.orcc.backends.linkNativeLibraryFolder"
+                     name="Path to native library folder containing CMakeLists.txt.">
+                  <browseFile
+                        folder="true"
+                        workspace="false">
+                  </browseFile>
+               </option>
+               <option
+                     description="Names of the header files (separated by &apos;;&apos;) containing all prototypes."
+                     id="net.sf.orcc.backends.linkNativeLibraryHeaders"
+                     name="Names of the header files (separated by &apos;;&apos;) containing all prototypes.">
+                  <textBox>
+                     textBox body text
+                  </textBox>
                </option></checkBox>
          </option>
    </extension>
