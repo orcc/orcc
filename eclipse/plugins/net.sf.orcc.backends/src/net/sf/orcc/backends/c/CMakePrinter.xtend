@@ -31,6 +31,9 @@ package net.sf.orcc.backends.c
 import net.sf.orcc.backends.CommonPrinter
 import net.sf.orcc.df.Actor
 import net.sf.orcc.df.Network
+import java.util.Map
+
+import static net.sf.orcc.backends.BackendsConstants.*
 
 /**
  * Generate CMakeList.txt content
@@ -40,9 +43,26 @@ import net.sf.orcc.df.Network
 class CMakePrinter extends CommonPrinter {
 
 	protected var Network network
+	protected boolean linkNativeLib;
+	protected String linkNativeLibFolder;
+
 
 	def setNetwork(Network network) {
 		this.network = network
+	}
+
+	override setOptions(Map<String, Object> options) {
+		super.setOptions(options)
+
+		if(options.containsKey(LINK_NATIVE_LIBRARY)) {
+			linkNativeLib = options.get(LINK_NATIVE_LIBRARY) as Boolean;
+			linkNativeLibFolder = options.get(LINK_NATIVE_LIBRARY_FOLDER) as String;
+		}
+
+		if(linkNativeLib && linkNativeLibFolder != "")
+			linkNativeLib = true
+		else
+			linkNativeLib = false
 	}
 
 	def rootCMakeContent() '''
@@ -60,6 +80,33 @@ class CMakePrinter extends CommonPrinter {
 		set(extra_includes)
 		set(extra_libraries)
 
+		«IF linkNativeLib»
+			# Native lib
+			set(external_definitions)
+			set(external_include_paths)
+			set(external_library_paths)
+			set(external_libraries)
+			
+			# All external vars should be set by the CMakeLists.txt inside the following folder.
+			add_subdirectory(«linkNativeLibFolder» «linkNativeLibFolder»)
+			
+			if(external_definitions)
+				list(APPEND extra_definitions ${external_definitions})
+			endif()
+
+			if(external_include_paths)
+				list(APPEND extra_includes ${external_include_paths})
+			endif()
+			
+			if(external_libraries)
+				list(APPEND extra_libraries ${external_libraries})
+			endif()
+			
+			if(external_library_paths)
+				link_directories(${external_library_paths})
+			endif()
+			
+		«ENDIF»
 		# Runtime libraries inclusion
 		include_directories(
 			${PROJECT_BINARY_DIR}/libs # to find config.h

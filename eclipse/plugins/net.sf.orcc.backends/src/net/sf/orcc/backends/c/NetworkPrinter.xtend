@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.backends.c
 
+import java.util.HashSet
 import java.util.Map
 import net.sf.orcc.df.Actor
 import net.sf.orcc.df.Connection
@@ -35,9 +36,9 @@ import net.sf.orcc.df.Entity
 import net.sf.orcc.df.Network
 import net.sf.orcc.df.Port
 import net.sf.orcc.graph.Vertex
+import net.sf.orcc.ir.Var
 
 import static net.sf.orcc.backends.BackendsConstants.*
-import static net.sf.orcc.util.OrccAttributes.*
 
 /**
  * Generate and print network source file for C backend.
@@ -56,7 +57,10 @@ class NetworkPrinter extends CTemplate {
 
 	var boolean genWeights = false
 	var int genWeightsDataCounter = 0
-	
+
+	var boolean linkNativeLib
+	var String linkNativeLibHeaders
+		
 	def setNetwork(Network network) {
 		this.network = network
 	}
@@ -76,9 +80,14 @@ class NetworkPrinter extends CTemplate {
 			}
 		}
 				
-		if(options.containsKey(GEN_WEIGHTS)){
+		if(options.containsKey(GEN_WEIGHTS)) {
 			genWeights = options.get(GEN_WEIGHTS) as Boolean;
 			genWeightsDataCounter = 0;			
+		}
+
+		if(options.containsKey(LINK_NATIVE_LIBRARY)) {
+			linkNativeLib = options.get(LINK_NATIVE_LIBRARY) as Boolean;
+			linkNativeLibHeaders = options.get(LINK_NATIVE_LIBRARY_HEADERS) as String;
 		}
 	}
 
@@ -101,6 +110,11 @@ class NetworkPrinter extends CTemplate {
 		«IF genWeights»
 			#include "rdtsc.h"
 			#include <stdint.h>
+			
+		«ENDIF»
+		«IF linkNativeLib && linkNativeLibHeaders != ""»
+		«printNativeLibHeaders(linkNativeLibHeaders)»
+
 		«ENDIF»
 		
 		#define SIZE «fifoSize»
@@ -182,7 +196,14 @@ class NetworkPrinter extends CTemplate {
 		// Declaration of the network
 		network_t network = {"«network.name»", actors, connections, «network.allActors.size», «network.connections.size»};
 		
-		
+		«IF network.hasAttribute("network_shared_variables")»
+			/////////////////////////////////////////////////
+			// Shared Variables
+			«FOR v : network.getAttribute("network_shared_variables").objectValue as HashSet<Var>»
+				«v.type.doSwitch» «v.name»«FOR dim : v.type.dimensions»[«dim»]«ENDFOR»;
+			«ENDFOR»
+
+		«ENDIF»
 		////////////////////////////////////////////////////////////////////////////////
 		// Main
 		int main(int argc, char *argv[]) {
@@ -255,5 +276,4 @@ class NetworkPrinter extends CTemplate {
 		«ENDIF»
 	«ENDIF»
 	'''
-
 }

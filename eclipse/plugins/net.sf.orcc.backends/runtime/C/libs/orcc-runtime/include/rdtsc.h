@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <float.h>
 
 #define MAX_VAL_UINT64 UINT64_MAX
 #define MIN_VAL_UINT64 0x0
@@ -14,20 +15,21 @@ typedef struct rdtsc_node {
 
 typedef struct rdtsc_data {
 	uint64_t _numFirings;
-	uint64_t _minWeight;
-	uint64_t _maxWeight;
+	long double _minWeight;
+	long double _maxWeight;
 	long double _avgWeight;
+	long double _variance;
 	rdtsc_node_t *_head;
-	rdtsc_node_t *_currNode;
+	rdtsc_node_t *_lastNode;
 } rdtsc_data_t;
 
-#define DECLARE_RDTSC_DATA(count) static rdtsc_data_t rdtsc_data_##count = {0, MAX_VAL_UINT64, MIN_VAL_UINT64, 0.0, NULL, NULL};
+#define DECLARE_RDTSC_DATA(count) static rdtsc_data_t rdtsc_data_##count = {0, LDBL_MAX, 0.0, 0.0, 0.0, NULL, NULL};
 
-inline void saveNewFiringWeight(rdtsc_data_t *x, uint64_t weight);
+inline void saveNewFiringWeight(rdtsc_data_t *llist, uint64_t weight);
 
-inline void calcWeightStats(rdtsc_data_t *x);
+inline void calcWeightStats(rdtsc_data_t *llist, int useFilter);
 
-inline void printFiringcWeights(rdtsc_data_t *x, FILE *fp);
+inline void printFiringcWeights(char *actionName, rdtsc_data_t *llist, FILE *fp);
 
 
 /*--------------------------------------------------------------------------------------------------*/

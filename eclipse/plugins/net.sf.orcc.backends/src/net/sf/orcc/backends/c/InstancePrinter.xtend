@@ -69,6 +69,7 @@ import static net.sf.orcc.OrccLaunchConstants.*
 import static net.sf.orcc.backends.BackendsConstants.*
 import static net.sf.orcc.util.OrccAttributes.*
 import net.sf.orcc.df.Network
+import java.util.HashSet
 
 /**
  * Generate and print instance source file for C backend.
@@ -112,10 +113,15 @@ class InstancePrinter extends CTemplate {
 	var Iterable<String> papiEvents
 
 	var boolean genWeights = false
+	var boolean genWeightsFilter = true
+	var boolean genWeightsDump = false	
 	var boolean genWeightsExit = false
 	var Action genWeightsExitAction = null
 	var String genWeightsExitCond = null	
 	
+	var boolean linkNativeLib
+	var String linkNativeLibHeaders
+
 	protected val Pattern inputPattern = DfFactory::eINSTANCE.createPattern
 	protected val Map<State, Pattern> transitionPattern = new HashMap<State, Pattern>
 
@@ -153,7 +159,18 @@ class InstancePrinter extends CTemplate {
 
 		if(options.containsKey(GEN_WEIGHTS)){
 			genWeights = options.get(GEN_WEIGHTS) as Boolean;
-		}		
+		}
+		if(options.containsKey(GEN_WEIGHTS_FILTER)){
+			genWeightsFilter = options.get(GEN_WEIGHTS_FILTER) as Boolean;
+		}
+		if(options.containsKey(GEN_WEIGHTS_DUMP)){
+			genWeightsDump = options.get(GEN_WEIGHTS_DUMP) as Boolean;
+		}
+
+		if(options.containsKey(LINK_NATIVE_LIBRARY)) {
+			linkNativeLib = options.get(LINK_NATIVE_LIBRARY) as Boolean;
+			linkNativeLibHeaders = options.get(LINK_NATIVE_LIBRARY_HEADERS) as String;
+		}
 	}
 
 	def getInstanceContent(Instance instance) {
@@ -241,7 +258,7 @@ class InstancePrinter extends CTemplate {
 		«IF checkArrayInbounds»
 			#include <assert.h>
 		«ENDIF»
-		#include "config.h"
+		#include "orcc_config.h"
 
 		#include "types.h"
 		#include "fifo.h"
@@ -261,12 +278,17 @@ class InstancePrinter extends CTemplate {
 		«IF profile»
 			#include "profiling.h"
 		«ENDIF»
+		
 		«IF genWeights»
 			#include "rdtsc.h"
 			#include "options.h"
 			#include <libgen.h>
-		«ENDIF»
 
+		«ENDIF»
+		«IF linkNativeLib && linkNativeLibHeaders != ""»
+		«printNativeLibHeaders(linkNativeLibHeaders)»
+
+		«ENDIF»
 		#define SIZE «fifoSize»
 		«IF instance != null»
 			«instance.printAttributes»
@@ -278,6 +300,14 @@ class InstancePrinter extends CTemplate {
 		// Instance
 		extern actor_t «entityName»;
 
+		«IF actor.hasAttribute("actor_shared_variables")»
+			////////////////////////////////////////////////////////////////////////////////
+			// Shared Variables
+			«FOR v : actor.getAttribute("actor_shared_variables").objectValue as HashSet<Var>»
+				extern «v.type.doSwitch» «v.name»«FOR dim : v.type.dimensions»[«dim»]«ENDFOR»;
+			«ENDFOR»
+			
+		«ENDIF»
 		«IF !actor.inputs.nullOrEmpty»
 			////////////////////////////////////////////////////////////////////////////////
 			// Input FIFOs
@@ -377,8 +407,8 @@ class InstancePrinter extends CTemplate {
 
 		«IF genWeights»
 			////////////////////////////////////////////////////////////////////////////////
-			// Data structures for genWeights
-			«printGenWeightsVars»
+			// Declarations for genWeights
+			«printGenWeightsDeclartions»
 			
 			static unsigned int cycles_high, cycles_low, cycles_high1, cycles_low1;
 			
@@ -386,7 +416,7 @@ class InstancePrinter extends CTemplate {
 		«IF !actor.stateVars.nullOrEmpty»
 			////////////////////////////////////////////////////////////////////////////////
 			// State variables of the actor
-			«FOR variable : actor.stateVars»
+			«FOR variable : actor.stateVars.filter[!hasAttribute("shared")]»
 				«variable.declare»
 			«ENDFOR»
 
@@ -817,7 +847,9 @@ class InstancePrinter extends CTemplate {
 			«ENDFOR»
 			«IF genWeightsExit && genWeightsExitAction.identityEquals(action)»
 				FILE *fpGenWeightsStats = NULL;
+				«IF genWeightsDump»FILE *fpGenWeightsFirings = NULL;«ENDIF»
 				char fnGenWeightsStats[FILENAME_MAX];
+				int useFilter = «IF genWeightsFilter»1«ELSE»0«ENDIF»;
 			«ENDIF»
 			«IF debugActor || debugAction»
 				printf("-- «entityName»: «action.name»«IF isAligned» (aligned)«ENDIF»\n");
@@ -927,7 +959,7 @@ class InstancePrinter extends CTemplate {
 		«ENDIF»
 	'''
 	
-	def protected printGenWeightsVars()	{
+	def protected printGenWeightsDeclartions()	{
 		var Network network = null
 		if(genWeightsExit) {
 			if( actor.eContainer() instanceof Network){
@@ -951,6 +983,7 @@ class InstancePrinter extends CTemplate {
 		«ENDFOR»
 	'''
 
+	
 	def protected printCalcGenWeightsStats()	{
 		var Network network = null
 		if( actor.eContainer() instanceof Network){
@@ -963,16 +996,19 @@ class InstancePrinter extends CTemplate {
 					sprintf(fnGenWeightsStats, "rdtsc_weights_«network.simpleName»_%s.xml", basename(opt->input_file));
 				else
 					sprintf(fnGenWeightsStats, "rdtsc_weights_«network.simpleName».xml");
-
 				fpGenWeightsStats = fopen(fnGenWeightsStats, "w");
 				if(fpGenWeightsStats == NULL) {
-					printf("Error opening output file \"%s\" for generation of execution weights.\nExiting...", fnGenWeightsStats);
+					printf("Error opening output file \"%s\" for generation of total weights.\nExiting...", fnGenWeightsStats);
 					exit(0);
 				}
 
+				«IF genWeightsDump»
+					// Create directory for dumping individual weights for all firings
+					mkdir("Firings-Data", 0777);
+					
+				«ENDIF»
 				fprintf(fpGenWeightsStats, "<?xml version=\"1.0\" ?>\n<network name=\"«network.simpleName»\">\n");
-
-				«FOR child : network.children»
+				«FOR child : network.children»					
 					«printCalcGenWeightsInstanceStats(child.getAdapter(typeof(Actor)))»
 				«ENDFOR»
 
@@ -986,17 +1022,28 @@ class InstancePrinter extends CTemplate {
 	}
 	
 	def protected printCalcGenWeightsInstanceStats(Actor actor) '''
+		«IF genWeightsDump»
+		fpGenWeightsFirings = fopen("Firings-Data/«actor.name»", "w");
+		if(fpGenWeightsFirings == NULL) {
+			printf("Error opening output file \"%s\" for generation of individual weights.\nExiting...", "Firings-Data/«actor.name»");
+			exit(0);
+		}		
+		«ENDIF»
 		fprintf(fpGenWeightsStats, "\t<actor id=\"«actor.name»\">\n");
 		«FOR action : actor.actions»
-			calcWeightStats(rdtsc_data_«actor.name»_«action.name»);
-			fprintf(fpGenWeightsStats, "\t\t<action id=\"«action.name»\" clockcycles=\"%Lf\" clockcycles-min=\"%"PRIu64"\" clockcycles-max=\"%"PRIu64"\" firings=\"%"PRIu64"\"/>\n", 
+			«IF genWeightsDump»printFiringcWeights("«action.name»", rdtsc_data_«actor.name»_«action.name», fpGenWeightsFirings);«ENDIF»
+			calcWeightStats(rdtsc_data_«actor.name»_«action.name», useFilter);
+			fprintf(fpGenWeightsStats, "\t\t<action id=\"«action.name»\" clockcycles=\"%Lf\" clockcycles-min=\"%Lf\" clockcycles-max=\"%Lf\" clockcycles-var=\"%Lf\" firings=\"%"PRIu64"\"/>\n", 
 				rdtsc_data_«actor.name»_«action.name»->_avgWeight, 
 				(rdtsc_data_«actor.name»_«action.name»->_numFirings > 0)?rdtsc_data_«actor.name»_«action.name»->_minWeight:0, 
 				rdtsc_data_«actor.name»_«action.name»->_maxWeight,
+				rdtsc_data_«actor.name»_«action.name»->_variance, 
 				rdtsc_data_«actor.name»_«action.name»->_numFirings);
 
 		«ENDFOR»
 		fprintf(fpGenWeightsStats, "\t</actor>\n");
+		«IF genWeightsDump»fclose(fpGenWeightsFirings);«ENDIF»
+		
 	'''
 
 	def protected profileStart(Action action) '''
@@ -1020,7 +1067,7 @@ class InstancePrinter extends CTemplate {
 			action_«action.name».firings++;
 		«ENDIF»
 	'''
-
+	
 	private def papifyStruct(Action action)
 		'''Papi_actions_«actor.name»[«papifyActions.toList.indexOf(action)»]'''
 

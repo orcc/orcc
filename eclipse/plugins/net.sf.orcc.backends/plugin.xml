@@ -40,6 +40,9 @@
          <option
                id="net.sf.orcc.backends.genWeights">
          </option>
+         <option
+               id="net.sf.orcc.backends.linkNativeLibrary">
+         </option>
       </backend>
       <backend
             class="net.sf.orcc.backends.c.compa.COMPABackend"
@@ -475,7 +478,45 @@
                description="A xml file is generated giving the min, max and average weights (as number of clock cycles) for each action. These weights are calculated by profiling only computational part of each action using Intel RDTSC/RDTSCP instructions. This output file can be used as weights file needed for various automated analysis options provided by TURNUS."
                id="net.sf.orcc.backends.genWeights"
                name="genWeights: Generate execution based weights on Intel platforms.">
-            <checkBox></checkBox>
+            <checkBox>
+               <option
+                     defaultValue="true"
+                     description="Remove outliers (with a Gaussian filter) from profiling results of each action."
+                     id="net.sf.orcc.backends.genWeightsFltr"
+                     name="Remove outliers (with a Gaussian filter).">
+                  <checkBox></checkBox>
+               </option>
+               <option
+                     defaultValue="false"
+                     description="Dump individual weights for all firings. of all actors/actions."
+                     id="net.sf.orcc.backends.genWeightsDump"
+                     name="Dump individual weights for all firings.">
+                  <checkBox></checkBox>
+               </option></checkBox>
+         </option>
+         <option
+               defaultValue="false"
+               description="Link with a native library containing native functions"
+               id="net.sf.orcc.backends.linkNativeLibrary"
+               name="Link with a native library containing native functions">
+            <checkBox>
+               <option
+                     description="Path to native library folder containing CMakeLists.txt."
+                     id="net.sf.orcc.backends.linkNativeLibraryFolder"
+                     name="Path to native library folder containing CMakeLists.txt.">
+                  <browseFile
+                        folder="true"
+                        workspace="false">
+                  </browseFile>
+               </option>
+               <option
+                     description="Names of the header files (separated by &apos;;&apos;) containing all prototypes."
+                     id="net.sf.orcc.backends.linkNativeLibraryHeaders"
+                     name="Names of the header files (separated by &apos;;&apos;) containing all prototypes.">
+                  <textBox>
+                     textBox body text
+                  </textBox>
+               </option></checkBox>
          </option>
    </extension>
    <extension

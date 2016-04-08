@@ -53,6 +53,9 @@ import static net.sf.orcc.backends.BackendsConstants.NEW_SCHEDULER;
 import static net.sf.orcc.backends.BackendsConstants.PAPIFY;
 import static net.sf.orcc.backends.BackendsConstants.PROFILE;
 import static net.sf.orcc.backends.BackendsConstants.TTA_PROCESSORS_CONFIGURATION;
+import static net.sf.orcc.backends.BackendsConstants.LINK_NATIVE_LIBRARY;
+import static net.sf.orcc.backends.BackendsConstants.LINK_NATIVE_LIBRARY_FOLDER;
+import static net.sf.orcc.backends.BackendsConstants.LINK_NATIVE_LIBRARY_HEADERS;
 import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER;
 import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER_OPTIONS;
 import static net.sf.orcc.util.OrccUtil.getFile;
@@ -816,6 +819,9 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		options.addOption("prof", "profile", false, "(C) Enable profiling");
 		options.addOption("papify", false, "(C) Enable papi performance tool analyzer code printing.");
 		options.addOption("et", "enable-traces", true, "(C) Enable tracing of the FIFOs in the given directory");
+		options.addOption("natLib", "native-lib", false, "(C) Enable linking with a native library containing native functions");
+		options.addOption("natLibF", "native-lib-folder", true, "(C) Path to the native lib project");
+		options.addOption("natLibH", "native-lib-headers", true, "(C) Names of the header files defining functions implemented in native library");		
 		options.addOption("ttapc", "tta-processorconf", true,
 				"(TTA) Predefined configurations for the processors (Standard|Custom|Fast|Huge)");
 
@@ -913,6 +919,14 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			optionMap.put(ADDITIONAL_TRANSFOS, line.hasOption('t'));
 			optionMap.put(PROFILE, line.hasOption("prof"));
 			optionMap.put(PAPIFY, line.hasOption("papify"));
+			
+			optionMap.put(LINK_NATIVE_LIBRARY, line.hasOption("natLib"));
+			if (line.hasOption("natLibF")) {
+				optionMap.put(LINK_NATIVE_LIBRARY_FOLDER, line.getOptionValue("natLibF"));
+			}
+			if (line.hasOption("natLibH")) {
+				optionMap.put(LINK_NATIVE_LIBRARY_HEADERS, line.getOptionValue("natLibH"));
+			}			
 
 			// Set back-end name in options map
 			String backend = this.getClass().getName();

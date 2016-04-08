@@ -44,6 +44,7 @@ else()
     message(STATUS "Cannot find Metis")
 endif()
 
+list(APPEND extra_libraries "-lm")
 
 include_directories(${extra_includes})
 add_definitions(${extra_definitions})

@@ -76,5 +76,11 @@ public class BackendsConstants {
 	public static final String PAPIFY_MULTIPLEX = "net.sf.orcc.backends.papify.multiplex";
 	
 	public static final String GEN_WEIGHTS = "net.sf.orcc.backends.genWeights";
+	public static final String GEN_WEIGHTS_FILTER = "net.sf.orcc.backends.genWeightsFltr";
+	public static final String GEN_WEIGHTS_DUMP = "net.sf.orcc.backends.genWeightsDump";
+	
+	public static final String LINK_NATIVE_LIBRARY = "net.sf.orcc.backends.linkNativeLibrary";
+	public static final String LINK_NATIVE_LIBRARY_FOLDER = "net.sf.orcc.backends.linkNativeLibraryFolder";
+	public static final String LINK_NATIVE_LIBRARY_HEADERS = "net.sf.orcc.backends.linkNativeLibraryHeaders";
 
 }
