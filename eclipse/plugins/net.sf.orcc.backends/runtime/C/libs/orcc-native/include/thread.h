@@ -32,7 +32,7 @@
 #include "orcc.h"
 
 #ifndef _WIN32
-#define __USE_GNU
+#define __USE_GNU 1
 #endif
 
 #define MAX_THREAD_NB 10
@@ -116,13 +116,15 @@
     #include <semaphore.h>
 
     #define orcc_clear_cpu_set(cpuset) CPU_ZERO(&(cpuset))
-    #define orcc_set_thread_affinity(cpuset, proc_num, thread) {                    \
-            CPU_SET(proc_num, &(cpuset));                                    \
-            pthread_setaffinity_np(thread, sizeof(cpu_set_t), &(cpuset));    \
+    #define orcc_set_thread_affinity(cpuset, proc_num, thread) {             	\
+			CPU_ZERO(&(cpuset));											 	\
+    		CPU_SET(proc_num, &(cpuset));                                    	\
+            pthread_setaffinity_np(thread, sizeof(cpu_set_t), &(cpuset));    	\
     }
-    #define orcc_set_this_process_affinity(cpuset, proc_num) {                    \
-            CPU_SET(proc_num, &(cpuset));                                    \
-            sched_setaffinity(0, sizeof(cpu_set_t), &(cpuset));                \
+    #define orcc_set_this_process_affinity(cpuset, proc_num) {					\
+			CPU_ZERO(&(cpuset));											 	\
+    		CPU_SET(proc_num, &(cpuset));										\
+            sched_setaffinity(0, sizeof(cpu_set_t), &(cpuset));					\
     }
 
     #define orcc_semaphore_create(semaphore, number) sem_init(&(semaphore), 0, (number))
