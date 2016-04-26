@@ -410,7 +410,7 @@ class InstancePrinter extends CTemplate {
 			// Declarations for genWeights
 			«printGenWeightsDeclartions»
 			
-			static unsigned int cycles_high, cycles_low, cycles_high1, cycles_low1;
+			static unsigned int actionsCyclesHigh1, actionsCyclesLow1, actionsCyclesHigh2, actionsCyclesLow2;
 			
 		«ENDIF»
 		«IF !actor.stateVars.nullOrEmpty»
@@ -944,8 +944,8 @@ class InstancePrinter extends CTemplate {
 	def protected genWeightsStart(Action action) '''
 		«IF genWeights && !actor.initializes.contains(action)»
 
-			rdtsc_warmup(&cycles_high, &cycles_low, &cycles_high1, &cycles_low1);
-			rdtsc_tick(&cycles_high, &cycles_low);
+			rdtsc_warmup(&actionsCyclesHigh1, &actionsCyclesLow1, &actionsCyclesHigh2, &actionsCyclesLow2);
+			rdtsc_tick(&actionsCyclesHigh1, &actionsCyclesLow1);
 			
 		«ENDIF»
 	'''
@@ -953,8 +953,8 @@ class InstancePrinter extends CTemplate {
 	def protected genWeightsStop(Action action) '''
 		«IF genWeights && !actor.initializes.contains(action)»
 		
-		rdtsc_tock(&cycles_high1, &cycles_low1);
-		saveNewFiringWeight(rdtsc_data_«actor.name»_«action.name», rdtsc_getTicksCount(cycles_high, cycles_low, cycles_high1, cycles_low1));
+		rdtsc_tock(&actionsCyclesHigh2, &actionsCyclesLow2);
+		saveNewFiringWeight(profDataAction_«actor.name»_«action.name», rdtsc_getTicksCount(actionsCyclesHigh1, actionsCyclesLow1, actionsCyclesHigh2, actionsCyclesLow2));
 
 		«ENDIF»
 	'''
@@ -979,7 +979,7 @@ class InstancePrinter extends CTemplate {
 	
 	def protected printGenWeightsInstanceVars(Actor actor) '''
 		«FOR action : actor.actions»
-			extern rdtsc_data_t *rdtsc_data_«actor.name»_«action.name»;
+			extern rdtsc_data_t *profDataAction_«actor.name»_«action.name»;
 		«ENDFOR»
 	'''
 
@@ -1031,14 +1031,14 @@ class InstancePrinter extends CTemplate {
 		«ENDIF»
 		fprintf(fpGenWeightsStats, "\t<actor id=\"«actor.name»\">\n");
 		«FOR action : actor.actions»
-			«IF genWeightsDump»printFiringcWeights("«action.name»", rdtsc_data_«actor.name»_«action.name», fpGenWeightsFirings);«ENDIF»
-			calcWeightStats(rdtsc_data_«actor.name»_«action.name», useFilter);
+			«IF genWeightsDump»printFiringcWeights("«action.name»", profDataAction_«actor.name»_«action.name», fpGenWeightsFirings);«ENDIF»
+			calcWeightStats(profDataAction_«actor.name»_«action.name», useFilter);
 			fprintf(fpGenWeightsStats, "\t\t<action id=\"«action.name»\" clockcycles=\"%Lf\" clockcycles-min=\"%Lf\" clockcycles-max=\"%Lf\" clockcycles-var=\"%Lf\" firings=\"%"PRIu64"\"/>\n", 
-				rdtsc_data_«actor.name»_«action.name»->_avgWeight, 
-				(rdtsc_data_«actor.name»_«action.name»->_numFirings > 0)?rdtsc_data_«actor.name»_«action.name»->_minWeight:0, 
-				rdtsc_data_«actor.name»_«action.name»->_maxWeight,
-				rdtsc_data_«actor.name»_«action.name»->_variance, 
-				rdtsc_data_«actor.name»_«action.name»->_numFirings);
+				profDataAction_«actor.name»_«action.name»->_avgWeight, 
+				(profDataAction_«actor.name»_«action.name»->_numFirings > 0)?profDataAction_«actor.name»_«action.name»->_minWeight:0, 
+				profDataAction_«actor.name»_«action.name»->_maxWeight,
+				profDataAction_«actor.name»_«action.name»->_variance, 
+				profDataAction_«actor.name»_«action.name»->_numFirings);
 
 		«ENDFOR»
 		fprintf(fpGenWeightsStats, "\t</actor>\n");

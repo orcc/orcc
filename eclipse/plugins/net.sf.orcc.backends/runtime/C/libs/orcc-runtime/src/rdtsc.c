@@ -92,7 +92,6 @@ inline void calcWeightSimple(rdtsc_data_t *llist, long double threshold) {
 	calcVariance(llist);
 }
 
-
 inline void calcWeightStats(rdtsc_data_t *llist, int useFilter) {
 	long double threshold = LDBL_MAX;
 
@@ -166,24 +165,24 @@ inline void rdtscp_func(unsigned int *cycles_high, unsigned int *cycles_low) {
 #endif
 }
 
-inline void rdtsc_warmup(unsigned int *cycles_high, unsigned int *cycles_low, unsigned int *cycles_high1, unsigned int *cycles_low1) {
-	rdtsc_func(cycles_high, cycles_low);
-	rdtscp_func(cycles_high1, cycles_low1);
-	rdtsc_func(cycles_high, cycles_low);
-	rdtscp_func(cycles_high1, cycles_low1);
+inline void rdtsc_warmup(unsigned int *cycles_high1, unsigned int *cycles_low1, unsigned int *cycles_high2, unsigned int *cycles_low2) {
+	rdtsc_func(cycles_high1, cycles_low1);
+	rdtscp_func(cycles_high2, cycles_low2);
+	rdtsc_func(cycles_high1, cycles_low1);
+	rdtscp_func(cycles_high2, cycles_low2);
 }
 
-inline void rdtsc_tick(unsigned int *cycles_high, unsigned int *cycles_low) {
-	rdtsc_func(cycles_high, cycles_low);
+inline void rdtsc_tick(unsigned int *cycles_high1, unsigned int *cycles_low1) {
+	rdtsc_func(cycles_high1, cycles_low1);
 }
 
-inline void rdtsc_tock(unsigned int *cycles_high, unsigned int *cycles_low) {
-	rdtscp_func(cycles_high, cycles_low);
+inline void rdtsc_tock(unsigned int *cycles_high2, unsigned int *cycles_low2) {
+	rdtscp_func(cycles_high2, cycles_low2);
 }
 
-inline uint64_t rdtsc_getTicksCount(unsigned int cycles_high, unsigned int cycles_low, unsigned int cycles_high1, unsigned int cycles_low1) {
+inline uint64_t rdtsc_getTicksCount(unsigned int cycles_high1, unsigned int cycles_low1, unsigned int cycles_high2, unsigned int cycles_low2) {
 
-	uint64_t ticksCount = (((uint64_t) cycles_high1 << 32) | cycles_low1) - (((uint64_t) cycles_high << 32) | cycles_low);
+	uint64_t ticksCount = (((uint64_t) cycles_high2 << 32) | cycles_low2) - (((uint64_t) cycles_high1 << 32) | cycles_low1);
 
 	if(ticksCount < 0)
 	{

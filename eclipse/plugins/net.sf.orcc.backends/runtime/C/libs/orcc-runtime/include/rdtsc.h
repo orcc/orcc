@@ -23,14 +23,14 @@ typedef struct rdtsc_data {
 	rdtsc_node_t *_lastNode;
 } rdtsc_data_t;
 
-#define DECLARE_RDTSC_DATA(count) static rdtsc_data_t rdtsc_data_##count = {0, LDBL_MAX, 0.0, 0.0, 0.0, NULL, NULL};
+#define DECLARE_ACTION_PROFILING_DATA(count) static rdtsc_data_t profDataAction_##count = {0, LDBL_MAX, 0.0, 0.0, 0.0, NULL, NULL};
+#define DECLARE_SCHEDULER_PROFILING_DATA(count) static rdtsc_data_t profDataScheduler_##count = {0, LDBL_MAX, 0.0, 0.0, 0.0, NULL, NULL};
 
 inline void saveNewFiringWeight(rdtsc_data_t *llist, uint64_t weight);
 
 inline void calcWeightStats(rdtsc_data_t *llist, int useFilter);
 
 inline void printFiringcWeights(char *actionName, rdtsc_data_t *llist, FILE *fp);
-
 
 /*--------------------------------------------------------------------------------------------------*/
 

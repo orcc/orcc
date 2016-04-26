@@ -245,8 +245,8 @@ class NetworkPrinter extends CTemplate {
 	
 	def protected allocateGenWeightsData(Vertex vertex) '''
 		«FOR action : vertex.getAdapter(typeof(Actor)).actions»
-			DECLARE_RDTSC_DATA(«genWeightsDataCounter»)
-			rdtsc_data_t *rdtsc_data_«vertex.label»_«action.name» = &rdtsc_data_«genWeightsDataCounter»;
+			DECLARE_ACTION_PROFILING_DATA(«genWeightsDataCounter»)
+			rdtsc_data_t *profDataAction_«vertex.label»_«action.name» = &profDataAction_«genWeightsDataCounter»;
 			«incGenWeightsDataCounter»
 		«ENDFOR»
 	'''
