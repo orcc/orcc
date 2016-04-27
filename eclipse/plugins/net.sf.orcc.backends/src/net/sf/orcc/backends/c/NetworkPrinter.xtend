@@ -56,7 +56,8 @@ class NetworkPrinter extends CTemplate {
 	var boolean papifyMultiplex = false
 
 	var boolean genWeights = false
-	var int genWeightsDataCounter = 0
+	var int genWeightsActionDataCounter = 0
+	var int genWeightsSchedulerDataCounter = 0
 
 	var boolean linkNativeLib
 	var String linkNativeLibHeaders
@@ -82,7 +83,8 @@ class NetworkPrinter extends CTemplate {
 				
 		if(options.containsKey(GEN_WEIGHTS)) {
 			genWeights = options.get(GEN_WEIGHTS) as Boolean;
-			genWeightsDataCounter = 0;			
+			genWeightsActionDataCounter = 0;
+			genWeightsSchedulerDataCounter = 0;
 		}
 
 		if(options.containsKey(LINK_NATIVE_LIBRARY)) {
@@ -150,11 +152,16 @@ class NetworkPrinter extends CTemplate {
 		«ENDIF»
 		«IF genWeights»
 			/////////////////////////////////////////////////
-			// Declare rdtsc_data for the actions			
+			// Declare rdtsc_data for the actors/actions
 			«FOR child : network.children»
-				«child.allocateGenWeightsData»
+				«child.allocateGenWeightsActionData»
 			«ENDFOR»
-			
+
+			// Declare rdtsc_data for the actors/scheduler
+			«FOR child : network.children»
+				«child.allocateGenWeightsSchedulerData»
+			«ENDFOR»
+
 		«ENDIF»
 		«additionalDeclarations»
 		/////////////////////////////////////////////////
@@ -243,16 +250,26 @@ class NetworkPrinter extends CTemplate {
 		DECLARE_FIFO(«conn.sourcePort.type.doSwitch», «if (conn.size != null) conn.size else "SIZE"», «conn.<Object>getValueAsObject("idNoBcast")», «nbReaders»)
 	'''
 	
-	def protected allocateGenWeightsData(Vertex vertex) '''
+	def protected allocateGenWeightsActionData(Vertex vertex) '''
 		«FOR action : vertex.getAdapter(typeof(Actor)).actions»
-			DECLARE_ACTION_PROFILING_DATA(«genWeightsDataCounter»)
-			rdtsc_data_t *profDataAction_«vertex.label»_«action.name» = &profDataAction_«genWeightsDataCounter»;
-			«incGenWeightsDataCounter»
+			DECLARE_ACTION_PROFILING_DATA(«genWeightsActionDataCounter»)
+			rdtsc_data_t *profDataAction_«vertex.label»_«action.name» = &profDataAction_«genWeightsActionDataCounter»;
+			«incGenWeightsActionDataCounter»
 		«ENDFOR»
 	'''
 	
-	private def incGenWeightsDataCounter() {
-		genWeightsDataCounter++ ''''''
+	def protected allocateGenWeightsSchedulerData(Vertex vertex) '''
+		DECLARE_SCHEDULER_PROFILING_DATA(«genWeightsSchedulerDataCounter», «vertex.getAdapter(typeof(Actor)).actions.length+1», «vertex.getAdapter(typeof(Actor)).actions.length»)
+		rdtsc_scheduler_map_t *profDataScheduler_«vertex.label» = &profDataScheduler_«genWeightsSchedulerDataCounter»;
+		«incGenWeightsSchedulerDataCounter»
+	'''
+	
+	private def incGenWeightsActionDataCounter() {
+		genWeightsActionDataCounter++ ''''''
+	}
+	
+	private def incGenWeightsSchedulerDataCounter() {
+		genWeightsSchedulerDataCounter++ ''''''
 	}
 	
 	// This method can be override by other backends to print additional includes

@@ -409,9 +409,7 @@ class InstancePrinter extends CTemplate {
 			////////////////////////////////////////////////////////////////////////////////
 			// Declarations for genWeights
 			«printGenWeightsDeclartions»
-			
-			static unsigned int actionsCyclesHigh1, actionsCyclesLow1, actionsCyclesHigh2, actionsCyclesLow2;
-			
+
 		«ENDIF»
 		«IF !actor.stateVars.nullOrEmpty»
 			////////////////////////////////////////////////////////////////////////////////
@@ -845,12 +843,6 @@ class InstancePrinter extends CTemplate {
 			«FOR variable : action.body.locals»
 				«variable.declare»;
 			«ENDFOR»
-			«IF genWeightsExit && genWeightsExitAction.identityEquals(action)»
-				FILE *fpGenWeightsStats = NULL;
-				«IF genWeightsDump»FILE *fpGenWeightsFirings = NULL;«ENDIF»
-				char fnGenWeightsStats[FILENAME_MAX];
-				int useFilter = «IF genWeightsFilter»1«ELSE»0«ENDIF»;
-			«ENDIF»
 			«IF debugActor || debugAction»
 				printf("-- «entityName»: «action.name»«IF isAligned» (aligned)«ENDIF»\n");
 			«ENDIF»
@@ -896,7 +888,7 @@ class InstancePrinter extends CTemplate {
 			«action.profileEnd»
 			«IF genWeightsExit && genWeightsExitAction.identityEquals(action)»
 
-				«printCalcGenWeightsStats»
+				«printCallsToGenWeightsStats»
 			«ENDIF»
 		}
 	'''
@@ -966,68 +958,154 @@ class InstancePrinter extends CTemplate {
 				network = actor.eContainer() as Network
 			}
 		}
-		''' 
+		''' 		
 		«IF genWeightsExit && network != null»
+			// Data structures for profling actions.
 			«FOR child : network.children»
-				«printGenWeightsInstanceVars(child.getAdapter(typeof(Actor)))»
+				«printGenWeightsActionProfilingVars(child.getAdapter(typeof(Actor)))»
 			«ENDFOR»
+			
+			// Data structures for profling scheduler.
+			«FOR child : network.children»
+				«printGenWeightsSchedulerProfilingPart1(child.getAdapter(typeof(Actor)))»
+			«ENDFOR»
+			
+			«printGenWeightsSchedulerProfilingPart2(actor)»
 		«ELSE»
-			«printGenWeightsInstanceVars(actor)»
+			// Data structures for profling actions.
+			«printGenWeightsActionProfilingVars(actor)»
+			
+			// Data structures for profling scheduler.
+			«printGenWeightsSchedulerProfilingVars(actor)»
 		«ENDIF»
+		
+		static unsigned int actionsCyclesHigh1, actionsCyclesLow1, actionsCyclesHigh2, actionsCyclesLow2;
+		static unsigned int schedulerCyclesHigh1, schedulerCyclesLow1, schedulerCyclesHigh2, schedulerCyclesLow2;
+		«IF genWeightsExit»
+			
+			«printCalcGenWeightsStatsFunctions»
+		«ENDIF»	
 		'''
 	}
 	
-	def protected printGenWeightsInstanceVars(Actor actor) '''
+	def protected printGenWeightsActionProfilingVars(Actor actor) '''
 		«FOR action : actor.actions»
 			extern rdtsc_data_t *profDataAction_«actor.name»_«action.name»;
 		«ENDFOR»
 	'''
+	def protected printGenWeightsSchedulerProfilingPart1(Actor actor) '''
+		extern rdtsc_scheduler_map_t *profDataScheduler_«actor.name»;
+	'''
+	def protected printGenWeightsSchedulerProfilingPart2(Actor actor) '''
+		// ActionName as states
+		enum actionStates {
+			OUTSIDE,
+			«FOR action : actor.actions SEPARATOR ','»
+				actionState_«action.name»
+			«ENDFOR»
+		};
 
+		static char *actionNames[] = {
+			"OUTSIDE",
+			«FOR action : actor.actions SEPARATOR ','»
+				"«action.name»"
+			«ENDFOR»
+		};
+		
+		static enum actionStates _lastSelectedAction;
+	'''
+	def protected printGenWeightsSchedulerProfilingVars(Actor actor) '''
+		«printGenWeightsSchedulerProfilingPart1(actor)»
+		«printGenWeightsSchedulerProfilingPart2(actor)»
+	'''
 	
-	def protected printCalcGenWeightsStats()	{
+	def protected printCallsToGenWeightsStats() '''
+		if(«genWeightsExitCond») {
+			calcGenWeightsActions();
+			calcGenWeightsSchedulers();
+			exit(1); // Exiting the program after stats calculations & reporting are finished.
+		} // «genWeightsExitCond»
+	'''
+	
+	def protected printCalcGenWeightsStatsFunctions()	{
 		var Network network = null
 		if( actor.eContainer() instanceof Network){
 			network = actor.eContainer() as Network
 		}
 		''' 
 		«IF network != null»
-			if(«genWeightsExitCond») {
+			void calcGenWeightsActions() {
+				FILE *fpGenWeightsStats = NULL;
+				«IF genWeightsDump»FILE *fpGenWeightsFirings = NULL;«ENDIF»
+				char fnGenWeightsStats[FILENAME_MAX];
+				int useFilter = «IF genWeightsFilter»1«ELSE»0«ENDIF»;
+
 				if(opt->input_file != NULL)
-					sprintf(fnGenWeightsStats, "rdtsc_weights_«network.simpleName»_%s.xml", basename(opt->input_file));
+					sprintf(fnGenWeightsStats, "actions_weights_«network.simpleName»_%s.exdf", basename(opt->input_file));
 				else
-					sprintf(fnGenWeightsStats, "rdtsc_weights_«network.simpleName».xml");
+					sprintf(fnGenWeightsStats, "actions_weights_«network.simpleName».exdf");
 				fpGenWeightsStats = fopen(fnGenWeightsStats, "w");
 				if(fpGenWeightsStats == NULL) {
-					printf("Error opening output file \"%s\" for generation of total weights.\nExiting...", fnGenWeightsStats);
+					printf("Error opening output file \"%s\" for generation of total action weights.\nExiting...", fnGenWeightsStats);
 					exit(0);
 				}
 
 				«IF genWeightsDump»
 					// Create directory for dumping individual weights for all firings
-					mkdir("Firings-Data", 0777);
+					mkdir("Profiling-Data", 0777);
 					
 				«ENDIF»
 				fprintf(fpGenWeightsStats, "<?xml version=\"1.0\" ?>\n<network name=\"«network.simpleName»\">\n");
 				«FOR child : network.children»					
-					«printCalcGenWeightsInstanceStats(child.getAdapter(typeof(Actor)))»
+					«printCalcGenWeightsStatsInstanceActions(child.getAdapter(typeof(Actor)))»
 				«ENDFOR»
 
 				fprintf(fpGenWeightsStats, "</network>\n");
 				fclose(fpGenWeightsStats);
-				printf("Execution weights are generated in file: %s\n", fnGenWeightsStats);
-				exit(1); // Exiting the program after stats calculations & reporting are finished.
-			} // «genWeightsExitCond»
+				printf("Execution action weights are generated in file: %s\n", fnGenWeightsStats);
+			} // end-of-calcGenWeightsActions().
+			
+			void calcGenWeightsSchedulers() {
+				FILE *fpGenWeightsStats = NULL;
+				«IF genWeightsDump»FILE *fpGenWeightsFirings = NULL;«ENDIF»
+				char fnGenWeightsStats[FILENAME_MAX];
+				int useFilter = «IF genWeightsFilter»1«ELSE»0«ENDIF»;
+
+				if(opt->input_file != NULL)
+					sprintf(fnGenWeightsStats, "schedulers_weights_«network.simpleName»_%s.sxdf", basename(opt->input_file));
+				else
+					sprintf(fnGenWeightsStats, "schedulers_weights_«network.simpleName».sxdf");
+				fpGenWeightsStats = fopen(fnGenWeightsStats, "w");
+				if(fpGenWeightsStats == NULL) {
+					printf("Error opening output file \"%s\" for generation of total scheduler weights.\nExiting...", fnGenWeightsStats);
+					exit(0);
+				}
+
+				«IF genWeightsDump»
+					// Create directory for dumping individual weights for all firings
+					mkdir("Profiling-Data", 0777);
+					
+				«ENDIF»
+				fprintf(fpGenWeightsStats, "<?xml version=\"1.0\" ?>\n<network name=\"«network.simpleName»\">\n");
+				«FOR child : network.children»					
+					«printCalcGenWeightsStatsInstanceScheduler(child.getAdapter(typeof(Actor)))»
+				«ENDFOR»
+
+				fprintf(fpGenWeightsStats, "</network>\n");
+				fclose(fpGenWeightsStats);
+				printf("Execution scheduler weights are generated in file: %s\n", fnGenWeightsStats);
+			} // end-of-calcGenWeightsScheduler().
 		«ENDIF»
 		'''
 	}
 	
-	def protected printCalcGenWeightsInstanceStats(Actor actor) '''
+	def protected printCalcGenWeightsStatsInstanceActions(Actor actor) '''
 		«IF genWeightsDump»
-		fpGenWeightsFirings = fopen("Firings-Data/«actor.name»", "w");
+		fpGenWeightsFirings = fopen("Profiling-Data/actions_weights_«actor.name».exdf", "w");
 		if(fpGenWeightsFirings == NULL) {
-			printf("Error opening output file \"%s\" for generation of individual weights.\nExiting...", "Firings-Data/«actor.name»");
+			printf("Error opening output file \"%s\" for generation of individual action weights.\nExiting...", "Profiling-Data/actions_weights_«actor.name».exdf");
 			exit(0);
-		}		
+		}
 		«ENDIF»
 		fprintf(fpGenWeightsStats, "\t<actor id=\"«actor.name»\">\n");
 		«FOR action : actor.actions»
@@ -1041,6 +1119,20 @@ class InstancePrinter extends CTemplate {
 				profDataAction_«actor.name»_«action.name»->_numFirings);
 
 		«ENDFOR»
+		fprintf(fpGenWeightsStats, "\t</actor>\n");
+		«IF genWeightsDump»fclose(fpGenWeightsFirings);«ENDIF»
+		
+	'''
+
+	def protected printCalcGenWeightsStatsInstanceScheduler(Actor actor) '''
+		«IF genWeightsDump»
+		fpGenWeightsFirings = fopen("Profiling-Data/schedulers_weights_«actor.name».sxdf", "w");
+		if(fpGenWeightsFirings == NULL) {
+			printf("Error opening output file \"%s\" for generation of individual scheduler weights.\nExiting...", "Profiling-Data/schedulers_weights_«actor.name».sxdf");
+			exit(0);
+		}
+		«ENDIF»
+		fprintf(fpGenWeightsStats, "\t<actor id=\"«actor.name»\">\n");
 		fprintf(fpGenWeightsStats, "\t</actor>\n");
 		«IF genWeightsDump»fclose(fpGenWeightsFirings);«ENDIF»
 		

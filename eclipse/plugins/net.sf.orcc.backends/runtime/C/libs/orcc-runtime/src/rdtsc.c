@@ -17,6 +17,28 @@ inline void saveNewFiringWeight(rdtsc_data_t *llist, uint64_t weight) {
 	llist->_numFirings++;
 }
 
+inline void saveNewShedulerWeight(rdtsc_scheduler_data_t *transitionTop, char *srcAction, char *dstAction, uint64_t weight) {
+	rdtsc_data_t *y = NULL;
+
+	if(transitionTop->_profData == NULL) {
+		y = (rdtsc_data_t *) malloc(sizeof(rdtsc_data_t *));
+
+		transitionTop->_profData = y;
+		transitionTop->_profData->_numFirings = 0;
+		transitionTop->_profData->_minWeight = LDBL_MAX;
+		transitionTop->_profData->_maxWeight = 0.0;
+		transitionTop->_profData->_avgWeight = 0.0;
+		transitionTop->_profData->_variance = 0.0;
+		transitionTop->_profData->_head = NULL;
+		transitionTop->_profData->_lastNode = NULL;
+
+		sprintf(transitionTop->_srcAction, "%s", srcAction);
+		sprintf(transitionTop->_dstAction, "%s", dstAction);
+	}
+
+	saveNewFiringWeight(transitionTop->_profData, weight);
+}
+
 inline static uint64_t sqr(uint64_t x) {
 	return x*x;
 }
