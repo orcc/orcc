@@ -32,19 +32,19 @@ typedef struct rdtsc_scheduler_data {
 } rdtsc_scheduler_data_t;
 
 typedef struct rdtsc_scheduler_map {
-	const int _xT;
-	const int _yT;
-	rdtsc_scheduler_data_t *_map;
+	int _sizeX;
+	int _sizeY;
+	rdtsc_scheduler_data_t **_map;
 } rdtsc_scheduler_map_t;
 
 #define DECLARE_ACTION_PROFILING_DATA(count) static rdtsc_data_t profDataAction_##count = {0, LDBL_MAX, 0.0, 0.0, 0.0, NULL, NULL};
-#define DECLARE_SCHEDULER_PROFILING_DATA(count, sizeX, sizeY) 									\
-		static rdtsc_scheduler_data_t _2dMap_##count[(sizeX)][(sizeY)];\
-		static rdtsc_scheduler_map_t profDataScheduler_##count = {sizeX, sizeY, _2dMap_##count};
-// = {{"", "", NULL}};
+#define DECLARE_SCHEDULER_PROFILING_DATA(count, sizeX, sizeY) static rdtsc_scheduler_map_t profDataScheduler_##count = {(sizeX), (sizeY), NULL};
+
 inline void saveNewFiringWeight(rdtsc_data_t *llist, uint64_t weight);
 
 inline void saveNewShedulerWeight(rdtsc_scheduler_data_t *transitionTop, char *srcAction, char *dstAction, uint64_t weight);
+
+inline void initializeSchedulerProfilingVars(rdtsc_scheduler_map_t *profDataScheduler);
 
 inline void calcWeightStats(rdtsc_data_t *llist, int useFilter);
 

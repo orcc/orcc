@@ -22,22 +22,36 @@ inline void saveNewShedulerWeight(rdtsc_scheduler_data_t *transitionTop, char *s
 
 	if(transitionTop->_profData == NULL) {
 		y = (rdtsc_data_t *) malloc(sizeof(rdtsc_data_t *));
+		y->_numFirings = 0;
+		y->_minWeight = LDBL_MAX;
+		y->_maxWeight = 0.0;
+		y->_avgWeight = 0.0;
+		y->_variance = 0.0;
+		y->_head = NULL;
+		y->_lastNode = NULL;/**/
 
 		transitionTop->_profData = y;
-		transitionTop->_profData->_numFirings = 0;
-		transitionTop->_profData->_minWeight = LDBL_MAX;
-		transitionTop->_profData->_maxWeight = 0.0;
-		transitionTop->_profData->_avgWeight = 0.0;
-		transitionTop->_profData->_variance = 0.0;
-		transitionTop->_profData->_head = NULL;
-		transitionTop->_profData->_lastNode = NULL;
-
-		sprintf(transitionTop->_srcAction, "%s", srcAction);
-		sprintf(transitionTop->_dstAction, "%s", dstAction);
+		transitionTop->_srcAction = srcAction;
+		transitionTop->_dstAction = dstAction;
 	}
 
 	saveNewFiringWeight(transitionTop->_profData, weight);
 }
+
+inline void initializeSchedulerProfilingVars(rdtsc_scheduler_map_t *profDataScheduler) {
+	int i, j;
+
+	profDataScheduler->_map = (rdtsc_scheduler_data_t **) malloc(profDataScheduler->_sizeX * sizeof(rdtsc_scheduler_data_t *));
+	for(i=0; i<profDataScheduler->_sizeX; i++) {
+		profDataScheduler->_map[i] = (rdtsc_scheduler_data_t *) malloc(profDataScheduler->_sizeY * sizeof(rdtsc_scheduler_data_t));
+		for(j=0; j<profDataScheduler->_sizeY;j++) {
+			profDataScheduler->_map[i][j]._srcAction = "";
+			profDataScheduler->_map[i][j]._dstAction = "";
+			profDataScheduler->_map[i][j]._profData = NULL;
+		}
+	}
+}
+
 
 inline static uint64_t sqr(uint64_t x) {
 	return x*x;
