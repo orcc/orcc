@@ -46,6 +46,7 @@ import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.util.DfUtil;
+import net.sf.orcc.graph.Edge;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.graph.impl.GraphImpl;
 import net.sf.orcc.ir.Var;
@@ -77,9 +78,9 @@ public class NetworkImpl extends GraphImpl implements Network {
 	private Entity cachedAdaptedEntity;
 
 	/**
-	 * The cached value of the '{@link #getChildren() <em>Children</em>}' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The cached value of the '{@link #getChildren() <em>Children</em>}'
+	 * reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getChildren()
 	 * @generated
 	 * @ordered
@@ -87,8 +88,9 @@ public class NetworkImpl extends GraphImpl implements Network {
 	protected EList<Vertex> children;
 
 	/**
-	 * The default value of the '{@link #getFileName() <em>File Name</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The default value of the '{@link #getFileName() <em>File Name</em>}'
+	 * attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getFileName()
 	 * @generated
 	 * @ordered
@@ -96,8 +98,9 @@ public class NetworkImpl extends GraphImpl implements Network {
 	protected static final String FILE_NAME_EDEFAULT = null;
 
 	/**
-	 * The cached value of the '{@link #getFileName() <em>File Name</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getFileName() <em>File Name</em>}'
+	 * attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getFileName()
 	 * @generated
 	 * @ordered
@@ -105,8 +108,9 @@ public class NetworkImpl extends GraphImpl implements Network {
 	protected String fileName = FILE_NAME_EDEFAULT;
 
 	/**
-	 * The cached value of the '{@link #getInputs() <em>Inputs</em>}' reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getInputs() <em>Inputs</em>}' reference
+	 * list. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getInputs()
 	 * @generated
 	 * @ordered
@@ -114,8 +118,9 @@ public class NetworkImpl extends GraphImpl implements Network {
 	protected EList<Port> inputs;
 
 	/**
-	 * The cached value of the '{@link #getMoC() <em>Mo C</em>}' containment reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getMoC() <em>Mo C</em>}' containment
+	 * reference. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getMoC()
 	 * @generated
 	 * @ordered
@@ -125,6 +130,7 @@ public class NetworkImpl extends GraphImpl implements Network {
 	/**
 	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getName()
 	 * @generated
 	 * @ordered
@@ -132,8 +138,9 @@ public class NetworkImpl extends GraphImpl implements Network {
 	protected static final String NAME_EDEFAULT = null;
 
 	/**
-	 * The cached value of the '{@link #getOutputs() <em>Outputs</em>}' reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getOutputs() <em>Outputs</em>}'
+	 * reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getOutputs()
 	 * @generated
 	 * @ordered
@@ -141,8 +148,9 @@ public class NetworkImpl extends GraphImpl implements Network {
 	protected EList<Port> outputs;
 
 	/**
-	 * The cached value of the '{@link #getParameters() <em>Parameters</em>}' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getParameters() <em>Parameters</em>}'
+	 * containment reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getParameters()
 	 * @generated
 	 * @ordered
@@ -156,6 +164,7 @@ public class NetworkImpl extends GraphImpl implements Network {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	protected NetworkImpl() {
@@ -182,14 +191,15 @@ public class NetworkImpl extends GraphImpl implements Network {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public NotificationChain basicSetMoC(MoC newMoC, NotificationChain msgs) {
 		MoC oldMoC = moC;
 		moC = newMoC;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET, DfPackage.NETWORK__MO_C, oldMoC, newMoC);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, DfPackage.NETWORK__MO_C,
+					oldMoC, newMoC);
 			if (msgs == null)
 				msgs = notification;
 			else
@@ -222,10 +232,18 @@ public class NetworkImpl extends GraphImpl implements Network {
 				i++;
 			}
 		}
+		for (Port port : inputs) {
+			List<Edge> edges = port.getOutgoing();
+			for (Edge edge : edges) {
+				edge.setAttribute("idNoBcast", i);
+			}
+			i++;
+		}
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -253,26 +271,25 @@ public class NetworkImpl extends GraphImpl implements Network {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd,
-			int featureID, NotificationChain msgs) {
+	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
 		case DfPackage.NETWORK__MO_C:
 			return basicSetMoC(null, msgs);
 		case DfPackage.NETWORK__PARAMETERS:
-			return ((InternalEList<?>) getParameters()).basicRemove(otherEnd,
-					msgs);
+			return ((InternalEList<?>) getParameters()).basicRemove(otherEnd, msgs);
 		case DfPackage.NETWORK__VARIABLES:
-			return ((InternalEList<?>) getVariables()).basicRemove(otherEnd,
-					msgs);
+			return ((InternalEList<?>) getVariables()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -281,15 +298,13 @@ public class NetworkImpl extends GraphImpl implements Network {
 		case DfPackage.NETWORK__CHILDREN:
 			return children != null && !children.isEmpty();
 		case DfPackage.NETWORK__FILE_NAME:
-			return FILE_NAME_EDEFAULT == null ? fileName != null
-					: !FILE_NAME_EDEFAULT.equals(fileName);
+			return FILE_NAME_EDEFAULT == null ? fileName != null : !FILE_NAME_EDEFAULT.equals(fileName);
 		case DfPackage.NETWORK__INPUTS:
 			return inputs != null && !inputs.isEmpty();
 		case DfPackage.NETWORK__MO_C:
 			return moC != null;
 		case DfPackage.NETWORK__NAME:
-			return NAME_EDEFAULT == null ? getName() != null : !NAME_EDEFAULT
-					.equals(getName());
+			return NAME_EDEFAULT == null ? getName() != null : !NAME_EDEFAULT.equals(getName());
 		case DfPackage.NETWORK__OUTPUTS:
 			return outputs != null && !outputs.isEmpty();
 		case DfPackage.NETWORK__PARAMETERS:
@@ -302,6 +317,7 @@ public class NetworkImpl extends GraphImpl implements Network {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@SuppressWarnings("unchecked")
@@ -343,6 +359,7 @@ public class NetworkImpl extends GraphImpl implements Network {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -352,6 +369,7 @@ public class NetworkImpl extends GraphImpl implements Network {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -390,8 +408,7 @@ public class NetworkImpl extends GraphImpl implements Network {
 	public <T> T getAdapter(Class<T> type) {
 		if (type == Entity.class) {
 			if (cachedAdaptedEntity == null) {
-				cachedAdaptedEntity = new EntityImpl(this, getAttributes(),
-						getInputs(), getOutputs(), getParameters());
+				cachedAdaptedEntity = new EntityImpl(this, getAttributes(), getInputs(), getOutputs(), getParameters());
 			}
 
 			return (T) cachedAdaptedEntity;
@@ -463,14 +480,13 @@ public class NetworkImpl extends GraphImpl implements Network {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EList<Vertex> getChildren() {
 		if (children == null) {
-			children = new EObjectResolvingEList<Vertex>(Vertex.class, this,
-					DfPackage.NETWORK__CHILDREN);
+			children = new EObjectResolvingEList<Vertex>(Vertex.class, this, DfPackage.NETWORK__CHILDREN);
 		}
 		return children;
 	}
@@ -493,6 +509,7 @@ public class NetworkImpl extends GraphImpl implements Network {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public String getFileName() {
@@ -511,12 +528,12 @@ public class NetworkImpl extends GraphImpl implements Network {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EList<Port> getInputs() {
 		if (inputs == null) {
-			inputs = new EObjectResolvingEList<Port>(Port.class, this,
-					DfPackage.NETWORK__INPUTS);
+			inputs = new EObjectResolvingEList<Port>(Port.class, this, DfPackage.NETWORK__INPUTS);
 		}
 		return inputs;
 	}
@@ -579,12 +596,12 @@ public class NetworkImpl extends GraphImpl implements Network {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EList<Port> getOutputs() {
 		if (outputs == null) {
-			outputs = new EObjectResolvingEList<Port>(Port.class, this,
-					DfPackage.NETWORK__OUTPUTS);
+			outputs = new EObjectResolvingEList<Port>(Port.class, this, DfPackage.NETWORK__OUTPUTS);
 		}
 		return outputs;
 	}
@@ -606,12 +623,12 @@ public class NetworkImpl extends GraphImpl implements Network {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EList<Var> getParameters() {
 		if (parameters == null) {
-			parameters = new EObjectContainmentEList<Var>(Var.class, this,
-					DfPackage.NETWORK__PARAMETERS);
+			parameters = new EObjectContainmentEList<Var>(Var.class, this, DfPackage.NETWORK__PARAMETERS);
 		}
 		return parameters;
 	}
@@ -639,8 +656,7 @@ public class NetworkImpl extends GraphImpl implements Network {
 	 */
 	public EList<Var> getVariables() {
 		if (variables == null) {
-			variables = new EObjectContainmentEList<Var>(Var.class, this,
-					DfPackage.NETWORK__VARIABLES);
+			variables = new EObjectContainmentEList<Var>(Var.class, this, DfPackage.NETWORK__VARIABLES);
 		}
 		return variables;
 	}
@@ -657,14 +673,14 @@ public class NetworkImpl extends GraphImpl implements Network {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public void setFileName(String newFileName) {
 		String oldFileName = fileName;
 		fileName = newFileName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					DfPackage.NETWORK__FILE_NAME, oldFileName, fileName));
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.NETWORK__FILE_NAME, oldFileName, fileName));
 	}
 
 	/**
@@ -678,19 +694,16 @@ public class NetworkImpl extends GraphImpl implements Network {
 		if (newMoC != moC) {
 			NotificationChain msgs = null;
 			if (moC != null)
-				msgs = ((InternalEObject) moC).eInverseRemove(this,
-						EOPPOSITE_FEATURE_BASE - DfPackage.NETWORK__MO_C, null,
-						msgs);
+				msgs = ((InternalEObject) moC).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - DfPackage.NETWORK__MO_C,
+						null, msgs);
 			if (newMoC != null)
-				msgs = ((InternalEObject) newMoC).eInverseAdd(this,
-						EOPPOSITE_FEATURE_BASE - DfPackage.NETWORK__MO_C, null,
-						msgs);
+				msgs = ((InternalEObject) newMoC).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - DfPackage.NETWORK__MO_C,
+						null, msgs);
 			msgs = basicSetMoC(newMoC, msgs);
 			if (msgs != null)
 				msgs.dispatch();
 		} else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					DfPackage.NETWORK__MO_C, newMoC, newMoC));
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.NETWORK__MO_C, newMoC, newMoC));
 	}
 
 	@Override
