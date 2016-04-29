@@ -3,9 +3,11 @@
 #include <stdint.h>
 #include <math.h>
 #include "rdtsc.h"
+#define _GNU_SOURCE
+#include <string.h>
 
 inline void saveNewFiringWeight(rdtsc_data_t *llist, uint64_t weight) {
-	rdtsc_node_t *y = (rdtsc_node_t *) malloc(sizeof(rdtsc_node_t *));
+	rdtsc_node_t *y = (rdtsc_node_t *) malloc(sizeof(rdtsc_node_t));
 	y->_weight = weight;
 	y->_next = NULL;
 
@@ -21,18 +23,18 @@ inline void saveNewShedulerWeight(rdtsc_scheduler_data_t *transitionTop, char *s
 	rdtsc_data_t *y = NULL;
 
 	if(transitionTop->_profData == NULL) {
-		y = (rdtsc_data_t *) malloc(sizeof(rdtsc_data_t *));
+		y = (rdtsc_data_t *) malloc(sizeof(rdtsc_data_t));
 		y->_numFirings = 0;
 		y->_minWeight = LDBL_MAX;
 		y->_maxWeight = 0.0;
 		y->_avgWeight = 0.0;
 		y->_variance = 0.0;
 		y->_head = NULL;
-		y->_lastNode = NULL;/**/
+		y->_lastNode = NULL;
 
 		transitionTop->_profData = y;
-		transitionTop->_srcAction = srcAction;
-		transitionTop->_dstAction = dstAction;
+		strcpy(transitionTop->_srcAction, srcAction);
+		strcpy(transitionTop->_dstAction, dstAction);
 	}
 
 	saveNewFiringWeight(transitionTop->_profData, weight);
@@ -45,13 +47,10 @@ inline void initializeSchedulerProfilingVars(rdtsc_scheduler_map_t *profDataSche
 	for(i=0; i<profDataScheduler->_sizeX; i++) {
 		profDataScheduler->_map[i] = (rdtsc_scheduler_data_t *) malloc(profDataScheduler->_sizeY * sizeof(rdtsc_scheduler_data_t));
 		for(j=0; j<profDataScheduler->_sizeY;j++) {
-			profDataScheduler->_map[i][j]._srcAction = "";
-			profDataScheduler->_map[i][j]._dstAction = "";
 			profDataScheduler->_map[i][j]._profData = NULL;
 		}
 	}
 }
-
 
 inline static uint64_t sqr(uint64_t x) {
 	return x*x;
@@ -141,7 +140,7 @@ inline void calcWeightStats(rdtsc_data_t *llist, int useFilter) {
 	calcWeightSimple(llist, threshold);
 }
 
-inline void printFiringcWeights(char *actionName, rdtsc_data_t *llist, FILE *fp) {
+inline void printAllFiringsWeights(char *actionName, rdtsc_data_t *llist, FILE *fp) {
 	rdtsc_node_t *y = llist->_head;
 	uint64_t counter = 0;
 
@@ -151,6 +150,12 @@ inline void printFiringcWeights(char *actionName, rdtsc_data_t *llist, FILE *fp)
 		y = y->_next;
 		counter++;
 	}
+}
+
+inline void printAllSchedFiringsWeights(rdtsc_scheduler_data_t *dataTop, FILE *fp) {
+	char cntStr[210];
+	sprintf(cntStr, "\"%s\" => \"%s\"", dataTop->_srcAction, dataTop->_dstAction);
+	printAllFiringsWeights(cntStr, dataTop->_profData, fp);
 }
 
 /*--------------------------------------------------------------------------------------------------*/

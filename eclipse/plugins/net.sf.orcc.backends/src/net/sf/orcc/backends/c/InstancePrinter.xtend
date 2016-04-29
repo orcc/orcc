@@ -483,6 +483,7 @@ class InstancePrinter extends CTemplate {
 				int i = 0;
 				si->ports = 0;
 
+				«printGenWeightsInitSchedulerProfilingVars»
 				«printCallTokensFunctions»
 				«IF enableTrace»
 					«printOpenFiles»
@@ -516,6 +517,8 @@ class InstancePrinter extends CTemplate {
 		«IF ! actor.actionsOutsideFsm.empty»
 			«inline»void «entityName»_outside_FSM_scheduler(schedinfo_t *si) {
 				int i = 0;
+				
+				«printGenWeightsInitSchedulerProfilingVars»
 				«actor.actionsOutsideFsm.printActionSchedulingLoop»
 			finished:
 				// no read_end/write_end here!
@@ -526,6 +529,7 @@ class InstancePrinter extends CTemplate {
 		«noInline»void «entityName»_scheduler(schedinfo_t *si) {
 			int i = 0;
 
+			«printGenWeightsInitSchedulerProfilingVars»
 			«printCallTokensFunctions»
 			«IF enableTrace»
 				«printOpenFiles»
@@ -604,6 +608,7 @@ class InstancePrinter extends CTemplate {
 						goto finished;
 					}
 				«ENDIF»
+				«genWeightsSchedulerTock("actionState_"+trans.action.body.name)»
 				«IF trans.action.hasAttribute(ALIGNED_ALWAYS)»
 					«trans.action.body.name»_aligned();
 				«ELSEIF trans.action.hasAttribute(ALIGNABLE)»
@@ -617,6 +622,7 @@ class InstancePrinter extends CTemplate {
 				«ELSE»
 					«trans.action.body.name»();
 				«ENDIF»
+				«genWeightsSchedulerTick("_currSelectedAction")»
 				i++;
 				goto l_«trans.target.name»;
 		'''
@@ -751,6 +757,7 @@ class InstancePrinter extends CTemplate {
 						goto finished;
 					}
 				«ENDIF»
+				«genWeightsSchedulerTock("actionState_"+action.body.name)»
 				«IF action.hasAttribute(ALIGNED_ALWAYS)»
 					«action.body.name»_aligned();
 				«ELSEIF action.hasAttribute(ALIGNABLE)»
@@ -764,6 +771,7 @@ class InstancePrinter extends CTemplate {
 				«ELSE»
 					«action.body.name»();
 				«ENDIF»
+				«genWeightsSchedulerTick("_currSelectedAction")»
 				i++;
 		'''
 		return output
@@ -850,13 +858,13 @@ class InstancePrinter extends CTemplate {
 				«debugTokens(action.inputPattern)»
 			«ENDIF»
 			«writeTraces(action.inputPattern)»
-			«action.genWeightsStart»
+			«action.genWeightsActionsTick»
 			«beforeActionBody»
 			«FOR block : action.body.blocks»
 				«block.doSwitch»
 			«ENDFOR»
 			«afterActionBody»
-			«action.genWeightsStop»
+			«action.genWeightsActionsTock»
 			«IF debugAction»
 				«debugTokens(action.outputPattern)»
 			«ENDIF»
@@ -933,22 +941,54 @@ class InstancePrinter extends CTemplate {
 		«ENDFOR»
 	'''
 	
-	def protected genWeightsStart(Action action) '''
+	def protected genWeightsActionsTick(Action action) '''
 		«IF genWeights && !actor.initializes.contains(action)»
 
-			rdtsc_warmup(&actionsCyclesHigh1, &actionsCyclesLow1, &actionsCyclesHigh2, &actionsCyclesLow2);
-			rdtsc_tick(&actionsCyclesHigh1, &actionsCyclesLow1);
-			
+		rdtsc_warmup(&actionsCyclesHigh1, &actionsCyclesLow1, &actionsCyclesHigh2, &actionsCyclesLow2);
+		rdtsc_tick(&actionsCyclesHigh1, &actionsCyclesLow1);
+
 		«ENDIF»
 	'''
 
-	def protected genWeightsStop(Action action) '''
+	def protected genWeightsActionsTock(Action action) '''
 		«IF genWeights && !actor.initializes.contains(action)»
-		
+
 		rdtsc_tock(&actionsCyclesHigh2, &actionsCyclesLow2);
 		saveNewFiringWeight(profDataAction_«actor.name»_«action.name», rdtsc_getTicksCount(actionsCyclesHigh1, actionsCyclesLow1, actionsCyclesHigh2, actionsCyclesLow2));
 
 		«ENDIF»
+	'''
+
+	def protected genWeightsSchedulerTick(String actionStateStr) '''
+		«IF genWeights»
+
+		_lastSelectedAction = «actionStateStr»;
+		rdtsc_warmup(&schedulerCyclesHigh1, &schedulerCyclesLow1, &schedulerCyclesHigh2, &schedulerCyclesLow2);
+		rdtsc_tick(&schedulerCyclesHigh1, &schedulerCyclesLow1);
+
+		«ENDIF»
+	'''
+
+	def protected genWeightsSchedulerTock(String actionStateStr) '''
+		«IF genWeights»
+		
+		rdtsc_tock(&schedulerCyclesHigh2, &schedulerCyclesLow2);
+		_currSelectedAction = «actionStateStr»;
+		saveNewShedulerWeight(&profDataScheduler_«actor.name»->_map[_lastSelectedAction][_currSelectedAction], 
+							  actionNames[_lastSelectedAction], actionNames[_currSelectedAction], 
+							  rdtsc_getTicksCount(schedulerCyclesHigh1, schedulerCyclesLow1, schedulerCyclesHigh2, schedulerCyclesLow2));
+
+		«ENDIF»
+	'''	
+	
+	def protected printGenWeightsInitSchedulerProfilingVars() '''
+		«IF genWeights»
+			if(!ifInitSchedulerProfilingVars) {
+				initializeSchedulerProfilingVars(profDataScheduler_«actor.name»);
+				ifInitSchedulerProfilingVars = 1;
+			}
+			«genWeightsSchedulerTick("OUTSIDE")»
+		«ENDIF»	
 	'''
 	
 	def protected printGenWeightsDeclartions()	{
@@ -981,6 +1021,7 @@ class InstancePrinter extends CTemplate {
 		
 		static unsigned int actionsCyclesHigh1, actionsCyclesLow1, actionsCyclesHigh2, actionsCyclesLow2;
 		static unsigned int schedulerCyclesHigh1, schedulerCyclesLow1, schedulerCyclesHigh2, schedulerCyclesLow2;
+		static int ifInitSchedulerProfilingVars = 0;
 		«IF genWeightsExit»
 			
 			«printCalcGenWeightsStatsFunctions»
@@ -1006,13 +1047,14 @@ class InstancePrinter extends CTemplate {
 		};
 
 		static char *actionNames[] = {
-			"OUTSIDE",
+			"",
 			«FOR action : actor.actions SEPARATOR ','»
 				"«action.name»"
 			«ENDFOR»
 		};
 		
 		static enum actionStates _lastSelectedAction;
+		static enum actionStates _currSelectedAction;
 	'''
 	def protected printGenWeightsSchedulerProfilingVars(Actor actor) '''
 		«printGenWeightsSchedulerProfilingPart1(actor)»
@@ -1067,6 +1109,7 @@ class InstancePrinter extends CTemplate {
 			
 			void calcGenWeightsSchedulers() {
 				FILE *fpGenWeightsStats = NULL;
+				int i, j;
 				«IF genWeightsDump»FILE *fpGenWeightsFirings = NULL;«ENDIF»
 				char fnGenWeightsStats[FILENAME_MAX];
 				int useFilter = «IF genWeightsFilter»1«ELSE»0«ENDIF»;
@@ -1109,7 +1152,7 @@ class InstancePrinter extends CTemplate {
 		«ENDIF»
 		fprintf(fpGenWeightsStats, "\t<actor id=\"«actor.name»\">\n");
 		«FOR action : actor.actions»
-			«IF genWeightsDump»printFiringcWeights("«action.name»", profDataAction_«actor.name»_«action.name», fpGenWeightsFirings);«ENDIF»
+			«IF genWeightsDump»printAllFiringsWeights("«action.name»", profDataAction_«actor.name»_«action.name», fpGenWeightsFirings);«ENDIF»
 			calcWeightStats(profDataAction_«actor.name»_«action.name», useFilter);
 			fprintf(fpGenWeightsStats, "\t\t<action id=\"«action.name»\" clockcycles=\"%Lf\" clockcycles-min=\"%Lf\" clockcycles-max=\"%Lf\" clockcycles-var=\"%Lf\" firings=\"%"PRIu64"\"/>\n", 
 				profDataAction_«actor.name»_«action.name»->_avgWeight, 
@@ -1133,6 +1176,22 @@ class InstancePrinter extends CTemplate {
 		}
 		«ENDIF»
 		fprintf(fpGenWeightsStats, "\t<actor id=\"«actor.name»\">\n");
+		for(i=0; i<profDataScheduler_«actor.name»->_sizeX; i++) {
+			for(j=0; j<profDataScheduler_«actor.name»->_sizeY; j++) {
+				if(profDataScheduler_«actor.name»->_map[i][j]._profData != NULL && profDataScheduler_«actor.name»->_map[i][j]._profData->_head != NULL) {
+					«IF genWeightsDump»printAllSchedFiringsWeights(&profDataScheduler_«actor.name»->_map[i][j], fpGenWeightsFirings);«ENDIF»
+					calcWeightStats(profDataScheduler_«actor.name»->_map[i][j]._profData, useFilter);
+					fprintf(fpGenWeightsStats, "\t\t<scheduling source=\"%s\" target=\"%s\" clockcycles=\"%Lf\" clockcycles-min=\"%Lf\" clockcycles-max=\"%Lf\" clockcycles-var=\"%Lf\" firings=\"%"PRIu64"\"/>\n", 
+						profDataScheduler_«actor.name»->_map[i][j]._srcAction,
+						profDataScheduler_«actor.name»->_map[i][j]._dstAction,
+						profDataScheduler_«actor.name»->_map[i][j]._profData->_avgWeight, 
+						(profDataScheduler_«actor.name»->_map[i][j]._profData->_numFirings > 0)?profDataScheduler_«actor.name»->_map[i][j]._profData->_minWeight:0, 
+						profDataScheduler_«actor.name»->_map[i][j]._profData->_maxWeight,
+						profDataScheduler_«actor.name»->_map[i][j]._profData->_variance, 
+						profDataScheduler_«actor.name»->_map[i][j]._profData->_numFirings);
+				}
+			}
+		}
 		fprintf(fpGenWeightsStats, "\t</actor>\n");
 		«IF genWeightsDump»fclose(fpGenWeightsFirings);«ENDIF»
 		

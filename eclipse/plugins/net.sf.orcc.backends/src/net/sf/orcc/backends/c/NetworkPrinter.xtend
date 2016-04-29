@@ -259,7 +259,7 @@ class NetworkPrinter extends CTemplate {
 	'''
 	
 	def protected allocateGenWeightsSchedulerData(Vertex vertex) '''
-		DECLARE_SCHEDULER_PROFILING_DATA(«genWeightsSchedulerDataCounter», «vertex.getAdapter(typeof(Actor)).actions.length+1», «vertex.getAdapter(typeof(Actor)).actions.length»)
+		DECLARE_SCHEDULER_PROFILING_DATA(«genWeightsSchedulerDataCounter», «vertex.getAdapter(typeof(Actor)).actions.length+1», «vertex.getAdapter(typeof(Actor)).actions.length»+1)
 		rdtsc_scheduler_map_t *profDataScheduler_«vertex.label» = &profDataScheduler_«genWeightsSchedulerDataCounter»;
 		«incGenWeightsSchedulerDataCounter»
 	'''

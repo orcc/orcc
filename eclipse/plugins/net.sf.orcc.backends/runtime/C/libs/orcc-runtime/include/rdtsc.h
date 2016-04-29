@@ -26,8 +26,8 @@ typedef struct rdtsc_data {
 
 // Transition
 typedef struct rdtsc_scheduler_data {
-	char *_srcAction;
-	char *_dstAction;
+	char _srcAction[100];
+	char _dstAction[100];
 	rdtsc_data_t *_profData;
 } rdtsc_scheduler_data_t;
 
@@ -38,7 +38,8 @@ typedef struct rdtsc_scheduler_map {
 } rdtsc_scheduler_map_t;
 
 #define DECLARE_ACTION_PROFILING_DATA(count) static rdtsc_data_t profDataAction_##count = {0, LDBL_MAX, 0.0, 0.0, 0.0, NULL, NULL};
-#define DECLARE_SCHEDULER_PROFILING_DATA(count, sizeX, sizeY) static rdtsc_scheduler_map_t profDataScheduler_##count = {(sizeX), (sizeY), NULL};
+#define DECLARE_SCHEDULER_PROFILING_DATA(count, sizeX, sizeY) \
+		static rdtsc_scheduler_map_t profDataScheduler_##count = {(sizeX), (sizeY), NULL};
 
 inline void saveNewFiringWeight(rdtsc_data_t *llist, uint64_t weight);
 
@@ -48,7 +49,9 @@ inline void initializeSchedulerProfilingVars(rdtsc_scheduler_map_t *profDataSche
 
 inline void calcWeightStats(rdtsc_data_t *llist, int useFilter);
 
-inline void printFiringcWeights(char *actionName, rdtsc_data_t *llist, FILE *fp);
+inline void printAllFiringsWeights(char *actionName, rdtsc_data_t *llist, FILE *fp);
+
+inline void printAllSchedFiringsWeights(rdtsc_scheduler_data_t *dataTop, FILE *fp);
 
 /*--------------------------------------------------------------------------------------------------*/
 
