@@ -17,7 +17,7 @@ xtend-gen
 
 # Specific rules to ignore Xtext arifacts
 plugin.xml_gen
-.antlr-generator-*.jar
+#.antlr-generator-*.jar
 /eclipse/plugins/net.sf.orcc.cal/model/generated
 
 # Do not track CHANGELOG symlinks
