@@ -11,6 +11,7 @@
 # Common rules for Eclipse projects
 # src-gen folders are ignored with a specific .gitignore inside each
 bin
+target
 xtend-gen
 .metadata
 
