@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="net.sf.orcc"
+      id="net.sf.orcc.feature"
       label="Orcc"
       version="2.3.1.qualifier"
       provider-name="IETR/INSA Rennes">
@@ -33,7 +33,59 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&
 
    <url>
       <update label="Open RVC-CAL Compiler - Stable releases" url="http://orcc.sourceforge.net/eclipse"/>
+      <discovery label="Eclipse Mars" url="http://download.eclipse.org/releases/mars"/>
+      <discovery label="Xtext and Xtend" url="http://download.eclipse.org/modeling/tmf/xtext/updates/composite/releases/"/>
+      <discovery label="Graphiti" url="http://download.eclipse.org/graphiti/updates/0.12.2/"/>
    </url>
+
+   <requires>
+      <import plugin="net.sf.orcc.models" version="2.3.1" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.expressions" version="3.4.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.emf.ecore.xmi" version="2.7.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.jdt.core" version="3.7.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.emf.ecore"/>
+      <import plugin="org.eclipse.xtend.lib" version="2.4.0" match="greaterOrEqual"/>
+      <import plugin="net.sf.orcc.core" version="2.3.1" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.xtext.xbase.lib" version="2.4.0" match="greaterOrEqual"/>
+      <import plugin="org.apache.commons.cli" version="1.2.0" match="greaterOrEqual"/>
+      <import plugin="org.apache.commons.lang" version="2.6.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.xtext" version="2.9.0" match="greaterOrEqual"/>
+      <import plugin="org.antlr.runtime" version="3.2.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.resources" version="3.7.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.runtime" version="3.7.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.emf.common" version="2.7.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.emf.ecore" version="2.7.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.xtext.util" version="2.0.0" match="greaterOrEqual"/>
+      <import plugin="org.objectweb.asm" version="5.0.1" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.xtext.common.types"/>
+      <import plugin="org.apache.log4j"/>
+      <import plugin="net.sf.orcc.cal" version="2.3.1" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.compare" version="3.5.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui" version="3.7.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui.editors" version="3.7.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui.ide" version="3.7.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.xtext.builder" version="2.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.xtext.common.types.ui" version="2.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.xtext.ui" version="2.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.xtext.ui.shared" version="2.0.0" match="greaterOrEqual"/>
+      <import plugin="org.apache.commons.lang" version="2.4.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.xtext.ui.codetemplates.ui"/>
+      <import plugin="com.google.guava"/>
+      <import plugin="net.sf.orcc.backends" version="2.3.1" match="greaterOrEqual"/>
+      <import plugin="net.sf.orcc.cal.ui" version="2.3.1" match="greaterOrEqual"/>
+      <import plugin="net.sf.orcc.simulators" version="2.3.1" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.gef" version="3.7.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui.views.properties.tabbed"/>
+      <import plugin="org.eclipse.debug.ui" version="3.7.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui.console" version="3.5.100" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui.workbench"/>
+      <import plugin="org.eclipse.graphiti"/>
+      <import plugin="org.eclipse.graphiti.ui"/>
+      <import plugin="org.eclipse.graphiti.pattern"/>
+      <import plugin="org.eclipse.draw2d"/>
+      <import plugin="org.eclipse.emf.transaction"/>
+   </requires>
 
    <plugin
          id="net.sf.orcc.core"

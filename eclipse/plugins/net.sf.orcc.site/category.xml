@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/net.sf.orcc.feature_2.3.1.qualifier.jar" id="net.sf.orcc.feature" version="2.3.1.qualifier">
+      <category name="Orcc"/>
+   </feature>
+   <category-def name="Orcc" label="Orcc"/>
+</site>
