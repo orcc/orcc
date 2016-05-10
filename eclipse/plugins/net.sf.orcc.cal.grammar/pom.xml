@@ -1,0 +1,113 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>net.sf.orcc.cal.grammar</artifactId>
+	<version>2.3.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	
+	<properties>
+		<xtext-version>2.9.0</xtext-version>
+	</properties>
+	
+	<build>
+		<plugins>
+			<!-- adapted from http://www.eclipse.org/forums/index.php/t/639454/ -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>2.5</version>
+				<configuration>
+					<filesets>
+						<!-- clean ui plugin -->
+						<fileset>
+							<directory>${basedir}/../${project.groupId}.${project.artifactId}.ui/src-gen</directory>
+						</fileset>
+						<fileset>
+							<directory>${basedir}/../${project.groupId}.${project.artifactId}.ui/xtend-gen</directory>
+						</fileset>
+					</filesets>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.4.0</version>
+				<executions>
+					<execution>
+						<id>mwe2Launcher</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>java</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<mainClass>org.eclipse.emf.mwe2.launch.runtime.Mwe2Launcher</mainClass>
+					<arguments>
+						<argument>/${project.basedir}/../net.sf.orcc.cal/src/net/sf/orcc/cal/GenerateCal.mwe2</argument>
+					</arguments>
+					<includePluginDependencies>true</includePluginDependencies>
+					<cleanupDaemonThreads>false</cleanupDaemonThreads>
+				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>org.eclipse.xtext</groupId>
+						<artifactId>org.eclipse.xtext.xtext</artifactId>
+						<version>${xtext-version}</version>
+					</dependency>
+					<dependency>
+						<groupId>org.eclipse.xtext</groupId>
+						<artifactId>org.eclipse.xtext.xbase</artifactId>
+						<version>${xtext-version}</version>
+					</dependency>
+					<dependency>
+						<groupId>org.eclipse.equinox</groupId>
+						<artifactId>common</artifactId>
+						<version>3.6.200-v20130402-1505</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+		
+		</plugins>
+		
+		<pluginManagement>
+			<plugins>
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. -->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.codehaus.mojo</groupId>
+										<artifactId>exec-maven-plugin</artifactId>
+										<versionRange>[,)</versionRange>
+										<goals>
+											<goal>java</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<execute />
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+		
+	</build>
+
+	<parent>
+		<groupId>net.sf.orcc</groupId>
+		<artifactId>net.sf.orcc</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+	
+</project>
