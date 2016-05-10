@@ -47,7 +47,7 @@ import com.google.inject.Inject;
  * @author Matthieu Wipliez
  * 
  */
-public class CalJavaValidator extends AbstractCalJavaValidator {
+public class CalJavaValidator extends AbstractCalValidator {
 
 	@Inject
 	private StructuralValidator structuralValidator;

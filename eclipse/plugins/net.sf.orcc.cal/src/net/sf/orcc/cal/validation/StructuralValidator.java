@@ -97,7 +97,7 @@ import org.jgrapht.graph.DefaultEdge;
  * @author Matthieu Wipliez
  * 
  */
-public class StructuralValidator extends AbstractCalJavaValidator {
+public class StructuralValidator extends AbstractCalValidator {
 
 	private static final String DEFAULT = "(default)";
 

@@ -78,7 +78,7 @@ import com.google.inject.Inject;
  * @author Matthieu Wipliez
  * 
  */
-public class WarningValidator extends AbstractCalJavaValidator {
+public class WarningValidator extends AbstractCalValidator {
 
 	@Inject
 	XtextResourceSet rs;

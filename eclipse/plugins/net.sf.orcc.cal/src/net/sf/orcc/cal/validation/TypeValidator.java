@@ -83,7 +83,7 @@ import org.eclipse.xtext.validation.CheckType;
  * @author Matthieu Wipliez
  * 
  */
-public class TypeValidator extends AbstractCalJavaValidator {
+public class TypeValidator extends AbstractCalValidator {
 
 	private final TypePrinter printer;
 
