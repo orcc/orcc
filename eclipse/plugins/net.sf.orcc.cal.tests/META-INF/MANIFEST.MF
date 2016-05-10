@@ -16,7 +16,8 @@ Require-Bundle: net.sf.orcc.backends;bundle-version="2.3.1",
  com.google.guava,
  org.eclipse.xtext.xbase.lib,
  org.eclipse.core.runtime,
- org.eclipse.ui.workbench;resolution:=optional
+ org.eclipse.ui.workbench;resolution:=optional,
+ org.objectweb.asm;bundle-version="[5.0.1,6.0.0)";resolution:=optional
 Export-Package: net.sf.orcc.cal
 Import-Package: org.junit.runner;version="4.5.0",
  org.junit.runner.manipulation;version="4.5.0",

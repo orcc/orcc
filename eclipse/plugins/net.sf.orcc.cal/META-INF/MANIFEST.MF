@@ -6,7 +6,7 @@ Bundle-Version: 2.3.1.qualifier
 Bundle-SymbolicName: net.sf.orcc.cal; singleton:=true
 Bundle-ActivationPolicy: lazy
 Require-Bundle: net.sf.orcc.core;bundle-version="2.3.1";visibility:=reexport,
- org.eclipse.xtext;bundle-version="2.0.0",
+ org.eclipse.xtext;bundle-version="2.9.0",
  org.antlr.runtime;bundle-version="3.2.0",
  org.apache.commons.logging;resolution:=optional,
  org.apache.commons.lang,
@@ -19,7 +19,8 @@ Require-Bundle: net.sf.orcc.core;bundle-version="2.3.1";visibility:=reexport,
  org.eclipse.jdt.core;bundle-version="3.7.0",
  org.eclipse.xtext.util;bundle-version="2.0.0",
  org.objectweb.asm;bundle-version="5.0.1",
- org.eclipse.xtext.xbase.lib
+ org.eclipse.xtext.xbase.lib,
+ org.eclipse.xtext.common.types
 Import-Package: org.apache.log4j,
  org.eclipse.xtext.xbase.lib
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
@@ -28,7 +29,6 @@ Export-Package: net.sf.orcc.cache,
  net.sf.orcc.cal.cal,
  net.sf.orcc.cal.cal.impl,
  net.sf.orcc.cal.cal.util,
- net.sf.orcc.cal.parseTreeConstruction,
  net.sf.orcc.cal.parser.antlr,
  net.sf.orcc.cal.parser.antlr.internal,
  net.sf.orcc.cal.services,
@@ -37,5 +37,6 @@ Export-Package: net.sf.orcc.cache,
  net.sf.orcc.frontend,
  net.sf.orcc.cal.formatting,
  net.sf.orcc.cal.scoping,
- net.sf.orcc.cal.generator
+ net.sf.orcc.cal.generator,
+ net.sf.orcc.cal.serializer
 Bundle-ClassPath: .,lib/jgrapht-0.9.0/jgrapht-core-0.9.0.jar,lib/jgrapht-0.9.0/jgrapht-ext-0.9.0.jar
