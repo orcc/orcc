@@ -115,13 +115,12 @@ public class MocPackageImpl extends EPackageImpl implements MocPackage {
 	 */
 	public static MocPackage init() {
 		if (isInited)
-			return (MocPackage) EPackage.Registry.INSTANCE
-					.getEPackage(MocPackage.eNS_URI);
+			return (MocPackage) EPackage.Registry.INSTANCE.getEPackage(MocPackage.eNS_URI);
 
 		// Obtain or create and register package
 		MocPackageImpl theMocPackage = (MocPackageImpl) (EPackage.Registry.INSTANCE
-				.get(eNS_URI) instanceof MocPackageImpl ? EPackage.Registry.INSTANCE
-				.get(eNS_URI) : new MocPackageImpl());
+				.get(eNS_URI) instanceof MocPackageImpl ? EPackage.Registry.INSTANCE.get(eNS_URI)
+						: new MocPackageImpl());
 
 		isInited = true;
 
@@ -131,11 +130,11 @@ public class MocPackageImpl extends EPackageImpl implements MocPackage {
 
 		// Obtain or create and register interdependencies
 		DfPackageImpl theDfPackage = (DfPackageImpl) (EPackage.Registry.INSTANCE
-				.getEPackage(DfPackage.eNS_URI) instanceof DfPackageImpl ? EPackage.Registry.INSTANCE
-				.getEPackage(DfPackage.eNS_URI) : DfPackage.eINSTANCE);
+				.getEPackage(DfPackage.eNS_URI) instanceof DfPackageImpl
+						? EPackage.Registry.INSTANCE.getEPackage(DfPackage.eNS_URI) : DfPackage.eINSTANCE);
 		IrPackageImpl theIrPackage = (IrPackageImpl) (EPackage.Registry.INSTANCE
-				.getEPackage(IrPackage.eNS_URI) instanceof IrPackageImpl ? EPackage.Registry.INSTANCE
-				.getEPackage(IrPackage.eNS_URI) : IrPackage.eINSTANCE);
+				.getEPackage(IrPackage.eNS_URI) instanceof IrPackageImpl
+						? EPackage.Registry.INSTANCE.getEPackage(IrPackage.eNS_URI) : IrPackage.eINSTANCE);
 
 		// Create package meta-data objects
 		theMocPackage.createPackageContents();
@@ -335,8 +334,7 @@ public class MocPackageImpl extends EPackageImpl implements MocPackage {
 		setNsURI(eNS_URI);
 
 		// Obtain other dependent packages
-		DfPackage theDfPackage = (DfPackage) EPackage.Registry.INSTANCE
-				.getEPackage(DfPackage.eNS_URI);
+		DfPackage theDfPackage = (DfPackage) EPackage.Registry.INSTANCE.getEPackage(DfPackage.eNS_URI);
 
 		// Create type parameters
 
@@ -350,51 +348,37 @@ public class MocPackageImpl extends EPackageImpl implements MocPackage {
 		sdfMoCEClass.getESuperTypes().add(this.getCSDFMoC());
 
 		// Initialize classes and features; add operations and parameters
-		initEClass(moCEClass, MoC.class, "MoC", IS_ABSTRACT, !IS_INTERFACE,
+		initEClass(moCEClass, MoC.class, "MoC", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+
+		initEClass(csdfMoCEClass, CSDFMoC.class, "CSDFMoC", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getCSDFMoC_InputPattern(), theDfPackage.getPattern(), null, "inputPattern", null, 0, 1,
+				CSDFMoC.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getCSDFMoC_NumberOfPhases(), ecorePackage.getEInt(), "numberOfPhases", null, 0, 1, CSDFMoC.class,
+				!IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getCSDFMoC_OutputPattern(), theDfPackage.getPattern(), null, "outputPattern", null, 0, 1,
+				CSDFMoC.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getCSDFMoC_Invocations(), this.getInvocation(), null, "invocations", null, 0, -1, CSDFMoC.class,
+				!IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE,
+				IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getCSDFMoC_DelayPattern(), theDfPackage.getPattern(), null, "delayPattern", null, 0, 1,
+				CSDFMoC.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(dpnMoCEClass, DPNMoC.class, "DPNMoC", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+
+		initEClass(kpnMoCEClass, KPNMoC.class, "KPNMoC", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+
+		initEClass(qsdfMoCEClass, QSDFMoC.class, "QSDFMoC", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+
+		initEClass(sdfMoCEClass, SDFMoC.class, "SDFMoC", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+
+		initEClass(invocationEClass, Invocation.class, "Invocation", !IS_ABSTRACT, !IS_INTERFACE,
 				IS_GENERATED_INSTANCE_CLASS);
-
-		initEClass(csdfMoCEClass, CSDFMoC.class, "CSDFMoC", !IS_ABSTRACT,
-				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getCSDFMoC_InputPattern(), theDfPackage.getPattern(),
-				null, "inputPattern", null, 0, 1, CSDFMoC.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
-				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getCSDFMoC_NumberOfPhases(), ecorePackage.getEInt(),
-				"numberOfPhases", null, 0, 1, CSDFMoC.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
-				!IS_DERIVED, IS_ORDERED);
-		initEReference(getCSDFMoC_OutputPattern(), theDfPackage.getPattern(),
-				null, "outputPattern", null, 0, 1, CSDFMoC.class,
-				!IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE,
-				!IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED,
-				IS_ORDERED);
-		initEReference(getCSDFMoC_Invocations(), this.getInvocation(), null,
-				"invocations", null, 0, -1, CSDFMoC.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
-				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getCSDFMoC_DelayPattern(), theDfPackage.getPattern(),
-				null, "delayPattern", null, 0, 1, CSDFMoC.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
-				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-
-		initEClass(dpnMoCEClass, DPNMoC.class, "DPNMoC", !IS_ABSTRACT,
-				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-
-		initEClass(kpnMoCEClass, KPNMoC.class, "KPNMoC", !IS_ABSTRACT,
-				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-
-		initEClass(qsdfMoCEClass, QSDFMoC.class, "QSDFMoC", !IS_ABSTRACT,
-				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-
-		initEClass(sdfMoCEClass, SDFMoC.class, "SDFMoC", !IS_ABSTRACT,
-				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-
-		initEClass(invocationEClass, Invocation.class, "Invocation",
-				!IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getInvocation_Action(), theDfPackage.getAction(), null,
-				"action", null, 0, 1, Invocation.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
-				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getInvocation_Action(), theDfPackage.getAction(), null, "action", null, 0, 1, Invocation.class,
+				!IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE,
+				IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		// Create resource
 		createResource(eNS_URI);

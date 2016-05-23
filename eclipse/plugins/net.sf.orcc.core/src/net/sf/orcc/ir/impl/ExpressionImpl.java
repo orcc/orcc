@@ -41,8 +41,7 @@ import org.eclipse.emf.ecore.EClass;
  * @generated
  * 
  */
-public abstract class ExpressionImpl extends AttributableImpl implements
-		Expression {
+public abstract class ExpressionImpl extends AttributableImpl implements Expression {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->

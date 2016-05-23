@@ -66,14 +66,12 @@ public class DefImpl extends EObjectImpl implements Def {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetVariable(Var newVariable,
-			NotificationChain msgs) {
+	public NotificationChain basicSetVariable(Var newVariable, NotificationChain msgs) {
 		Var oldVariable = variable;
 		variable = newVariable;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET, IrPackage.DEF__VARIABLE, oldVariable,
-					newVariable);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.DEF__VARIABLE,
+					oldVariable, newVariable);
 			if (msgs == null)
 				msgs = notification;
 			else
@@ -104,13 +102,11 @@ public class DefImpl extends EObjectImpl implements Def {
 	 * @generated
 	 */
 	@Override
-	public NotificationChain eInverseAdd(InternalEObject otherEnd,
-			int featureID, NotificationChain msgs) {
+	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
 		case IrPackage.DEF__VARIABLE:
 			if (variable != null)
-				msgs = ((InternalEObject) variable).eInverseRemove(this,
-						IrPackage.VAR__DEFS, Var.class, msgs);
+				msgs = ((InternalEObject) variable).eInverseRemove(this, IrPackage.VAR__DEFS, Var.class, msgs);
 			return basicSetVariable((Var) otherEnd, msgs);
 		}
 		return super.eInverseAdd(otherEnd, featureID, msgs);
@@ -122,8 +118,7 @@ public class DefImpl extends EObjectImpl implements Def {
 	 * @generated
 	 */
 	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd,
-			int featureID, NotificationChain msgs) {
+	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
 		case IrPackage.DEF__VARIABLE:
 			return basicSetVariable(null, msgs);
@@ -196,8 +191,8 @@ public class DefImpl extends EObjectImpl implements Def {
 			variable = (Var) eResolveProxy(oldVariable);
 			if (variable != oldVariable) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
-							IrPackage.DEF__VARIABLE, oldVariable, variable));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, IrPackage.DEF__VARIABLE, oldVariable,
+							variable));
 			}
 		}
 		return variable;
@@ -212,17 +207,14 @@ public class DefImpl extends EObjectImpl implements Def {
 		if (newVariable != variable) {
 			NotificationChain msgs = null;
 			if (variable != null)
-				msgs = ((InternalEObject) variable).eInverseRemove(this,
-						IrPackage.VAR__DEFS, Var.class, msgs);
+				msgs = ((InternalEObject) variable).eInverseRemove(this, IrPackage.VAR__DEFS, Var.class, msgs);
 			if (newVariable != null)
-				msgs = ((InternalEObject) newVariable).eInverseAdd(this,
-						IrPackage.VAR__DEFS, Var.class, msgs);
+				msgs = ((InternalEObject) newVariable).eInverseAdd(this, IrPackage.VAR__DEFS, Var.class, msgs);
 			msgs = basicSetVariable(newVariable, msgs);
 			if (msgs != null)
 				msgs.dispatch();
 		} else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.DEF__VARIABLE, newVariable, newVariable));
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.DEF__VARIABLE, newVariable, newVariable));
 	}
 
 	@Override

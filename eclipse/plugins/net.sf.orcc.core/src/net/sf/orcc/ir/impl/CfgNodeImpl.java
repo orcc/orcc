@@ -88,9 +88,8 @@ public class CfgNodeImpl extends VertexImpl implements CfgNode {
 		Block oldNode = node;
 		node = newNode;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET, IrPackage.CFG_NODE__NODE, oldNode,
-					newNode);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.CFG_NODE__NODE,
+					oldNode, newNode);
 			if (msgs == null)
 				msgs = notification;
 			else
@@ -120,13 +119,11 @@ public class CfgNodeImpl extends VertexImpl implements CfgNode {
 	 * @generated
 	 */
 	@Override
-	public NotificationChain eInverseAdd(InternalEObject otherEnd,
-			int featureID, NotificationChain msgs) {
+	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
 		case IrPackage.CFG_NODE__NODE:
 			if (node != null)
-				msgs = ((InternalEObject) node).eInverseRemove(this,
-						IrPackage.BLOCK__CFG_NODE, Block.class, msgs);
+				msgs = ((InternalEObject) node).eInverseRemove(this, IrPackage.BLOCK__CFG_NODE, Block.class, msgs);
 			return basicSetNode((Block) otherEnd, msgs);
 		}
 		return super.eInverseAdd(otherEnd, featureID, msgs);
@@ -138,8 +135,7 @@ public class CfgNodeImpl extends VertexImpl implements CfgNode {
 	 * @generated
 	 */
 	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd,
-			int featureID, NotificationChain msgs) {
+	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
 		case IrPackage.CFG_NODE__NODE:
 			return basicSetNode(null, msgs);
@@ -207,8 +203,7 @@ public class CfgNodeImpl extends VertexImpl implements CfgNode {
 			node = (Block) eResolveProxy(oldNode);
 			if (node != oldNode) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
-							IrPackage.CFG_NODE__NODE, oldNode, node));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, IrPackage.CFG_NODE__NODE, oldNode, node));
 			}
 		}
 		return node;
@@ -222,17 +217,14 @@ public class CfgNodeImpl extends VertexImpl implements CfgNode {
 		if (newNode != node) {
 			NotificationChain msgs = null;
 			if (node != null)
-				msgs = ((InternalEObject) node).eInverseRemove(this,
-						IrPackage.BLOCK__CFG_NODE, Block.class, msgs);
+				msgs = ((InternalEObject) node).eInverseRemove(this, IrPackage.BLOCK__CFG_NODE, Block.class, msgs);
 			if (newNode != null)
-				msgs = ((InternalEObject) newNode).eInverseAdd(this,
-						IrPackage.BLOCK__CFG_NODE, Block.class, msgs);
+				msgs = ((InternalEObject) newNode).eInverseAdd(this, IrPackage.BLOCK__CFG_NODE, Block.class, msgs);
 			msgs = basicSetNode(newNode, msgs);
 			if (msgs != null)
 				msgs.dispatch();
 		} else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.CFG_NODE__NODE, newNode, newNode));
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.CFG_NODE__NODE, newNode, newNode));
 	}
 
 } // CfgNodeImpl

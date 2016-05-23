@@ -128,9 +128,10 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 			return (EObject) createVarToPortMapEntry();
 		case DfPackage.ARGUMENT:
 			return createArgument();
+		case DfPackage.PORT_TO_EXPRESSION_MAP_ENTRY:
+			return (EObject) createPortToExpressionMapEntry();
 		default:
-			throw new IllegalArgumentException("The class '" + eClass.getName()
-					+ "' is not a valid classifier");
+			throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
 	}
 
@@ -146,8 +147,7 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 		case DfPackage.LIST:
 			return createListFromString(eDataType, initialValue);
 		default:
-			throw new IllegalArgumentException("The datatype '"
-					+ eDataType.getName() + "' is not a valid classifier");
+			throw new IllegalArgumentException("The datatype '" + eDataType.getName() + "' is not a valid classifier");
 		}
 	}
 
@@ -163,8 +163,7 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 		case DfPackage.LIST:
 			return convertListToString(eDataType, instanceValue);
 		default:
-			throw new IllegalArgumentException("The datatype '"
-					+ eDataType.getName() + "' is not a valid classifier");
+			throw new IllegalArgumentException("The datatype '" + eDataType.getName() + "' is not a valid classifier");
 		}
 	}
 
@@ -178,9 +177,8 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 	}
 
 	@Override
-	public Action createAction(String tagName, Pattern inputPattern,
-			Pattern outputPattern, Pattern peekedPattern, Procedure scheduler,
-			Procedure body) {
+	public Action createAction(String tagName, Pattern inputPattern, Pattern outputPattern, Pattern peekedPattern,
+			Procedure scheduler, Procedure body) {
 		ActionImpl action = new ActionImpl();
 		action.setBody(body);
 		action.setInputPattern(inputPattern);
@@ -196,16 +194,14 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 		ActionImpl action = new ActionImpl();
 		action.setTag(createTag(tag));
 
-		Procedure body = IrFactory.eINSTANCE.createProcedure(tag, lineNumber,
-				IrFactory.eINSTANCE.createTypeVoid());
+		Procedure body = IrFactory.eINSTANCE.createProcedure(tag, lineNumber, IrFactory.eINSTANCE.createTypeVoid());
 		action.setBody(body);
 
 		action.setInputPattern(createPattern());
 		action.setOutputPattern(createPattern());
 		action.setPeekPattern(createPattern());
 
-		Procedure scheduler = IrFactory.eINSTANCE.createProcedure(
-				"isSchedulable_" + tag, lineNumber,
+		Procedure scheduler = IrFactory.eINSTANCE.createProcedure("isSchedulable_" + tag, lineNumber,
 				IrFactory.eINSTANCE.createTypeBool());
 		action.setScheduler(scheduler);
 
@@ -213,9 +209,8 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 	}
 
 	@Override
-	public Action createAction(Tag tag, Pattern inputPattern,
-			Pattern outputPattern, Pattern peekedPattern, Procedure scheduler,
-			Procedure body) {
+	public Action createAction(Tag tag, Pattern inputPattern, Pattern outputPattern, Pattern peekedPattern,
+			Procedure scheduler, Procedure body) {
 		ActionImpl action = new ActionImpl();
 		action.setBody(body);
 		action.setInputPattern(inputPattern);
@@ -245,11 +240,20 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Map.Entry<Port, Expression> createPortToExpressionMapEntry() {
+		PortToExpressionMapEntryImpl portToExpressionMapEntry = new PortToExpressionMapEntryImpl();
+		return portToExpressionMapEntry;
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Map<?, ?> createMapFromString(EDataType eDataType,
-			String initialValue) {
+	public Map<?, ?> createMapFromString(EDataType eDataType, String initialValue) {
 		return (Map<?, ?>) super.createFromString(initialValue);
 	}
 
@@ -295,8 +299,7 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 	}
 
 	@Override
-	public Connection createConnection(Vertex source, Port sourcePort,
-			Vertex target, Port targetPort) {
+	public Connection createConnection(Vertex source, Port sourcePort, Vertex target, Port targetPort) {
 		ConnectionImpl connection = new ConnectionImpl();
 		connection.setSource(source);
 		connection.setSourcePort(sourcePort);
@@ -306,19 +309,16 @@ public class DfFactoryImpl extends EFactoryImpl implements DfFactory {
 	}
 
 	@Override
-	public Connection createConnection(Vertex source, Port sourcePort,
-			Vertex target, Port targetPort, Collection<Attribute> attributes) {
-		Connection connection = createConnection(source, sourcePort, target,
-				targetPort);
+	public Connection createConnection(Vertex source, Port sourcePort, Vertex target, Port targetPort,
+			Collection<Attribute> attributes) {
+		Connection connection = createConnection(source, sourcePort, target, targetPort);
 		connection.getAttributes().addAll(EcoreUtil.copyAll(attributes));
 		return connection;
 	}
 
 	@Override
-	public Connection createConnection(Vertex source, Port sourcePort,
-			Vertex target, Port targetPort, Integer size) {
-		Connection connection = createConnection(source, sourcePort, target,
-				targetPort);
+	public Connection createConnection(Vertex source, Port sourcePort, Vertex target, Port targetPort, Integer size) {
+		Connection connection = createConnection(source, sourcePort, target, targetPort);
 		connection.setSize(size);
 		return connection;
 	}

@@ -200,9 +200,8 @@ public class ConnectionImpl extends EdgeImpl implements Connection {
 			sourcePort = (Port) eResolveProxy(oldSourcePort);
 			if (sourcePort != oldSourcePort) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
-							DfPackage.CONNECTION__SOURCE_PORT, oldSourcePort,
-							sourcePort));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, DfPackage.CONNECTION__SOURCE_PORT,
+							oldSourcePort, sourcePort));
 			}
 		}
 		return sourcePort;
@@ -218,9 +217,8 @@ public class ConnectionImpl extends EdgeImpl implements Connection {
 			targetPort = (Port) eResolveProxy(oldTargetPort);
 			if (targetPort != oldTargetPort) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
-							DfPackage.CONNECTION__TARGET_PORT, oldTargetPort,
-							targetPort));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, DfPackage.CONNECTION__TARGET_PORT,
+							oldTargetPort, targetPort));
 			}
 		}
 		return targetPort;
@@ -241,8 +239,7 @@ public class ConnectionImpl extends EdgeImpl implements Connection {
 		Port oldSourcePort = sourcePort;
 		sourcePort = newSourcePort;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					DfPackage.CONNECTION__SOURCE_PORT, oldSourcePort,
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.CONNECTION__SOURCE_PORT, oldSourcePort,
 					sourcePort));
 	}
 
@@ -254,8 +251,7 @@ public class ConnectionImpl extends EdgeImpl implements Connection {
 		Port oldTargetPort = targetPort;
 		targetPort = newTargetPort;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					DfPackage.CONNECTION__TARGET_PORT, oldTargetPort,
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.CONNECTION__TARGET_PORT, oldTargetPort,
 					targetPort));
 	}
 

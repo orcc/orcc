@@ -1,39 +1,67 @@
 /**
  * <copyright>
+ * Copyright (c) 2009-2012, IETR/INSA of Rennes
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * 
+ *   * Redistributions of source code must retain the above copyright notice,
+ *     this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above copyright notice,
+ *     this list of conditions and the following disclaimer in the documentation
+ *     and/or other materials provided with the distribution.
+ *   * Neither the name of the IETR/INSA of Rennes nor the names of its
+ *     contributors may be used to endorse or promote products derived from this
+ *     software without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
+ * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
  * </copyright>
- *
- * $Id$
  */
 package net.sf.orcc.df.impl;
 
 import net.sf.orcc.df.DfPackage;
 import net.sf.orcc.df.Port;
-import net.sf.orcc.ir.Var;
+
+import net.sf.orcc.ir.Expression;
 
 import org.eclipse.emf.common.notify.Notification;
+
 import org.eclipse.emf.common.util.BasicEMap;
 import org.eclipse.emf.common.util.EMap;
+
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.InternalEObject;
+
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
 
 /**
  * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>Port To Var Map Entry</b></em>'.
+ * An implementation of the model object '<em><b>Port To Expression Map Entry</b></em>'.
  * <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link net.sf.orcc.df.impl.PortToVarMapEntryImpl#getTypedKey <em>Key</em>}</li>
- *   <li>{@link net.sf.orcc.df.impl.PortToVarMapEntryImpl#getTypedValue <em>Value</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.PortToExpressionMapEntryImpl#getTypedKey <em>Key</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.PortToExpressionMapEntryImpl#getTypedValue <em>Value</em>}</li>
  * </ul>
  * </p>
  *
  * @generated
  */
-public class PortToVarMapEntryImpl extends EObjectImpl implements BasicEMap.Entry<Port, Var> {
+public class PortToExpressionMapEntryImpl extends EObjectImpl implements BasicEMap.Entry<Port, Expression> {
 	/**
 	 * The cached value of the '{@link #getTypedKey() <em>Key</em>}' reference.
 	 * <!-- begin-user-doc -->
@@ -52,14 +80,14 @@ public class PortToVarMapEntryImpl extends EObjectImpl implements BasicEMap.Entr
 	 * @generated
 	 * @ordered
 	 */
-	protected Var value;
+	protected Expression value;
 
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected PortToVarMapEntryImpl() {
+	protected PortToExpressionMapEntryImpl() {
 		super();
 	}
 
@@ -70,7 +98,7 @@ public class PortToVarMapEntryImpl extends EObjectImpl implements BasicEMap.Entr
 	 */
 	@Override
 	protected EClass eStaticClass() {
-		return DfPackage.Literals.PORT_TO_VAR_MAP_ENTRY;
+		return DfPackage.Literals.PORT_TO_EXPRESSION_MAP_ENTRY;
 	}
 
 	/**
@@ -84,8 +112,8 @@ public class PortToVarMapEntryImpl extends EObjectImpl implements BasicEMap.Entr
 			key = (Port) eResolveProxy(oldKey);
 			if (key != oldKey) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, DfPackage.PORT_TO_VAR_MAP_ENTRY__KEY,
-							oldKey, key));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
+							DfPackage.PORT_TO_EXPRESSION_MAP_ENTRY__KEY, oldKey, key));
 			}
 		}
 		return key;
@@ -109,7 +137,8 @@ public class PortToVarMapEntryImpl extends EObjectImpl implements BasicEMap.Entr
 		Port oldKey = key;
 		key = newKey;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.PORT_TO_VAR_MAP_ENTRY__KEY, oldKey, key));
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.PORT_TO_EXPRESSION_MAP_ENTRY__KEY, oldKey,
+					key));
 	}
 
 	/**
@@ -117,14 +146,14 @@ public class PortToVarMapEntryImpl extends EObjectImpl implements BasicEMap.Entr
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Var getTypedValue() {
+	public Expression getTypedValue() {
 		if (value != null && value.eIsProxy()) {
 			InternalEObject oldValue = (InternalEObject) value;
-			value = (Var) eResolveProxy(oldValue);
+			value = (Expression) eResolveProxy(oldValue);
 			if (value != oldValue) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, DfPackage.PORT_TO_VAR_MAP_ENTRY__VALUE,
-							oldValue, value));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
+							DfPackage.PORT_TO_EXPRESSION_MAP_ENTRY__VALUE, oldValue, value));
 			}
 		}
 		return value;
@@ -135,7 +164,7 @@ public class PortToVarMapEntryImpl extends EObjectImpl implements BasicEMap.Entr
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Var basicGetTypedValue() {
+	public Expression basicGetTypedValue() {
 		return value;
 	}
 
@@ -144,12 +173,12 @@ public class PortToVarMapEntryImpl extends EObjectImpl implements BasicEMap.Entr
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setTypedValue(Var newValue) {
-		Var oldValue = value;
+	public void setTypedValue(Expression newValue) {
+		Expression oldValue = value;
 		value = newValue;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.PORT_TO_VAR_MAP_ENTRY__VALUE, oldValue,
-					value));
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.PORT_TO_EXPRESSION_MAP_ENTRY__VALUE,
+					oldValue, value));
 	}
 
 	/**
@@ -160,11 +189,11 @@ public class PortToVarMapEntryImpl extends EObjectImpl implements BasicEMap.Entr
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-		case DfPackage.PORT_TO_VAR_MAP_ENTRY__KEY:
+		case DfPackage.PORT_TO_EXPRESSION_MAP_ENTRY__KEY:
 			if (resolve)
 				return getTypedKey();
 			return basicGetTypedKey();
-		case DfPackage.PORT_TO_VAR_MAP_ENTRY__VALUE:
+		case DfPackage.PORT_TO_EXPRESSION_MAP_ENTRY__VALUE:
 			if (resolve)
 				return getTypedValue();
 			return basicGetTypedValue();
@@ -180,11 +209,11 @@ public class PortToVarMapEntryImpl extends EObjectImpl implements BasicEMap.Entr
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-		case DfPackage.PORT_TO_VAR_MAP_ENTRY__KEY:
+		case DfPackage.PORT_TO_EXPRESSION_MAP_ENTRY__KEY:
 			setTypedKey((Port) newValue);
 			return;
-		case DfPackage.PORT_TO_VAR_MAP_ENTRY__VALUE:
-			setTypedValue((Var) newValue);
+		case DfPackage.PORT_TO_EXPRESSION_MAP_ENTRY__VALUE:
+			setTypedValue((Expression) newValue);
 			return;
 		}
 		super.eSet(featureID, newValue);
@@ -198,11 +227,11 @@ public class PortToVarMapEntryImpl extends EObjectImpl implements BasicEMap.Entr
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-		case DfPackage.PORT_TO_VAR_MAP_ENTRY__KEY:
+		case DfPackage.PORT_TO_EXPRESSION_MAP_ENTRY__KEY:
 			setTypedKey((Port) null);
 			return;
-		case DfPackage.PORT_TO_VAR_MAP_ENTRY__VALUE:
-			setTypedValue((Var) null);
+		case DfPackage.PORT_TO_EXPRESSION_MAP_ENTRY__VALUE:
+			setTypedValue((Expression) null);
 			return;
 		}
 		super.eUnset(featureID);
@@ -216,9 +245,9 @@ public class PortToVarMapEntryImpl extends EObjectImpl implements BasicEMap.Entr
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-		case DfPackage.PORT_TO_VAR_MAP_ENTRY__KEY:
+		case DfPackage.PORT_TO_EXPRESSION_MAP_ENTRY__KEY:
 			return key != null;
-		case DfPackage.PORT_TO_VAR_MAP_ENTRY__VALUE:
+		case DfPackage.PORT_TO_EXPRESSION_MAP_ENTRY__VALUE:
 			return value != null;
 		}
 		return super.eIsSet(featureID);
@@ -276,7 +305,7 @@ public class PortToVarMapEntryImpl extends EObjectImpl implements BasicEMap.Entr
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Var getValue() {
+	public Expression getValue() {
 		return getTypedValue();
 	}
 
@@ -285,8 +314,8 @@ public class PortToVarMapEntryImpl extends EObjectImpl implements BasicEMap.Entr
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Var setValue(Var value) {
-		Var oldValue = getValue();
+	public Expression setValue(Expression value) {
+		Expression oldValue = getValue();
 		setTypedValue(value);
 		return oldValue;
 	}
@@ -297,9 +326,9 @@ public class PortToVarMapEntryImpl extends EObjectImpl implements BasicEMap.Entr
 	 * @generated
 	 */
 	@SuppressWarnings("unchecked")
-	public EMap<Port, Var> getEMap() {
+	public EMap<Port, Expression> getEMap() {
 		EObject container = eContainer();
-		return container == null ? null : (EMap<Port, Var>) container.eGet(eContainmentFeature());
+		return container == null ? null : (EMap<Port, Expression>) container.eGet(eContainmentFeature());
 	}
 
-} //PortToVarMapEntryImpl
+} //PortToExpressionMapEntryImpl

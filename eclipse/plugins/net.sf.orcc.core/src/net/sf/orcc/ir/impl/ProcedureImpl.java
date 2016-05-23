@@ -180,8 +180,8 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 		Cfg oldCfg = cfg;
 		cfg = newCfg;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET, IrPackage.PROCEDURE__CFG, oldCfg, newCfg);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.PROCEDURE__CFG,
+					oldCfg, newCfg);
 			if (msgs == null)
 				msgs = notification;
 			else
@@ -194,14 +194,12 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetReturnType(Type newReturnType,
-			NotificationChain msgs) {
+	public NotificationChain basicSetReturnType(Type newReturnType, NotificationChain msgs) {
 		Type oldReturnType = returnType;
 		returnType = newReturnType;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET, IrPackage.PROCEDURE__RETURN_TYPE,
-					oldReturnType, newReturnType);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET,
+					IrPackage.PROCEDURE__RETURN_TYPE, oldReturnType, newReturnType);
 			if (msgs == null)
 				msgs = notification;
 			else
@@ -242,16 +240,14 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 	 * @generated
 	 */
 	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd,
-			int featureID, NotificationChain msgs) {
+	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
 		case IrPackage.PROCEDURE__LOCALS:
 			return ((InternalEList<?>) getLocals()).basicRemove(otherEnd, msgs);
 		case IrPackage.PROCEDURE__BLOCKS:
 			return ((InternalEList<?>) getBlocks()).basicRemove(otherEnd, msgs);
 		case IrPackage.PROCEDURE__PARAMETERS:
-			return ((InternalEList<?>) getParameters()).basicRemove(otherEnd,
-					msgs);
+			return ((InternalEList<?>) getParameters()).basicRemove(otherEnd, msgs);
 		case IrPackage.PROCEDURE__RETURN_TYPE:
 			return basicSetReturnType(null, msgs);
 		case IrPackage.PROCEDURE__CFG:
@@ -272,8 +268,7 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 		case IrPackage.PROCEDURE__LOCALS:
 			return locals != null && !locals.isEmpty();
 		case IrPackage.PROCEDURE__NAME:
-			return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT
-					.equals(name);
+			return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
 		case IrPackage.PROCEDURE__NATIVE:
 			return native_ != NATIVE_EDEFAULT;
 		case IrPackage.PROCEDURE__BLOCKS:
@@ -378,8 +373,7 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 	@Override
 	public EList<Block> getBlocks() {
 		if (blocks == null) {
-			blocks = new EObjectContainmentEList<Block>(Block.class, this,
-					IrPackage.PROCEDURE__BLOCKS);
+			blocks = new EObjectContainmentEList<Block>(Block.class, this, IrPackage.PROCEDURE__BLOCKS);
 		}
 		return blocks;
 	}
@@ -436,8 +430,7 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 	@Override
 	public EList<Var> getLocals() {
 		if (locals == null) {
-			locals = new EObjectContainmentEList<Var>(Var.class, this,
-					IrPackage.PROCEDURE__LOCALS);
+			locals = new EObjectContainmentEList<Var>(Var.class, this, IrPackage.PROCEDURE__LOCALS);
 		}
 		return locals;
 	}
@@ -467,8 +460,7 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 	@Override
 	public EList<Param> getParameters() {
 		if (parameters == null) {
-			parameters = new EObjectContainmentEList<Param>(Param.class, this,
-					IrPackage.PROCEDURE__PARAMETERS);
+			parameters = new EObjectContainmentEList<Param>(Param.class, this, IrPackage.PROCEDURE__PARAMETERS);
 		}
 		return parameters;
 	}
@@ -546,19 +538,16 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 		if (newCfg != cfg) {
 			NotificationChain msgs = null;
 			if (cfg != null)
-				msgs = ((InternalEObject) cfg).eInverseRemove(this,
-						EOPPOSITE_FEATURE_BASE - IrPackage.PROCEDURE__CFG,
+				msgs = ((InternalEObject) cfg).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.PROCEDURE__CFG,
 						null, msgs);
 			if (newCfg != null)
-				msgs = ((InternalEObject) newCfg).eInverseAdd(this,
-						EOPPOSITE_FEATURE_BASE - IrPackage.PROCEDURE__CFG,
+				msgs = ((InternalEObject) newCfg).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.PROCEDURE__CFG,
 						null, msgs);
 			msgs = basicSetCfg(newCfg, msgs);
 			if (msgs != null)
 				msgs.dispatch();
 		} else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.PROCEDURE__CFG, newCfg, newCfg));
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.PROCEDURE__CFG, newCfg, newCfg));
 	}
 
 	/**
@@ -570,8 +559,8 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 		int oldLineNumber = lineNumber;
 		lineNumber = newLineNumber;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.PROCEDURE__LINE_NUMBER, oldLineNumber, lineNumber));
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.PROCEDURE__LINE_NUMBER, oldLineNumber,
+					lineNumber));
 	}
 
 	/**
@@ -583,8 +572,7 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 		String oldName = name;
 		name = newName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.PROCEDURE__NAME, oldName, name));
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.PROCEDURE__NAME, oldName, name));
 	}
 
 	/**
@@ -596,8 +584,7 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 		boolean oldNative = native_;
 		native_ = newNative;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.PROCEDURE__NATIVE, oldNative, native_));
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.PROCEDURE__NATIVE, oldNative, native_));
 	}
 
 	@Override
@@ -615,18 +602,15 @@ public class ProcedureImpl extends AttributableImpl implements Procedure {
 			NotificationChain msgs = null;
 			if (returnType != null)
 				msgs = ((InternalEObject) returnType).eInverseRemove(this,
-						EOPPOSITE_FEATURE_BASE
-								- IrPackage.PROCEDURE__RETURN_TYPE, null, msgs);
+						EOPPOSITE_FEATURE_BASE - IrPackage.PROCEDURE__RETURN_TYPE, null, msgs);
 			if (newReturnType != null)
 				msgs = ((InternalEObject) newReturnType).eInverseAdd(this,
-						EOPPOSITE_FEATURE_BASE
-								- IrPackage.PROCEDURE__RETURN_TYPE, null, msgs);
+						EOPPOSITE_FEATURE_BASE - IrPackage.PROCEDURE__RETURN_TYPE, null, msgs);
 			msgs = basicSetReturnType(newReturnType, msgs);
 			if (msgs != null)
 				msgs.dispatch();
 		} else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.PROCEDURE__RETURN_TYPE, newReturnType,
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.PROCEDURE__RETURN_TYPE, newReturnType,
 					newReturnType));
 	}
 

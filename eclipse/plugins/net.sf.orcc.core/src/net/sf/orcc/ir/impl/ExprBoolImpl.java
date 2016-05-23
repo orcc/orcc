@@ -147,8 +147,7 @@ public class ExprBoolImpl extends ExpressionImpl implements ExprBool {
 		boolean oldValue = value;
 		value = newValue;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.EXPR_BOOL__VALUE, oldValue, value));
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.EXPR_BOOL__VALUE, oldValue, value));
 	}
 
 	/**

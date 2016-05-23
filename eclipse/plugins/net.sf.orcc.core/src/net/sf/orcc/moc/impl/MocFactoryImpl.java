@@ -89,8 +89,7 @@ public class MocFactoryImpl extends EFactoryImpl implements MocFactory {
 		case MocPackage.INVOCATION:
 			return createInvocation();
 		default:
-			throw new IllegalArgumentException("The class '" + eClass.getName()
-					+ "' is not a valid classifier");
+			throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
 	}
 

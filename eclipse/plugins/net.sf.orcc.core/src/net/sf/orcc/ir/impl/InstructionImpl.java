@@ -31,8 +31,7 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  *
  * @generated
  */
-public abstract class InstructionImpl extends AttributableImpl implements
-		Instruction {
+public abstract class InstructionImpl extends AttributableImpl implements Instruction {
 
 	/**
 	 * The default value of the '{@link #getLineNumber() <em>Line Number</em>}' attribute.
@@ -76,14 +75,12 @@ public abstract class InstructionImpl extends AttributableImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetPredicate(Predicate newPredicate,
-			NotificationChain msgs) {
+	public NotificationChain basicSetPredicate(Predicate newPredicate, NotificationChain msgs) {
 		Predicate oldPredicate = predicate;
 		predicate = newPredicate;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET, IrPackage.INSTRUCTION__PREDICATE,
-					oldPredicate, newPredicate);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET,
+					IrPackage.INSTRUCTION__PREDICATE, oldPredicate, newPredicate);
 			if (msgs == null)
 				msgs = notification;
 			else
@@ -112,8 +109,7 @@ public abstract class InstructionImpl extends AttributableImpl implements
 	 * @generated
 	 */
 	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd,
-			int featureID, NotificationChain msgs) {
+	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
 		case IrPackage.INSTRUCTION__PREDICATE:
 			return basicSetPredicate(null, msgs);
@@ -245,8 +241,7 @@ public abstract class InstructionImpl extends AttributableImpl implements
 		int oldLineNumber = lineNumber;
 		lineNumber = newLineNumber;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.INSTRUCTION__LINE_NUMBER, oldLineNumber,
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.INSTRUCTION__LINE_NUMBER, oldLineNumber,
 					lineNumber));
 	}
 
@@ -259,18 +254,15 @@ public abstract class InstructionImpl extends AttributableImpl implements
 			NotificationChain msgs = null;
 			if (predicate != null)
 				msgs = ((InternalEObject) predicate).eInverseRemove(this,
-						EOPPOSITE_FEATURE_BASE
-								- IrPackage.INSTRUCTION__PREDICATE, null, msgs);
+						EOPPOSITE_FEATURE_BASE - IrPackage.INSTRUCTION__PREDICATE, null, msgs);
 			if (newPredicate != null)
 				msgs = ((InternalEObject) newPredicate).eInverseAdd(this,
-						EOPPOSITE_FEATURE_BASE
-								- IrPackage.INSTRUCTION__PREDICATE, null, msgs);
+						EOPPOSITE_FEATURE_BASE - IrPackage.INSTRUCTION__PREDICATE, null, msgs);
 			msgs = basicSetPredicate(newPredicate, msgs);
 			if (msgs != null)
 				msgs.dispatch();
 		} else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.INSTRUCTION__PREDICATE, newPredicate,
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.INSTRUCTION__PREDICATE, newPredicate,
 					newPredicate));
 	}
 

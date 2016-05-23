@@ -111,14 +111,12 @@ public class CSDFMoCImpl extends MoCImpl implements CSDFMoC {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetDelayPattern(Pattern newDelayPattern,
-			NotificationChain msgs) {
+	public NotificationChain basicSetDelayPattern(Pattern newDelayPattern, NotificationChain msgs) {
 		Pattern oldDelayPattern = delayPattern;
 		delayPattern = newDelayPattern;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET, MocPackage.CSDF_MO_C__DELAY_PATTERN,
-					oldDelayPattern, newDelayPattern);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET,
+					MocPackage.CSDF_MO_C__DELAY_PATTERN, oldDelayPattern, newDelayPattern);
 			if (msgs == null)
 				msgs = notification;
 			else
@@ -131,14 +129,12 @@ public class CSDFMoCImpl extends MoCImpl implements CSDFMoC {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetInputPattern(Pattern newInputPattern,
-			NotificationChain msgs) {
+	public NotificationChain basicSetInputPattern(Pattern newInputPattern, NotificationChain msgs) {
 		Pattern oldInputPattern = inputPattern;
 		inputPattern = newInputPattern;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET, MocPackage.CSDF_MO_C__INPUT_PATTERN,
-					oldInputPattern, newInputPattern);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET,
+					MocPackage.CSDF_MO_C__INPUT_PATTERN, oldInputPattern, newInputPattern);
 			if (msgs == null)
 				msgs = notification;
 			else
@@ -151,14 +147,12 @@ public class CSDFMoCImpl extends MoCImpl implements CSDFMoC {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetOutputPattern(Pattern newOutputPattern,
-			NotificationChain msgs) {
+	public NotificationChain basicSetOutputPattern(Pattern newOutputPattern, NotificationChain msgs) {
 		Pattern oldOutputPattern = outputPattern;
 		outputPattern = newOutputPattern;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET, MocPackage.CSDF_MO_C__OUTPUT_PATTERN,
-					oldOutputPattern, newOutputPattern);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET,
+					MocPackage.CSDF_MO_C__OUTPUT_PATTERN, oldOutputPattern, newOutputPattern);
 			if (msgs == null)
 				msgs = notification;
 			else
@@ -193,16 +187,14 @@ public class CSDFMoCImpl extends MoCImpl implements CSDFMoC {
 	 * @generated
 	 */
 	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd,
-			int featureID, NotificationChain msgs) {
+	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
 		case MocPackage.CSDF_MO_C__INPUT_PATTERN:
 			return basicSetInputPattern(null, msgs);
 		case MocPackage.CSDF_MO_C__OUTPUT_PATTERN:
 			return basicSetOutputPattern(null, msgs);
 		case MocPackage.CSDF_MO_C__INVOCATIONS:
-			return ((InternalEList<?>) getInvocations()).basicRemove(otherEnd,
-					msgs);
+			return ((InternalEList<?>) getInvocations()).basicRemove(otherEnd, msgs);
 		case MocPackage.CSDF_MO_C__DELAY_PATTERN:
 			return basicSetDelayPattern(null, msgs);
 		}
@@ -249,8 +241,7 @@ public class CSDFMoCImpl extends MoCImpl implements CSDFMoC {
 			return;
 		case MocPackage.CSDF_MO_C__INVOCATIONS:
 			getInvocations().clear();
-			getInvocations()
-					.addAll((Collection<? extends Invocation>) newValue);
+			getInvocations().addAll((Collection<? extends Invocation>) newValue);
 			return;
 		case MocPackage.CSDF_MO_C__DELAY_PATTERN:
 			setDelayPattern((Pattern) newValue);
@@ -319,8 +310,8 @@ public class CSDFMoCImpl extends MoCImpl implements CSDFMoC {
 	@Override
 	public EList<Invocation> getInvocations() {
 		if (invocations == null) {
-			invocations = new EObjectContainmentEList<Invocation>(
-					Invocation.class, this, MocPackage.CSDF_MO_C__INVOCATIONS);
+			invocations = new EObjectContainmentEList<Invocation>(Invocation.class, this,
+					MocPackage.CSDF_MO_C__INVOCATIONS);
 		}
 		return invocations;
 	}
@@ -387,20 +378,15 @@ public class CSDFMoCImpl extends MoCImpl implements CSDFMoC {
 			NotificationChain msgs = null;
 			if (delayPattern != null)
 				msgs = ((InternalEObject) delayPattern).eInverseRemove(this,
-						EOPPOSITE_FEATURE_BASE
-								- MocPackage.CSDF_MO_C__DELAY_PATTERN, null,
-						msgs);
+						EOPPOSITE_FEATURE_BASE - MocPackage.CSDF_MO_C__DELAY_PATTERN, null, msgs);
 			if (newDelayPattern != null)
 				msgs = ((InternalEObject) newDelayPattern).eInverseAdd(this,
-						EOPPOSITE_FEATURE_BASE
-								- MocPackage.CSDF_MO_C__DELAY_PATTERN, null,
-						msgs);
+						EOPPOSITE_FEATURE_BASE - MocPackage.CSDF_MO_C__DELAY_PATTERN, null, msgs);
 			msgs = basicSetDelayPattern(newDelayPattern, msgs);
 			if (msgs != null)
 				msgs.dispatch();
 		} else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					MocPackage.CSDF_MO_C__DELAY_PATTERN, newDelayPattern,
+			eNotify(new ENotificationImpl(this, Notification.SET, MocPackage.CSDF_MO_C__DELAY_PATTERN, newDelayPattern,
 					newDelayPattern));
 	}
 
@@ -414,20 +400,15 @@ public class CSDFMoCImpl extends MoCImpl implements CSDFMoC {
 			NotificationChain msgs = null;
 			if (inputPattern != null)
 				msgs = ((InternalEObject) inputPattern).eInverseRemove(this,
-						EOPPOSITE_FEATURE_BASE
-								- MocPackage.CSDF_MO_C__INPUT_PATTERN, null,
-						msgs);
+						EOPPOSITE_FEATURE_BASE - MocPackage.CSDF_MO_C__INPUT_PATTERN, null, msgs);
 			if (newInputPattern != null)
 				msgs = ((InternalEObject) newInputPattern).eInverseAdd(this,
-						EOPPOSITE_FEATURE_BASE
-								- MocPackage.CSDF_MO_C__INPUT_PATTERN, null,
-						msgs);
+						EOPPOSITE_FEATURE_BASE - MocPackage.CSDF_MO_C__INPUT_PATTERN, null, msgs);
 			msgs = basicSetInputPattern(newInputPattern, msgs);
 			if (msgs != null)
 				msgs.dispatch();
 		} else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					MocPackage.CSDF_MO_C__INPUT_PATTERN, newInputPattern,
+			eNotify(new ENotificationImpl(this, Notification.SET, MocPackage.CSDF_MO_C__INPUT_PATTERN, newInputPattern,
 					newInputPattern));
 	}
 
@@ -440,9 +421,8 @@ public class CSDFMoCImpl extends MoCImpl implements CSDFMoC {
 		int oldNumberOfPhases = numberOfPhases;
 		numberOfPhases = newNumberOfPhases;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					MocPackage.CSDF_MO_C__NUMBER_OF_PHASES, oldNumberOfPhases,
-					numberOfPhases));
+			eNotify(new ENotificationImpl(this, Notification.SET, MocPackage.CSDF_MO_C__NUMBER_OF_PHASES,
+					oldNumberOfPhases, numberOfPhases));
 	}
 
 	/**
@@ -455,21 +435,16 @@ public class CSDFMoCImpl extends MoCImpl implements CSDFMoC {
 			NotificationChain msgs = null;
 			if (outputPattern != null)
 				msgs = ((InternalEObject) outputPattern).eInverseRemove(this,
-						EOPPOSITE_FEATURE_BASE
-								- MocPackage.CSDF_MO_C__OUTPUT_PATTERN, null,
-						msgs);
+						EOPPOSITE_FEATURE_BASE - MocPackage.CSDF_MO_C__OUTPUT_PATTERN, null, msgs);
 			if (newOutputPattern != null)
 				msgs = ((InternalEObject) newOutputPattern).eInverseAdd(this,
-						EOPPOSITE_FEATURE_BASE
-								- MocPackage.CSDF_MO_C__OUTPUT_PATTERN, null,
-						msgs);
+						EOPPOSITE_FEATURE_BASE - MocPackage.CSDF_MO_C__OUTPUT_PATTERN, null, msgs);
 			msgs = basicSetOutputPattern(newOutputPattern, msgs);
 			if (msgs != null)
 				msgs.dispatch();
 		} else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					MocPackage.CSDF_MO_C__OUTPUT_PATTERN, newOutputPattern,
-					newOutputPattern));
+			eNotify(new ENotificationImpl(this, Notification.SET, MocPackage.CSDF_MO_C__OUTPUT_PATTERN,
+					newOutputPattern, newOutputPattern));
 	}
 
 	@Override

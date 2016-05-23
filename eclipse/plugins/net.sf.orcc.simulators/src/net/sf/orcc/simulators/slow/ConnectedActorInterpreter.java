@@ -145,7 +145,7 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 			// (@see #isSchedulable())
 			SimulatorFifo fifo = (SimulatorFifo) port.getAttribute("fifo")
 					.getObjectValue();
-			Var variable = inputPattern.getVariable(port);
+			Var variable = inputPattern.getPortToVarMap().get(port);
 			Type type = ((TypeList) variable.getType()).getInnermostType();
 			Object array = variable.getValue();
 			for (int i = 0; i < numTokens; i++) {
@@ -164,7 +164,7 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 				List<SimulatorFifo> fifos = (List<SimulatorFifo>) attr
 						.getObjectValue();
 				int numTokens = outputPattern.getNumTokens(port);
-				Var variable = outputPattern.getVariable(port);
+				Var variable = outputPattern.getPortToVarMap().get(port);
 				Type type = ((TypeList) variable.getType()).getInnermostType();
 				Object array = variable.getValue();
 				for (int i = 0; i < numTokens; i++) {
@@ -202,7 +202,7 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 			SimulatorFifo fifo = (SimulatorFifo) port.getAttribute(0)
 					.getObjectValue();
 
-			Var peeked = pattern.getVariable(port);
+			Var peeked = pattern.getPortToVarMap().get(port);
 			if (peeked != null) {
 				peeked.setValue(ValueUtil.createArray((TypeList) peeked
 						.getType()));

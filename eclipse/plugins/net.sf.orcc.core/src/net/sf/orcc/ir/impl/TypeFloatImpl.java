@@ -100,8 +100,7 @@ public class TypeFloatImpl extends TypeImpl implements TypeFloat {
 
 	@Override
 	public boolean equals(Object obj) {
-		return (obj instanceof TypeFloat)
-				&& ((TypeFloat) obj).getSize() == getSize();
+		return (obj instanceof TypeFloat) && ((TypeFloat) obj).getSize() == getSize();
 	}
 
 	/**
@@ -181,8 +180,7 @@ public class TypeFloatImpl extends TypeImpl implements TypeFloat {
 		int oldSize = size;
 		size = newSize;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.TYPE_FLOAT__SIZE, oldSize, size));
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.TYPE_FLOAT__SIZE, oldSize, size));
 	}
 
 	@Override

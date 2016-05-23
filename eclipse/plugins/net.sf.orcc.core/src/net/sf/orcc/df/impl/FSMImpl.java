@@ -59,8 +59,7 @@ public class FSMImpl extends GraphImpl implements FSM {
 
 	@Override
 	public Transition addTransition(State source, Action action, State target) {
-		Transition transition = DfFactory.eINSTANCE.createTransition(source,
-				action, target);
+		Transition transition = DfFactory.eINSTANCE.createTransition(source, action, target);
 		getTransitions().add(transition);
 		return transition;
 	}
@@ -148,9 +147,8 @@ public class FSMImpl extends GraphImpl implements FSM {
 			initialState = (State) eResolveProxy(oldInitialState);
 			if (initialState != oldInitialState) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
-							DfPackage.FSM__INITIAL_STATE, oldInitialState,
-							initialState));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, DfPackage.FSM__INITIAL_STATE,
+							oldInitialState, initialState));
 			}
 		}
 		return initialState;
@@ -213,8 +211,8 @@ public class FSMImpl extends GraphImpl implements FSM {
 		State oldInitialState = initialState;
 		initialState = newInitialState;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					DfPackage.FSM__INITIAL_STATE, oldInitialState, initialState));
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.FSM__INITIAL_STATE, oldInitialState,
+					initialState));
 	}
 
 } // FSMImpl

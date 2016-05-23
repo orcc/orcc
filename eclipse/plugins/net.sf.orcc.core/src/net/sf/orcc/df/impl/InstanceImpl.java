@@ -81,8 +81,7 @@ public class InstanceImpl extends VertexImpl implements Instance {
 		public void notifyChanged(Notification msg) {
 			InstanceImpl inst = (InstanceImpl) target;
 			if (inst.cachedAdaptedEntity != null) {
-				if (msg.getEventType() == Notification.SET
-						&& msg.getFeature() == DfPackage.Literals.INSTANCE__ENTITY) {
+				if (msg.getEventType() == Notification.SET && msg.getFeature() == DfPackage.Literals.INSTANCE__ENTITY) {
 					inst.cachedAdaptedEntity = null;
 				}
 			}
@@ -164,12 +163,10 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	 * @generated
 	 */
 	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd,
-			int featureID, NotificationChain msgs) {
+	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
 		case DfPackage.INSTANCE__ARGUMENTS:
-			return ((InternalEList<?>) getArguments()).basicRemove(otherEnd,
-					msgs);
+			return ((InternalEList<?>) getArguments()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -186,8 +183,7 @@ public class InstanceImpl extends VertexImpl implements Instance {
 		case DfPackage.INSTANCE__ENTITY:
 			return entity != null;
 		case DfPackage.INSTANCE__NAME:
-			return NAME_EDEFAULT == null ? getName() != null : !NAME_EDEFAULT
-					.equals(getName());
+			return NAME_EDEFAULT == null ? getName() != null : !NAME_EDEFAULT.equals(getName());
 		}
 		return super.eIsSet(featureID);
 	}
@@ -304,8 +300,7 @@ public class InstanceImpl extends VertexImpl implements Instance {
 	 */
 	public EList<Argument> getArguments() {
 		if (arguments == null) {
-			arguments = new EObjectContainmentEList<Argument>(Argument.class,
-					this, DfPackage.INSTANCE__ARGUMENTS);
+			arguments = new EObjectContainmentEList<Argument>(Argument.class, this, DfPackage.INSTANCE__ARGUMENTS);
 		}
 		return arguments;
 	}
@@ -320,8 +315,8 @@ public class InstanceImpl extends VertexImpl implements Instance {
 			entity = eResolveProxy(oldEntity);
 			if (entity != oldEntity) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
-							DfPackage.INSTANCE__ENTITY, oldEntity, entity));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, DfPackage.INSTANCE__ENTITY, oldEntity,
+							entity));
 			}
 		}
 		return entity;
@@ -411,8 +406,7 @@ public class InstanceImpl extends VertexImpl implements Instance {
 		EObject oldEntity = entity;
 		entity = newEntity;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					DfPackage.INSTANCE__ENTITY, oldEntity, entity));
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.INSTANCE__ENTITY, oldEntity, entity));
 	}
 
 	@Override

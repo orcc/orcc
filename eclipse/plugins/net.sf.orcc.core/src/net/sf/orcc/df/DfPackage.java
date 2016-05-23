@@ -1220,13 +1220,13 @@ public interface DfPackage extends EPackage {
 	int FSM_FEATURE_COUNT = GraphPackage.GRAPH_FEATURE_COUNT + 1;
 
 	/**
-	 * The feature id for the '<em><b>Num Tokens Map</b></em>' map. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The feature id for the '<em><b>Expr Tokens Map</b></em>' map.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int PATTERN__NUM_TOKENS_MAP = 0;
+	int PATTERN__EXPR_TOKENS_MAP = 0;
 
 	/**
 	 * The feature id for the '<em><b>Ports</b></em>' reference list. <!--
@@ -1537,6 +1537,43 @@ public interface DfPackage extends EPackage {
 	int ARGUMENT_FEATURE_COUNT = 2;
 
 	/**
+	 * The meta object id for the '{@link net.sf.orcc.df.impl.PortToExpressionMapEntryImpl <em>Port To Expression Map Entry</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.df.impl.PortToExpressionMapEntryImpl
+	 * @see net.sf.orcc.df.impl.DfPackageImpl#getPortToExpressionMapEntry()
+	 * @generated
+	 */
+	int PORT_TO_EXPRESSION_MAP_ENTRY = 17;
+
+	/**
+	 * The feature id for the '<em><b>Key</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PORT_TO_EXPRESSION_MAP_ENTRY__KEY = 0;
+
+	/**
+	 * The feature id for the '<em><b>Value</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PORT_TO_EXPRESSION_MAP_ENTRY__VALUE = 1;
+
+	/**
+	 * The number of structural features of the '<em>Port To Expression Map Entry</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PORT_TO_EXPRESSION_MAP_ENTRY_FEATURE_COUNT = 2;
+
+	/**
 	 * The meta object id for the '<em>Map</em>' data type.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1544,7 +1581,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getMap()
 	 * @generated
 	 */
-	int MAP = 17;
+	int MAP = 18;
 
 	/**
 	 * The meta object id for the '<em>List</em>' data type.
@@ -1554,7 +1591,7 @@ public interface DfPackage extends EPackage {
 	 * @see net.sf.orcc.df.impl.DfPackageImpl#getList()
 	 * @generated
 	 */
-	int LIST = 18;
+	int LIST = 19;
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.df.Network <em>Network</em>}'.
@@ -2091,14 +2128,15 @@ public interface DfPackage extends EPackage {
 	EClass getPattern();
 
 	/**
-	 * Returns the meta object for the map '{@link net.sf.orcc.df.Pattern#getNumTokensMap <em>Num Tokens Map</em>}'.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @return the meta object for the map '<em>Num Tokens Map</em>'.
-	 * @see net.sf.orcc.df.Pattern#getNumTokensMap()
+	 * Returns the meta object for the map '{@link net.sf.orcc.df.Pattern#getExprTokensMap <em>Expr Tokens Map</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the map '<em>Expr Tokens Map</em>'.
+	 * @see net.sf.orcc.df.Pattern#getExprTokensMap()
 	 * @see #getPattern()
 	 * @generated
 	 */
-	EReference getPattern_NumTokensMap();
+	EReference getPattern_ExprTokensMap();
 
 	/**
 	 * Returns the meta object for the reference list '
@@ -2382,6 +2420,40 @@ public interface DfPackage extends EPackage {
 	EReference getArgument_Variable();
 
 	/**
+	 * Returns the meta object for class '{@link java.util.Map.Entry <em>Port To Expression Map Entry</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Port To Expression Map Entry</em>'.
+	 * @see java.util.Map.Entry
+	 * @model keyType="net.sf.orcc.df.Port"
+	 *        valueType="net.sf.orcc.ir.Expression"
+	 * @generated
+	 */
+	EClass getPortToExpressionMapEntry();
+
+	/**
+	 * Returns the meta object for the reference '{@link java.util.Map.Entry <em>Key</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Key</em>'.
+	 * @see java.util.Map.Entry
+	 * @see #getPortToExpressionMapEntry()
+	 * @generated
+	 */
+	EReference getPortToExpressionMapEntry_Key();
+
+	/**
+	 * Returns the meta object for the reference '{@link java.util.Map.Entry <em>Value</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Value</em>'.
+	 * @see java.util.Map.Entry
+	 * @see #getPortToExpressionMapEntry()
+	 * @generated
+	 */
+	EReference getPortToExpressionMapEntry_Value();
+
+	/**
 	 * Returns the meta object for data type '{@link java.util.Map <em>Map</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2582,16 +2654,14 @@ public interface DfPackage extends EPackage {
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference CONNECTION__SOURCE_PORT = eINSTANCE
-				.getConnection_SourcePort();
+		EReference CONNECTION__SOURCE_PORT = eINSTANCE.getConnection_SourcePort();
 
 		/**
 		 * The meta object literal for the '<em><b>Target Port</b></em>' reference feature.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference CONNECTION__TARGET_PORT = eINSTANCE
-				.getConnection_TargetPort();
+		EReference CONNECTION__TARGET_PORT = eINSTANCE.getConnection_TargetPort();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.df.impl.InstanceImpl <em>Instance</em>}' class.
@@ -2641,8 +2711,7 @@ public interface DfPackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute ENTITY__INCOMING_PORT_MAP = eINSTANCE
-				.getEntity_IncomingPortMap();
+		EAttribute ENTITY__INCOMING_PORT_MAP = eINSTANCE.getEntity_IncomingPortMap();
 
 		/**
 		 * The meta object literal for the '<em><b>Inputs</b></em>' reference list feature.
@@ -2666,8 +2735,7 @@ public interface DfPackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute ENTITY__OUTGOING_PORT_MAP = eINSTANCE
-				.getEntity_OutgoingPortMap();
+		EAttribute ENTITY__OUTGOING_PORT_MAP = eINSTANCE.getEntity_OutgoingPortMap();
 
 		/**
 		 * The meta object literal for the '<em><b>Outputs</b></em>' reference list feature.
@@ -2765,8 +2833,7 @@ public interface DfPackage extends EPackage {
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference ACTOR__ACTIONS_OUTSIDE_FSM = eINSTANCE
-				.getActor_ActionsOutsideFsm();
+		EReference ACTOR__ACTIONS_OUTSIDE_FSM = eINSTANCE.getActor_ActionsOutsideFsm();
 
 		/**
 		 * The meta object literal for the '<em><b>Fsm</b></em>' containment reference feature.
@@ -2886,12 +2953,12 @@ public interface DfPackage extends EPackage {
 		EClass PATTERN = eINSTANCE.getPattern();
 
 		/**
-		 * The meta object literal for the '<em><b>Num Tokens Map</b></em>' map feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * The meta object literal for the '<em><b>Expr Tokens Map</b></em>' map feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference PATTERN__NUM_TOKENS_MAP = eINSTANCE
-				.getPattern_NumTokensMap();
+		EReference PATTERN__EXPR_TOKENS_MAP = eINSTANCE.getPattern_ExprTokensMap();
 
 		/**
 		 * The meta object literal for the '<em><b>Ports</b></em>' reference list feature.
@@ -2905,8 +2972,7 @@ public interface DfPackage extends EPackage {
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference PATTERN__PORT_TO_VAR_MAP = eINSTANCE
-				.getPattern_PortToVarMap();
+		EReference PATTERN__PORT_TO_VAR_MAP = eINSTANCE.getPattern_PortToVarMap();
 
 		/**
 		 * The meta object literal for the '<em><b>Variables</b></em>' containment reference list feature.
@@ -2921,8 +2987,7 @@ public interface DfPackage extends EPackage {
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference PATTERN__VAR_TO_PORT_MAP = eINSTANCE
-				.getPattern_VarToPortMap();
+		EReference PATTERN__VAR_TO_PORT_MAP = eINSTANCE.getPattern_VarToPortMap();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.df.impl.PortImpl <em>Port</em>}' class.
@@ -2938,16 +3003,14 @@ public interface DfPackage extends EPackage {
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute PORT__NUM_TOKENS_CONSUMED = eINSTANCE
-				.getPort_NumTokensConsumed();
+		EAttribute PORT__NUM_TOKENS_CONSUMED = eINSTANCE.getPort_NumTokensConsumed();
 
 		/**
 		 * The meta object literal for the '<em><b>Num Tokens Produced</b></em>' attribute feature.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute PORT__NUM_TOKENS_PRODUCED = eINSTANCE
-				.getPort_NumTokensProduced();
+		EAttribute PORT__NUM_TOKENS_PRODUCED = eINSTANCE.getPort_NumTokensProduced();
 
 		/**
 		 * The meta object literal for the '<em><b>Type</b></em>' containment reference feature.
@@ -3018,24 +3081,21 @@ public interface DfPackage extends EPackage {
 		 * @see net.sf.orcc.df.impl.DfPackageImpl#getPortToEIntegerObjectMapEntry()
 		 * @generated
 		 */
-		EClass PORT_TO_EINTEGER_OBJECT_MAP_ENTRY = eINSTANCE
-				.getPortToEIntegerObjectMapEntry();
+		EClass PORT_TO_EINTEGER_OBJECT_MAP_ENTRY = eINSTANCE.getPortToEIntegerObjectMapEntry();
 
 		/**
 		 * The meta object literal for the '<em><b>Key</b></em>' reference feature.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__KEY = eINSTANCE
-				.getPortToEIntegerObjectMapEntry_Key();
+		EReference PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__KEY = eINSTANCE.getPortToEIntegerObjectMapEntry_Key();
 
 		/**
 		 * The meta object literal for the '<em><b>Value</b></em>' attribute feature.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__VALUE = eINSTANCE
-				.getPortToEIntegerObjectMapEntry_Value();
+		EAttribute PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__VALUE = eINSTANCE.getPortToEIntegerObjectMapEntry_Value();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.df.impl.PortToVarMapEntryImpl <em>Port To Var Map Entry</em>}' class.
@@ -3052,16 +3112,14 @@ public interface DfPackage extends EPackage {
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference PORT_TO_VAR_MAP_ENTRY__KEY = eINSTANCE
-				.getPortToVarMapEntry_Key();
+		EReference PORT_TO_VAR_MAP_ENTRY__KEY = eINSTANCE.getPortToVarMapEntry_Key();
 
 		/**
 		 * The meta object literal for the '<em><b>Value</b></em>' reference feature.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference PORT_TO_VAR_MAP_ENTRY__VALUE = eINSTANCE
-				.getPortToVarMapEntry_Value();
+		EReference PORT_TO_VAR_MAP_ENTRY__VALUE = eINSTANCE.getPortToVarMapEntry_Value();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.df.impl.VarToPortMapEntryImpl <em>Var To Port Map Entry</em>}' class.
@@ -3078,16 +3136,14 @@ public interface DfPackage extends EPackage {
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference VAR_TO_PORT_MAP_ENTRY__KEY = eINSTANCE
-				.getVarToPortMapEntry_Key();
+		EReference VAR_TO_PORT_MAP_ENTRY__KEY = eINSTANCE.getVarToPortMapEntry_Key();
 
 		/**
 		 * The meta object literal for the '<em><b>Value</b></em>' reference feature.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference VAR_TO_PORT_MAP_ENTRY__VALUE = eINSTANCE
-				.getVarToPortMapEntry_Value();
+		EReference VAR_TO_PORT_MAP_ENTRY__VALUE = eINSTANCE.getVarToPortMapEntry_Value();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.df.impl.ArgumentImpl <em>Argument</em>}' class.
@@ -3111,6 +3167,32 @@ public interface DfPackage extends EPackage {
 		 * @generated
 		 */
 		EReference ARGUMENT__VARIABLE = eINSTANCE.getArgument_Variable();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.df.impl.PortToExpressionMapEntryImpl <em>Port To Expression Map Entry</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.df.impl.PortToExpressionMapEntryImpl
+		 * @see net.sf.orcc.df.impl.DfPackageImpl#getPortToExpressionMapEntry()
+		 * @generated
+		 */
+		EClass PORT_TO_EXPRESSION_MAP_ENTRY = eINSTANCE.getPortToExpressionMapEntry();
+
+		/**
+		 * The meta object literal for the '<em><b>Key</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference PORT_TO_EXPRESSION_MAP_ENTRY__KEY = eINSTANCE.getPortToExpressionMapEntry_Key();
+
+		/**
+		 * The meta object literal for the '<em><b>Value</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference PORT_TO_EXPRESSION_MAP_ENTRY__VALUE = eINSTANCE.getPortToExpressionMapEntry_Value();
 
 		/**
 		 * The meta object literal for the '<em>Map</em>' data type.

@@ -91,14 +91,12 @@ public class InstCallImpl extends InstructionImpl implements InstCall {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetTarget(Def newTarget,
-			NotificationChain msgs) {
+	public NotificationChain basicSetTarget(Def newTarget, NotificationChain msgs) {
 		Def oldTarget = target;
 		target = newTarget;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET, IrPackage.INST_CALL__TARGET, oldTarget,
-					newTarget);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.INST_CALL__TARGET,
+					oldTarget, newTarget);
 			if (msgs == null)
 				msgs = notification;
 			else
@@ -131,12 +129,10 @@ public class InstCallImpl extends InstructionImpl implements InstCall {
 	 * @generated
 	 */
 	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd,
-			int featureID, NotificationChain msgs) {
+	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
 		case IrPackage.INST_CALL__ARGUMENTS:
-			return ((InternalEList<?>) getArguments()).basicRemove(otherEnd,
-					msgs);
+			return ((InternalEList<?>) getArguments()).basicRemove(otherEnd, msgs);
 		case IrPackage.INST_CALL__TARGET:
 			return basicSetTarget(null, msgs);
 		}
@@ -217,8 +213,7 @@ public class InstCallImpl extends InstructionImpl implements InstCall {
 	 */
 	public EList<Arg> getArguments() {
 		if (arguments == null) {
-			arguments = new EObjectContainmentEList<Arg>(Arg.class, this,
-					IrPackage.INST_CALL__ARGUMENTS);
+			arguments = new EObjectContainmentEList<Arg>(Arg.class, this, IrPackage.INST_CALL__ARGUMENTS);
 		}
 		return arguments;
 	}
@@ -233,9 +228,8 @@ public class InstCallImpl extends InstructionImpl implements InstCall {
 			procedure = (Procedure) eResolveProxy(oldProcedure);
 			if (procedure != oldProcedure) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
-							IrPackage.INST_CALL__PROCEDURE, oldProcedure,
-							procedure));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, IrPackage.INST_CALL__PROCEDURE,
+							oldProcedure, procedure));
 			}
 		}
 		return procedure;
@@ -272,8 +266,8 @@ public class InstCallImpl extends InstructionImpl implements InstCall {
 		Procedure oldProcedure = procedure;
 		procedure = newProcedure;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.INST_CALL__PROCEDURE, oldProcedure, procedure));
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.INST_CALL__PROCEDURE, oldProcedure,
+					procedure));
 	}
 
 	/**
@@ -285,18 +279,15 @@ public class InstCallImpl extends InstructionImpl implements InstCall {
 			NotificationChain msgs = null;
 			if (target != null)
 				msgs = ((InternalEObject) target).eInverseRemove(this,
-						EOPPOSITE_FEATURE_BASE - IrPackage.INST_CALL__TARGET,
-						null, msgs);
+						EOPPOSITE_FEATURE_BASE - IrPackage.INST_CALL__TARGET, null, msgs);
 			if (newTarget != null)
 				msgs = ((InternalEObject) newTarget).eInverseAdd(this,
-						EOPPOSITE_FEATURE_BASE - IrPackage.INST_CALL__TARGET,
-						null, msgs);
+						EOPPOSITE_FEATURE_BASE - IrPackage.INST_CALL__TARGET, null, msgs);
 			msgs = basicSetTarget(newTarget, msgs);
 			if (msgs != null)
 				msgs.dispatch();
 		} else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.INST_CALL__TARGET, newTarget, newTarget));
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.INST_CALL__TARGET, newTarget, newTarget));
 	}
 
 	@Override

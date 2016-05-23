@@ -96,14 +96,12 @@ public class BlockWhileImpl extends BlockImpl implements BlockWhile {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetCondition(Expression newCondition,
-			NotificationChain msgs) {
+	public NotificationChain basicSetCondition(Expression newCondition, NotificationChain msgs) {
 		Expression oldCondition = condition;
 		condition = newCondition;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET, IrPackage.BLOCK_WHILE__CONDITION,
-					oldCondition, newCondition);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET,
+					IrPackage.BLOCK_WHILE__CONDITION, oldCondition, newCondition);
 			if (msgs == null)
 				msgs = notification;
 			else
@@ -116,14 +114,12 @@ public class BlockWhileImpl extends BlockImpl implements BlockWhile {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetJoinBlock(BlockBasic newJoinBlock,
-			NotificationChain msgs) {
+	public NotificationChain basicSetJoinBlock(BlockBasic newJoinBlock, NotificationChain msgs) {
 		BlockBasic oldJoinBlock = joinBlock;
 		joinBlock = newJoinBlock;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET, IrPackage.BLOCK_WHILE__JOIN_BLOCK,
-					oldJoinBlock, newJoinBlock);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET,
+					IrPackage.BLOCK_WHILE__JOIN_BLOCK, oldJoinBlock, newJoinBlock);
 			if (msgs == null)
 				msgs = notification;
 			else
@@ -156,8 +152,7 @@ public class BlockWhileImpl extends BlockImpl implements BlockWhile {
 	 * @generated
 	 */
 	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd,
-			int featureID, NotificationChain msgs) {
+	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
 		case IrPackage.BLOCK_WHILE__CONDITION:
 			return basicSetCondition(null, msgs);
@@ -251,8 +246,7 @@ public class BlockWhileImpl extends BlockImpl implements BlockWhile {
 	 */
 	public EList<Block> getBlocks() {
 		if (blocks == null) {
-			blocks = new EObjectContainmentEList<Block>(Block.class, this,
-					IrPackage.BLOCK_WHILE__BLOCKS);
+			blocks = new EObjectContainmentEList<Block>(Block.class, this, IrPackage.BLOCK_WHILE__BLOCKS);
 		}
 		return blocks;
 	}
@@ -305,18 +299,15 @@ public class BlockWhileImpl extends BlockImpl implements BlockWhile {
 			NotificationChain msgs = null;
 			if (condition != null)
 				msgs = ((InternalEObject) condition).eInverseRemove(this,
-						EOPPOSITE_FEATURE_BASE
-								- IrPackage.BLOCK_WHILE__CONDITION, null, msgs);
+						EOPPOSITE_FEATURE_BASE - IrPackage.BLOCK_WHILE__CONDITION, null, msgs);
 			if (newCondition != null)
 				msgs = ((InternalEObject) newCondition).eInverseAdd(this,
-						EOPPOSITE_FEATURE_BASE
-								- IrPackage.BLOCK_WHILE__CONDITION, null, msgs);
+						EOPPOSITE_FEATURE_BASE - IrPackage.BLOCK_WHILE__CONDITION, null, msgs);
 			msgs = basicSetCondition(newCondition, msgs);
 			if (msgs != null)
 				msgs.dispatch();
 		} else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.BLOCK_WHILE__CONDITION, newCondition,
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.BLOCK_WHILE__CONDITION, newCondition,
 					newCondition));
 	}
 
@@ -328,19 +319,16 @@ public class BlockWhileImpl extends BlockImpl implements BlockWhile {
 		if (newJoinBlock != joinBlock) {
 			NotificationChain msgs = null;
 			if (joinBlock != null)
-				msgs = ((InternalEObject) joinBlock)
-						.eInverseRemove(this, EOPPOSITE_FEATURE_BASE
-								- IrPackage.BLOCK_WHILE__JOIN_BLOCK, null, msgs);
+				msgs = ((InternalEObject) joinBlock).eInverseRemove(this,
+						EOPPOSITE_FEATURE_BASE - IrPackage.BLOCK_WHILE__JOIN_BLOCK, null, msgs);
 			if (newJoinBlock != null)
-				msgs = ((InternalEObject) newJoinBlock)
-						.eInverseAdd(this, EOPPOSITE_FEATURE_BASE
-								- IrPackage.BLOCK_WHILE__JOIN_BLOCK, null, msgs);
+				msgs = ((InternalEObject) newJoinBlock).eInverseAdd(this,
+						EOPPOSITE_FEATURE_BASE - IrPackage.BLOCK_WHILE__JOIN_BLOCK, null, msgs);
 			msgs = basicSetJoinBlock(newJoinBlock, msgs);
 			if (msgs != null)
 				msgs.dispatch();
 		} else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.BLOCK_WHILE__JOIN_BLOCK, newJoinBlock,
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.BLOCK_WHILE__JOIN_BLOCK, newJoinBlock,
 					newJoinBlock));
 	}
 
@@ -352,8 +340,7 @@ public class BlockWhileImpl extends BlockImpl implements BlockWhile {
 		int oldLineNumber = lineNumber;
 		lineNumber = newLineNumber;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.BLOCK_WHILE__LINE_NUMBER, oldLineNumber,
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.BLOCK_WHILE__LINE_NUMBER, oldLineNumber,
 					lineNumber));
 	}
 

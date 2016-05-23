@@ -73,8 +73,7 @@ public class ExprListImpl extends ExpressionImpl implements ExprList {
 	 * @generated
 	 */
 	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd,
-			int featureID, NotificationChain msgs) {
+	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
 		case IrPackage.EXPR_LIST__VALUE:
 			return ((InternalEList<?>) getValue()).basicRemove(otherEnd, msgs);
@@ -163,8 +162,7 @@ public class ExprListImpl extends ExpressionImpl implements ExprList {
 	 */
 	public EList<Expression> getValue() {
 		if (value == null) {
-			value = new EObjectContainmentEList<Expression>(Expression.class,
-					this, IrPackage.EXPR_LIST__VALUE);
+			value = new EObjectContainmentEList<Expression>(Expression.class, this, IrPackage.EXPR_LIST__VALUE);
 		}
 		return value;
 	}
@@ -176,8 +174,7 @@ public class ExprListImpl extends ExpressionImpl implements ExprList {
 
 	@Override
 	public void set(ExprInt index, Expression value) {
-		((AbstractEList<Expression>) getValue()).setUnique(index.getIntValue(),
-				value);
+		((AbstractEList<Expression>) getValue()).setUnique(index.getIntValue(), value);
 	}
 
 	@Override

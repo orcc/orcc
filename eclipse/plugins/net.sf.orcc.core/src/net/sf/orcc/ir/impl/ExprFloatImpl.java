@@ -82,8 +82,7 @@ public class ExprFloatImpl extends ExpressionImpl implements ExprFloat {
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
 		case IrPackage.EXPR_FLOAT__VALUE:
-			return VALUE_EDEFAULT == null ? value != null : !VALUE_EDEFAULT
-					.equals(value);
+			return VALUE_EDEFAULT == null ? value != null : !VALUE_EDEFAULT.equals(value);
 		}
 		return super.eIsSet(featureID);
 	}
@@ -158,8 +157,7 @@ public class ExprFloatImpl extends ExpressionImpl implements ExprFloat {
 		BigDecimal oldValue = value;
 		value = newValue;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.EXPR_FLOAT__VALUE, oldValue, value));
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.EXPR_FLOAT__VALUE, oldValue, value));
 	}
 
 	/**

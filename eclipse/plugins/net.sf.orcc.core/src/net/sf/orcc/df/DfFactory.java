@@ -60,9 +60,8 @@ public interface DfFactory extends EFactory {
 	 * @param body
 	 *            procedure that holds the body of the action
 	 */
-	Action createAction(String tag, Pattern inputPattern,
-			Pattern outputPattern, Pattern peekedPattern, Procedure scheduler,
-			Procedure body);
+	Action createAction(String tag, Pattern inputPattern, Pattern outputPattern, Pattern peekedPattern,
+			Procedure scheduler, Procedure body);
 
 	/**
 	 * Creates a new action with empty patterns, scheduler and body, and the
@@ -91,9 +90,8 @@ public interface DfFactory extends EFactory {
 	 * @param body
 	 *            procedure that holds the body of the action
 	 */
-	Action createAction(Tag tagName, Pattern inputPattern,
-			Pattern outputPattern, Pattern peekedPattern, Procedure scheduler,
-			Procedure body);
+	Action createAction(Tag tagName, Pattern inputPattern, Pattern outputPattern, Pattern peekedPattern,
+			Procedure scheduler, Procedure body);
 
 	/**
 	 * Returns a new object of class '<em>Actor</em>'.
@@ -137,8 +135,7 @@ public interface DfFactory extends EFactory {
 	 * @param targetPort
 	 *            target port
 	 */
-	Connection createConnection(Vertex source, Port sourcePort, Vertex target,
-			Port targetPort);
+	Connection createConnection(Vertex source, Port sourcePort, Vertex target, Port targetPort);
 
 	/**
 	 * Creates a connection from source (and source port) to target (and target
@@ -155,8 +152,8 @@ public interface DfFactory extends EFactory {
 	 * @param attributes
 	 *            attributes to associate with the new connection
 	 */
-	Connection createConnection(Vertex source, Port sourcePort, Vertex target,
-			Port targetPort, Collection<Attribute> attributes);
+	Connection createConnection(Vertex source, Port sourcePort, Vertex target, Port targetPort,
+			Collection<Attribute> attributes);
 
 	/**
 	 * Creates a connection from source (and source port) to target (and target
@@ -172,8 +169,7 @@ public interface DfFactory extends EFactory {
 	 * @param targetPort
 	 *            target port
 	 */
-	Connection createConnection(Vertex source, Port sourcePort, Vertex target,
-			Port targetPort, Integer size);
+	Connection createConnection(Vertex source, Port sourcePort, Vertex target, Port targetPort, Integer size);
 
 	/**
 	 * Returns a new object of class '<em>FSM</em>'.

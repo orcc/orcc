@@ -114,8 +114,7 @@ public class TransitionImpl extends EdgeImpl implements Transition {
 	 */
 	public EList<Action> getActions() {
 		if (actions == null) {
-			actions = new EObjectResolvingEList<Action>(Action.class, this,
-					DfPackage.TRANSITION__ACTIONS);
+			actions = new EObjectResolvingEList<Action>(Action.class, this, DfPackage.TRANSITION__ACTIONS);
 		}
 		return actions;
 	}

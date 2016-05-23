@@ -469,8 +469,7 @@ public interface IrPackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference INSTRUCTION__PREDICATE = eINSTANCE
-				.getInstruction_Predicate();
+		EReference INSTRUCTION__PREDICATE = eINSTANCE.getInstruction_Predicate();
 
 		/**
 		 * The meta object literal for the '<em><b>Line Number</b></em>' attribute feature.
@@ -478,8 +477,7 @@ public interface IrPackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute INSTRUCTION__LINE_NUMBER = eINSTANCE
-				.getInstruction_LineNumber();
+		EAttribute INSTRUCTION__LINE_NUMBER = eINSTANCE.getInstruction_LineNumber();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.PredicateImpl <em>Predicate</em>}' class.
@@ -497,8 +495,7 @@ public interface IrPackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference PREDICATE__EXPRESSIONS = eINSTANCE
-				.getPredicate_Expressions();
+		EReference PREDICATE__EXPRESSIONS = eINSTANCE.getPredicate_Expressions();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.CfgImpl <em>Cfg</em>}' class.
@@ -696,8 +693,7 @@ public interface IrPackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference BLOCK_BASIC__INSTRUCTIONS = eINSTANCE
-				.getBlockBasic_Instructions();
+		EReference BLOCK_BASIC__INSTRUCTIONS = eINSTANCE.getBlockBasic_Instructions();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.BlockIfImpl <em>Block If</em>}' class.
@@ -773,8 +769,7 @@ public interface IrPackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference BLOCK_WHILE__JOIN_BLOCK = eINSTANCE
-				.getBlockWhile_JoinBlock();
+		EReference BLOCK_WHILE__JOIN_BLOCK = eINSTANCE.getBlockWhile_JoinBlock();
 
 		/**
 		 * The meta object literal for the '<em><b>Line Number</b></em>' attribute feature.
@@ -782,8 +777,7 @@ public interface IrPackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute BLOCK_WHILE__LINE_NUMBER = eINSTANCE
-				.getBlockWhile_LineNumber();
+		EAttribute BLOCK_WHILE__LINE_NUMBER = eINSTANCE.getBlockWhile_LineNumber();
 
 		/**
 		 * The meta object literal for the '<em><b>Blocks</b></em>' containment reference list feature.

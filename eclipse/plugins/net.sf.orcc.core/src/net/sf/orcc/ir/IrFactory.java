@@ -156,8 +156,7 @@ public interface IrFactory extends EFactory {
 	 * @param type
 	 * @return
 	 */
-	ExprBinary createExprBinary(Expression e1, OpBinary op, Expression e2,
-			Type type);
+	ExprBinary createExprBinary(Expression e1, OpBinary op, Expression e2, Type type);
 
 	/**
 	 * Returns a new object of class '<em>Expr Bool</em>'.
@@ -339,8 +338,7 @@ public interface IrFactory extends EFactory {
 	 * @param parameters
 	 * @return a call
 	 */
-	InstCall createInstCall(int lineNumber, Var target, Procedure procedure,
-			List<Expression> parameters);
+	InstCall createInstCall(int lineNumber, Var target, Procedure procedure, List<Expression> parameters);
 
 	/**
 	 * Creates an InstCall with the given target, procedure, parameters.
@@ -351,8 +349,7 @@ public interface IrFactory extends EFactory {
 	 * @param parameters
 	 * @return a call
 	 */
-	InstCall createInstCall(Var target, Procedure procedure,
-			List<Expression> parameters);
+	InstCall createInstCall(Var target, Procedure procedure, List<Expression> parameters);
 
 	/**
 	 * Returns a new object of class '<em>Inst Load</em>'.
@@ -372,8 +369,7 @@ public interface IrFactory extends EFactory {
 	 * @param indexes
 	 * @return a load
 	 */
-	InstLoad createInstLoad(int lineNumber, Def target, Use source,
-			List<Expression> indexes);
+	InstLoad createInstLoad(int lineNumber, Def target, Use source, List<Expression> indexes);
 
 	/**
 	 * Creates an InstLoad with the given location, target, source, indexes.
@@ -384,8 +380,7 @@ public interface IrFactory extends EFactory {
 	 * @param indexes
 	 * @return a load
 	 */
-	InstLoad createInstLoad(int lineNumber, Var target, Var source,
-			List<Expression> indexes);
+	InstLoad createInstLoad(int lineNumber, Var target, Var source, List<Expression> indexes);
 
 	/**
 	 * Creates an InstLoad with the given target, source, index.
@@ -498,8 +493,7 @@ public interface IrFactory extends EFactory {
 	 * @param indexes
 	 * @return a store
 	 */
-	InstStore createInstStore(int lineNumber, Def target,
-			Collection<Expression> indexes, Expression value);
+	InstStore createInstStore(int lineNumber, Def target, Collection<Expression> indexes, Expression value);
 
 	/**
 	 * Creates an InstStore with the given location, target, indexes, value.
@@ -510,8 +504,7 @@ public interface IrFactory extends EFactory {
 	 * @param indexes
 	 * @return a store
 	 */
-	InstStore createInstStore(int lineNumber, Var target,
-			Collection<Expression> indexes, Expression value);
+	InstStore createInstStore(int lineNumber, Var target, Collection<Expression> indexes, Expression value);
 
 	/**
 	 * Creates an InstStore with the given target and source.
@@ -559,8 +552,7 @@ public interface IrFactory extends EFactory {
 	 * @param indexes
 	 * @return a store
 	 */
-	InstStore createInstStore(Var target, List<Expression> indexes,
-			Expression value);
+	InstStore createInstStore(Var target, List<Expression> indexes, Expression value);
 
 	/**
 	 * Creates an InstStore with the given target, indexes, value.
@@ -839,8 +831,7 @@ public interface IrFactory extends EFactory {
 	 * @param initialValue
 	 *            initial value of this variable
 	 */
-	Var createVar(int lineNumber, Type type, String name, boolean assignable,
-			Expression initialValue);
+	Var createVar(int lineNumber, Type type, String name, boolean assignable, Expression initialValue);
 
 	/**
 	 * Creates a new variable with the given location, type, name, index. The
@@ -857,8 +848,7 @@ public interface IrFactory extends EFactory {
 	 * @param index
 	 *            index of this variable
 	 */
-	Var createVar(int lineNumber, Type type, String name, boolean assignable,
-			int index);
+	Var createVar(int lineNumber, Type type, String name, boolean assignable, int index);
 
 	/**
 	 * Creates a new local variable with the given type, name, index. The

@@ -82,14 +82,12 @@ public class ExprUnaryImpl extends ExpressionImpl implements ExprUnary {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetExpr(Expression newExpr,
-			NotificationChain msgs) {
+	public NotificationChain basicSetExpr(Expression newExpr, NotificationChain msgs) {
 		Expression oldExpr = expr;
 		expr = newExpr;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET, IrPackage.EXPR_UNARY__EXPR, oldExpr,
-					newExpr);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.EXPR_UNARY__EXPR,
+					oldExpr, newExpr);
 			if (msgs == null)
 				msgs = notification;
 			else
@@ -122,8 +120,7 @@ public class ExprUnaryImpl extends ExpressionImpl implements ExprUnary {
 	 * @generated
 	 */
 	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd,
-			int featureID, NotificationChain msgs) {
+	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
 		case IrPackage.EXPR_UNARY__EXPR:
 			return basicSetExpr(null, msgs);
@@ -235,9 +232,8 @@ public class ExprUnaryImpl extends ExpressionImpl implements ExprUnary {
 		Type oldType = type;
 		type = newType;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET, IrPackage.EXPR_UNARY__TYPE, oldType,
-					newType);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.EXPR_UNARY__TYPE,
+					oldType, newType);
 			if (msgs == null)
 				msgs = notification;
 			else
@@ -261,18 +257,15 @@ public class ExprUnaryImpl extends ExpressionImpl implements ExprUnary {
 			NotificationChain msgs = null;
 			if (expr != null)
 				msgs = ((InternalEObject) expr).eInverseRemove(this,
-						EOPPOSITE_FEATURE_BASE - IrPackage.EXPR_UNARY__EXPR,
-						null, msgs);
+						EOPPOSITE_FEATURE_BASE - IrPackage.EXPR_UNARY__EXPR, null, msgs);
 			if (newExpr != null)
 				msgs = ((InternalEObject) newExpr).eInverseAdd(this,
-						EOPPOSITE_FEATURE_BASE - IrPackage.EXPR_UNARY__EXPR,
-						null, msgs);
+						EOPPOSITE_FEATURE_BASE - IrPackage.EXPR_UNARY__EXPR, null, msgs);
 			msgs = basicSetExpr(newExpr, msgs);
 			if (msgs != null)
 				msgs.dispatch();
 		} else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.EXPR_UNARY__EXPR, newExpr, newExpr));
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.EXPR_UNARY__EXPR, newExpr, newExpr));
 	}
 
 	/**
@@ -284,8 +277,7 @@ public class ExprUnaryImpl extends ExpressionImpl implements ExprUnary {
 		OpUnary oldOp = op;
 		op = newOp == null ? OP_EDEFAULT : newOp;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.EXPR_UNARY__OP, oldOp, op));
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.EXPR_UNARY__OP, oldOp, op));
 	}
 
 	@Override

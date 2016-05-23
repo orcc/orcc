@@ -94,14 +94,12 @@ public class InstPhiImpl extends InstructionImpl implements InstPhi {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetTarget(Def newTarget,
-			NotificationChain msgs) {
+	public NotificationChain basicSetTarget(Def newTarget, NotificationChain msgs) {
 		Def oldTarget = target;
 		target = newTarget;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET, IrPackage.INST_PHI__TARGET, oldTarget,
-					newTarget);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.INST_PHI__TARGET,
+					oldTarget, newTarget);
 			if (msgs == null)
 				msgs = notification;
 			else
@@ -136,8 +134,7 @@ public class InstPhiImpl extends InstructionImpl implements InstPhi {
 	 * @generated
 	 */
 	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd,
-			int featureID, NotificationChain msgs) {
+	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
 		case IrPackage.INST_PHI__TARGET:
 			return basicSetTarget(null, msgs);
@@ -230,9 +227,8 @@ public class InstPhiImpl extends InstructionImpl implements InstPhi {
 			oldVariable = (Var) eResolveProxy(oldOldVariable);
 			if (oldVariable != oldOldVariable) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
-							IrPackage.INST_PHI__OLD_VARIABLE, oldOldVariable,
-							oldVariable));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, IrPackage.INST_PHI__OLD_VARIABLE,
+							oldOldVariable, oldVariable));
 			}
 		}
 		return oldVariable;
@@ -254,8 +250,7 @@ public class InstPhiImpl extends InstructionImpl implements InstPhi {
 	 */
 	public EList<Expression> getValues() {
 		if (values == null) {
-			values = new EObjectContainmentEList<Expression>(Expression.class,
-					this, IrPackage.INST_PHI__VALUES);
+			values = new EObjectContainmentEList<Expression>(Expression.class, this, IrPackage.INST_PHI__VALUES);
 		}
 		return values;
 	}
@@ -274,8 +269,7 @@ public class InstPhiImpl extends InstructionImpl implements InstPhi {
 		Var oldOldVariable = oldVariable;
 		oldVariable = newOldVariable;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.INST_PHI__OLD_VARIABLE, oldOldVariable,
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.INST_PHI__OLD_VARIABLE, oldOldVariable,
 					oldVariable));
 	}
 
@@ -289,18 +283,15 @@ public class InstPhiImpl extends InstructionImpl implements InstPhi {
 			NotificationChain msgs = null;
 			if (target != null)
 				msgs = ((InternalEObject) target).eInverseRemove(this,
-						EOPPOSITE_FEATURE_BASE - IrPackage.INST_PHI__TARGET,
-						null, msgs);
+						EOPPOSITE_FEATURE_BASE - IrPackage.INST_PHI__TARGET, null, msgs);
 			if (newTarget != null)
 				msgs = ((InternalEObject) newTarget).eInverseAdd(this,
-						EOPPOSITE_FEATURE_BASE - IrPackage.INST_PHI__TARGET,
-						null, msgs);
+						EOPPOSITE_FEATURE_BASE - IrPackage.INST_PHI__TARGET, null, msgs);
 			msgs = basicSetTarget(newTarget, msgs);
 			if (msgs != null)
 				msgs.dispatch();
 		} else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.INST_PHI__TARGET, newTarget, newTarget));
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.INST_PHI__TARGET, newTarget, newTarget));
 	}
 
 	@Override

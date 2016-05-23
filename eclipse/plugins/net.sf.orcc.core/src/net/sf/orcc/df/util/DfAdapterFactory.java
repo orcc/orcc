@@ -26,6 +26,7 @@ import net.sf.orcc.df.Unit;
 import net.sf.orcc.graph.Edge;
 import net.sf.orcc.graph.Graph;
 import net.sf.orcc.graph.Vertex;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.util.Adaptable;
 import net.sf.orcc.util.Attributable;
@@ -154,8 +155,7 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 		}
 
 		@Override
-		public Adapter casePortToEIntegerObjectMapEntry(
-				Map.Entry<Port, Integer> object) {
+		public Adapter casePortToEIntegerObjectMapEntry(Map.Entry<Port, Integer> object) {
 			return createPortToEIntegerObjectMapEntryAdapter();
 		}
 
@@ -172,6 +172,11 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 		@Override
 		public Adapter caseArgument(Argument object) {
 			return createArgumentAdapter();
+		}
+
+		@Override
+		public Adapter casePortToExpressionMapEntry(Map.Entry<Port, Expression> object) {
+			return createPortToExpressionMapEntryAdapter();
 		}
 
 		@Override
@@ -471,6 +476,20 @@ public class DfAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createArgumentAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link java.util.Map.Entry <em>Port To Expression Map Entry</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see java.util.Map.Entry
+	 * @generated
+	 */
+	public Adapter createPortToExpressionMapEntryAdapter() {
 		return null;
 	}
 

@@ -54,14 +54,12 @@ public class ArgByValImpl extends ArgImpl implements ArgByVal {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetValue(Expression newValue,
-			NotificationChain msgs) {
+	public NotificationChain basicSetValue(Expression newValue, NotificationChain msgs) {
 		Expression oldValue = value;
 		value = newValue;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET, IrPackage.ARG_BY_VAL__VALUE, oldValue,
-					newValue);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.ARG_BY_VAL__VALUE,
+					oldValue, newValue);
 			if (msgs == null)
 				msgs = notification;
 			else
@@ -90,8 +88,7 @@ public class ArgByValImpl extends ArgImpl implements ArgByVal {
 	 * @generated
 	 */
 	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd,
-			int featureID, NotificationChain msgs) {
+	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
 		case IrPackage.ARG_BY_VAL__VALUE:
 			return basicSetValue(null, msgs);
@@ -182,18 +179,15 @@ public class ArgByValImpl extends ArgImpl implements ArgByVal {
 			NotificationChain msgs = null;
 			if (value != null)
 				msgs = ((InternalEObject) value).eInverseRemove(this,
-						EOPPOSITE_FEATURE_BASE - IrPackage.ARG_BY_VAL__VALUE,
-						null, msgs);
+						EOPPOSITE_FEATURE_BASE - IrPackage.ARG_BY_VAL__VALUE, null, msgs);
 			if (newValue != null)
 				msgs = ((InternalEObject) newValue).eInverseAdd(this,
-						EOPPOSITE_FEATURE_BASE - IrPackage.ARG_BY_VAL__VALUE,
-						null, msgs);
+						EOPPOSITE_FEATURE_BASE - IrPackage.ARG_BY_VAL__VALUE, null, msgs);
 			msgs = basicSetValue(newValue, msgs);
 			if (msgs != null)
 				msgs.dispatch();
 		} else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.ARG_BY_VAL__VALUE, newValue, newValue));
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.ARG_BY_VAL__VALUE, newValue, newValue));
 	}
 
 }

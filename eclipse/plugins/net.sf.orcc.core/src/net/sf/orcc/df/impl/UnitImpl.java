@@ -162,15 +162,12 @@ public class UnitImpl extends AttributableImpl implements Unit {
 	 * @generated
 	 */
 	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd,
-			int featureID, NotificationChain msgs) {
+	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
 		case DfPackage.UNIT__CONSTANTS:
-			return ((InternalEList<?>) getConstants()).basicRemove(otherEnd,
-					msgs);
+			return ((InternalEList<?>) getConstants()).basicRemove(otherEnd, msgs);
 		case DfPackage.UNIT__PROCEDURES:
-			return ((InternalEList<?>) getProcedures()).basicRemove(otherEnd,
-					msgs);
+			return ((InternalEList<?>) getProcedures()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -185,13 +182,11 @@ public class UnitImpl extends AttributableImpl implements Unit {
 		case DfPackage.UNIT__CONSTANTS:
 			return constants != null && !constants.isEmpty();
 		case DfPackage.UNIT__FILE_NAME:
-			return FILE_NAME_EDEFAULT == null ? fileName != null
-					: !FILE_NAME_EDEFAULT.equals(fileName);
+			return FILE_NAME_EDEFAULT == null ? fileName != null : !FILE_NAME_EDEFAULT.equals(fileName);
 		case DfPackage.UNIT__LINE_NUMBER:
 			return lineNumber != LINE_NUMBER_EDEFAULT;
 		case DfPackage.UNIT__NAME:
-			return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT
-					.equals(name);
+			return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
 		case DfPackage.UNIT__PROCEDURES:
 			return procedures != null && !procedures.isEmpty();
 		}
@@ -278,8 +273,7 @@ public class UnitImpl extends AttributableImpl implements Unit {
 	 */
 	public EList<Var> getConstants() {
 		if (constants == null) {
-			constants = new EObjectContainmentEList<Var>(Var.class, this,
-					DfPackage.UNIT__CONSTANTS);
+			constants = new EObjectContainmentEList<Var>(Var.class, this, DfPackage.UNIT__CONSTANTS);
 		}
 		return constants;
 	}
@@ -342,8 +336,7 @@ public class UnitImpl extends AttributableImpl implements Unit {
 	 */
 	public EList<Procedure> getProcedures() {
 		if (procedures == null) {
-			procedures = new EObjectContainmentEList<Procedure>(
-					Procedure.class, this, DfPackage.UNIT__PROCEDURES);
+			procedures = new EObjectContainmentEList<Procedure>(Procedure.class, this, DfPackage.UNIT__PROCEDURES);
 		}
 		return procedures;
 	}
@@ -367,8 +360,7 @@ public class UnitImpl extends AttributableImpl implements Unit {
 		String oldFileName = fileName;
 		fileName = newFileName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					DfPackage.UNIT__FILE_NAME, oldFileName, fileName));
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.UNIT__FILE_NAME, oldFileName, fileName));
 	}
 
 	/**
@@ -380,8 +372,8 @@ public class UnitImpl extends AttributableImpl implements Unit {
 		int oldLineNumber = lineNumber;
 		lineNumber = newLineNumber;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					DfPackage.UNIT__LINE_NUMBER, oldLineNumber, lineNumber));
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.UNIT__LINE_NUMBER, oldLineNumber,
+					lineNumber));
 	}
 
 	/**
@@ -393,8 +385,7 @@ public class UnitImpl extends AttributableImpl implements Unit {
 		String oldName = name;
 		name = newName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					DfPackage.UNIT__NAME, oldName, name));
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.UNIT__NAME, oldName, name));
 	}
 
 	@Override

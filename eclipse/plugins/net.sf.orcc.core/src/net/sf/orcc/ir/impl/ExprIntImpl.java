@@ -96,8 +96,7 @@ public class ExprIntImpl extends ExpressionImpl implements ExprInt {
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
 		case IrPackage.EXPR_INT__VALUE:
-			return VALUE_EDEFAULT == null ? value != null : !VALUE_EDEFAULT
-					.equals(value);
+			return VALUE_EDEFAULT == null ? value != null : !VALUE_EDEFAULT.equals(value);
 		case IrPackage.EXPR_INT__TYPE:
 			return type != null;
 		}
@@ -166,9 +165,8 @@ public class ExprIntImpl extends ExpressionImpl implements ExprInt {
 		Type oldType = type;
 		type = newType;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET, IrPackage.EXPR_INT__TYPE, oldType,
-					newType);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.EXPR_INT__TYPE,
+					oldType, newType);
 			if (msgs == null)
 				msgs = notification;
 			else
@@ -186,19 +184,16 @@ public class ExprIntImpl extends ExpressionImpl implements ExprInt {
 		if (newType != type) {
 			NotificationChain msgs = null;
 			if (type != null)
-				msgs = ((InternalEObject) type).eInverseRemove(this,
-						EOPPOSITE_FEATURE_BASE - IrPackage.EXPR_INT__TYPE,
+				msgs = ((InternalEObject) type).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.EXPR_INT__TYPE,
 						null, msgs);
 			if (newType != null)
-				msgs = ((InternalEObject) newType).eInverseAdd(this,
-						EOPPOSITE_FEATURE_BASE - IrPackage.EXPR_INT__TYPE,
+				msgs = ((InternalEObject) newType).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.EXPR_INT__TYPE,
 						null, msgs);
 			msgs = basicSetType(newType, msgs);
 			if (msgs != null)
 				msgs.dispatch();
 		} else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.EXPR_INT__TYPE, newType, newType));
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.EXPR_INT__TYPE, newType, newType));
 	}
 
 	/**
@@ -207,8 +202,7 @@ public class ExprIntImpl extends ExpressionImpl implements ExprInt {
 	 * @generated
 	 */
 	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd,
-			int featureID, NotificationChain msgs) {
+	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
 		case IrPackage.EXPR_INT__TYPE:
 			return basicSetType(null, msgs);
@@ -242,8 +236,7 @@ public class ExprIntImpl extends ExpressionImpl implements ExprInt {
 		BigInteger oldValue = value;
 		value = newValue;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.EXPR_INT__VALUE, oldValue, value));
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.EXPR_INT__VALUE, oldValue, value));
 	}
 
 	/**

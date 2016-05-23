@@ -95,14 +95,12 @@ public class ParamImpl extends AttributableImpl implements Param {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetVariable(Var newVariable,
-			NotificationChain msgs) {
+	public NotificationChain basicSetVariable(Var newVariable, NotificationChain msgs) {
 		Var oldVariable = variable;
 		variable = newVariable;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET, IrPackage.PARAM__VARIABLE, oldVariable,
-					newVariable);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.PARAM__VARIABLE,
+					oldVariable, newVariable);
 			if (msgs == null)
 				msgs = notification;
 			else
@@ -121,18 +119,15 @@ public class ParamImpl extends AttributableImpl implements Param {
 			NotificationChain msgs = null;
 			if (variable != null)
 				msgs = ((InternalEObject) variable).eInverseRemove(this,
-						EOPPOSITE_FEATURE_BASE - IrPackage.PARAM__VARIABLE,
-						null, msgs);
+						EOPPOSITE_FEATURE_BASE - IrPackage.PARAM__VARIABLE, null, msgs);
 			if (newVariable != null)
 				msgs = ((InternalEObject) newVariable).eInverseAdd(this,
-						EOPPOSITE_FEATURE_BASE - IrPackage.PARAM__VARIABLE,
-						null, msgs);
+						EOPPOSITE_FEATURE_BASE - IrPackage.PARAM__VARIABLE, null, msgs);
 			msgs = basicSetVariable(newVariable, msgs);
 			if (msgs != null)
 				msgs.dispatch();
 		} else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.PARAM__VARIABLE, newVariable, newVariable));
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.PARAM__VARIABLE, newVariable, newVariable));
 	}
 
 	/**
@@ -153,8 +148,7 @@ public class ParamImpl extends AttributableImpl implements Param {
 		boolean oldByRef = byRef;
 		byRef = newByRef;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.PARAM__BY_REF, oldByRef, byRef));
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.PARAM__BY_REF, oldByRef, byRef));
 	}
 
 	/**
@@ -163,8 +157,7 @@ public class ParamImpl extends AttributableImpl implements Param {
 	 * @generated
 	 */
 	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd,
-			int featureID, NotificationChain msgs) {
+	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
 		case IrPackage.PARAM__VARIABLE:
 			return basicSetVariable(null, msgs);

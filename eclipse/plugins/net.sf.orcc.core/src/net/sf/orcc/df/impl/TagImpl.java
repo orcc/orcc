@@ -61,8 +61,7 @@ public class TagImpl extends EObjectImpl implements Tag {
 	 */
 	public EList<String> getIdentifiers() {
 		if (identifiers == null) {
-			identifiers = new EDataTypeUniqueEList<String>(String.class, this,
-					DfPackage.TAG__IDENTIFIERS);
+			identifiers = new EDataTypeUniqueEList<String>(String.class, this, DfPackage.TAG__IDENTIFIERS);
 		}
 		return identifiers;
 	}

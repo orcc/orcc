@@ -77,14 +77,12 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetTarget(Def newTarget,
-			NotificationChain msgs) {
+	public NotificationChain basicSetTarget(Def newTarget, NotificationChain msgs) {
 		Def oldTarget = target;
 		target = newTarget;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET, IrPackage.INST_STORE__TARGET, oldTarget,
-					newTarget);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.INST_STORE__TARGET,
+					oldTarget, newTarget);
 			if (msgs == null)
 				msgs = notification;
 			else
@@ -97,14 +95,12 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetValue(Expression newValue,
-			NotificationChain msgs) {
+	public NotificationChain basicSetValue(Expression newValue, NotificationChain msgs) {
 		Expression oldValue = value;
 		value = newValue;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET, IrPackage.INST_STORE__VALUE, oldValue,
-					newValue);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.INST_STORE__VALUE,
+					oldValue, newValue);
 			if (msgs == null)
 				msgs = notification;
 			else
@@ -135,12 +131,10 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 	 * @generated
 	 */
 	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd,
-			int featureID, NotificationChain msgs) {
+	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
 		case IrPackage.INST_STORE__INDEXES:
-			return ((InternalEList<?>) getIndexes())
-					.basicRemove(otherEnd, msgs);
+			return ((InternalEList<?>) getIndexes()).basicRemove(otherEnd, msgs);
 		case IrPackage.INST_STORE__TARGET:
 			return basicSetTarget(null, msgs);
 		case IrPackage.INST_STORE__VALUE:
@@ -223,8 +217,7 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 	 */
 	public EList<Expression> getIndexes() {
 		if (indexes == null) {
-			indexes = new EObjectContainmentEList<Expression>(Expression.class,
-					this, IrPackage.INST_STORE__INDEXES);
+			indexes = new EObjectContainmentEList<Expression>(Expression.class, this, IrPackage.INST_STORE__INDEXES);
 		}
 		return indexes;
 	}
@@ -259,18 +252,15 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 			NotificationChain msgs = null;
 			if (target != null)
 				msgs = ((InternalEObject) target).eInverseRemove(this,
-						EOPPOSITE_FEATURE_BASE - IrPackage.INST_STORE__TARGET,
-						null, msgs);
+						EOPPOSITE_FEATURE_BASE - IrPackage.INST_STORE__TARGET, null, msgs);
 			if (newTarget != null)
 				msgs = ((InternalEObject) newTarget).eInverseAdd(this,
-						EOPPOSITE_FEATURE_BASE - IrPackage.INST_STORE__TARGET,
-						null, msgs);
+						EOPPOSITE_FEATURE_BASE - IrPackage.INST_STORE__TARGET, null, msgs);
 			msgs = basicSetTarget(newTarget, msgs);
 			if (msgs != null)
 				msgs.dispatch();
 		} else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.INST_STORE__TARGET, newTarget, newTarget));
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.INST_STORE__TARGET, newTarget, newTarget));
 	}
 
 	/**
@@ -282,18 +272,15 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 			NotificationChain msgs = null;
 			if (value != null)
 				msgs = ((InternalEObject) value).eInverseRemove(this,
-						EOPPOSITE_FEATURE_BASE - IrPackage.INST_STORE__VALUE,
-						null, msgs);
+						EOPPOSITE_FEATURE_BASE - IrPackage.INST_STORE__VALUE, null, msgs);
 			if (newValue != null)
 				msgs = ((InternalEObject) newValue).eInverseAdd(this,
-						EOPPOSITE_FEATURE_BASE - IrPackage.INST_STORE__VALUE,
-						null, msgs);
+						EOPPOSITE_FEATURE_BASE - IrPackage.INST_STORE__VALUE, null, msgs);
 			msgs = basicSetValue(newValue, msgs);
 			if (msgs != null)
 				msgs.dispatch();
 		} else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.INST_STORE__VALUE, newValue, newValue));
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.INST_STORE__VALUE, newValue, newValue));
 	}
 
 	@Override
@@ -306,9 +293,7 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 			builder.append(new ExpressionPrinter().doSwitch(index));
 			builder.append("]");
 		}
-		return builder.append(", ")
-				.append(new ExpressionPrinter().doSwitch(getValue()))
-				.append(")").toString();
+		return builder.append(", ").append(new ExpressionPrinter().doSwitch(getValue())).append(")").toString();
 	}
 
 } // InstStoreImpl

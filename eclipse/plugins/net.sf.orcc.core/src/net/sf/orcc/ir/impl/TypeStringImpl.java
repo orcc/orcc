@@ -163,8 +163,7 @@ public class TypeStringImpl extends TypeImpl implements TypeString {
 		int oldSize = size;
 		size = newSize;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.TYPE_STRING__SIZE, oldSize, size));
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.TYPE_STRING__SIZE, oldSize, size));
 	}
 
 	@Override

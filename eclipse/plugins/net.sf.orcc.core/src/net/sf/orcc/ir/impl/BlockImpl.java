@@ -103,8 +103,8 @@ public abstract class BlockImpl extends AttributableImpl implements Block {
 			cfgNode = (CfgNode) eResolveProxy(oldCfgNode);
 			if (cfgNode != oldCfgNode) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
-							IrPackage.BLOCK__CFG_NODE, oldCfgNode, cfgNode));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, IrPackage.BLOCK__CFG_NODE, oldCfgNode,
+							cfgNode));
 			}
 		}
 		return cfgNode;
@@ -122,14 +122,12 @@ public abstract class BlockImpl extends AttributableImpl implements Block {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetCfgNode(CfgNode newCfgNode,
-			NotificationChain msgs) {
+	public NotificationChain basicSetCfgNode(CfgNode newCfgNode, NotificationChain msgs) {
 		CfgNode oldCfgNode = cfgNode;
 		cfgNode = newCfgNode;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET, IrPackage.BLOCK__CFG_NODE, oldCfgNode,
-					newCfgNode);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.BLOCK__CFG_NODE,
+					oldCfgNode, newCfgNode);
 			if (msgs == null)
 				msgs = notification;
 			else
@@ -146,17 +144,14 @@ public abstract class BlockImpl extends AttributableImpl implements Block {
 		if (newCfgNode != cfgNode) {
 			NotificationChain msgs = null;
 			if (cfgNode != null)
-				msgs = ((InternalEObject) cfgNode).eInverseRemove(this,
-						IrPackage.CFG_NODE__NODE, CfgNode.class, msgs);
+				msgs = ((InternalEObject) cfgNode).eInverseRemove(this, IrPackage.CFG_NODE__NODE, CfgNode.class, msgs);
 			if (newCfgNode != null)
-				msgs = ((InternalEObject) newCfgNode).eInverseAdd(this,
-						IrPackage.CFG_NODE__NODE, CfgNode.class, msgs);
+				msgs = ((InternalEObject) newCfgNode).eInverseAdd(this, IrPackage.CFG_NODE__NODE, CfgNode.class, msgs);
 			msgs = basicSetCfgNode(newCfgNode, msgs);
 			if (msgs != null)
 				msgs.dispatch();
 		} else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.BLOCK__CFG_NODE, newCfgNode, newCfgNode));
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.BLOCK__CFG_NODE, newCfgNode, newCfgNode));
 	}
 
 	/**
@@ -164,13 +159,11 @@ public abstract class BlockImpl extends AttributableImpl implements Block {
 	 * @generated
 	 */
 	@Override
-	public NotificationChain eInverseAdd(InternalEObject otherEnd,
-			int featureID, NotificationChain msgs) {
+	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
 		case IrPackage.BLOCK__CFG_NODE:
 			if (cfgNode != null)
-				msgs = ((InternalEObject) cfgNode).eInverseRemove(this,
-						IrPackage.CFG_NODE__NODE, CfgNode.class, msgs);
+				msgs = ((InternalEObject) cfgNode).eInverseRemove(this, IrPackage.CFG_NODE__NODE, CfgNode.class, msgs);
 			return basicSetCfgNode((CfgNode) otherEnd, msgs);
 		}
 		return super.eInverseAdd(otherEnd, featureID, msgs);
@@ -181,8 +174,7 @@ public abstract class BlockImpl extends AttributableImpl implements Block {
 	 * @generated
 	 */
 	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd,
-			int featureID, NotificationChain msgs) {
+	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
 		case IrPackage.BLOCK__CFG_NODE:
 			return basicSetCfgNode(null, msgs);

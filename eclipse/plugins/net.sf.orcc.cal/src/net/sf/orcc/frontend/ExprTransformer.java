@@ -379,14 +379,14 @@ public class ExprTransformer extends CalSwitch<Expression> {
 						&& procContainer instanceof Action) {
 					Pattern inputPattern = ((Action) procContainer)
 							.getInputPattern();
-					if (inputPattern.contains(var)) {
+					if (inputPattern.getVarToPortMap().contains(var)) {
 						target = procedure.newTempLocalVariable(var.getType(),
 								"local_" + var.getName());
 						copyList(var, true);
 
 						// Mark the variable as a local copy of input data and
 						// reference the associated port.
-						Port port = inputPattern.getPort(var);
+						Port port = inputPattern.getVarToPortMap().get(var);
 						target.setAttribute(COPY_OF_TOKENS, port);
 
 						return eINSTANCE.createExprVar(target);
@@ -407,7 +407,7 @@ public class ExprTransformer extends CalSwitch<Expression> {
 					Pattern outputPattern = ((Action) procedure.eContainer())
 							.getOutputPattern();
 					var.setAttribute(COPY_OF_TOKENS,
-							outputPattern.getPort(target));
+							outputPattern.getPortToVarMap().get(target));
 				} else {
 					expr = copyList(var, false);
 				}

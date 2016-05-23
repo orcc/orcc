@@ -73,8 +73,8 @@ public class InvocationImpl extends EObjectImpl implements Invocation {
 			action = (Action) eResolveProxy(oldAction);
 			if (action != oldAction) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
-							MocPackage.INVOCATION__ACTION, oldAction, action));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, MocPackage.INVOCATION__ACTION, oldAction,
+							action));
 			}
 		}
 		return action;
@@ -98,8 +98,7 @@ public class InvocationImpl extends EObjectImpl implements Invocation {
 		Action oldAction = action;
 		action = newAction;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					MocPackage.INVOCATION__ACTION, oldAction, action));
+			eNotify(new ENotificationImpl(this, Notification.SET, MocPackage.INVOCATION__ACTION, oldAction, action));
 	}
 
 	/**

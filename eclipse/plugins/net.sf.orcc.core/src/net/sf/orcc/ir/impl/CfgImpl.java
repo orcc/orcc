@@ -204,8 +204,7 @@ public class CfgImpl extends GraphImpl implements Cfg {
 			entry = (CfgNode) eResolveProxy(oldEntry);
 			if (entry != oldEntry) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
-							IrPackage.CFG__ENTRY, oldEntry, entry));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, IrPackage.CFG__ENTRY, oldEntry, entry));
 			}
 		}
 		return entry;
@@ -221,8 +220,7 @@ public class CfgImpl extends GraphImpl implements Cfg {
 			exit = (CfgNode) eResolveProxy(oldExit);
 			if (exit != oldExit) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
-							IrPackage.CFG__EXIT, oldExit, exit));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, IrPackage.CFG__EXIT, oldExit, exit));
 			}
 		}
 		return exit;
@@ -237,8 +235,7 @@ public class CfgImpl extends GraphImpl implements Cfg {
 	@Override
 	public boolean immediatelyDominates(Vertex m, Vertex n) {
 		if (doms == null) {
-			throw new IllegalStateException(
-					"computeDominance must be called first");
+			throw new IllegalStateException("computeDominance must be called first");
 		}
 
 		return m == doms.get(n);
@@ -247,8 +244,7 @@ public class CfgImpl extends GraphImpl implements Cfg {
 	@Override
 	public boolean immediatelyPostDominates(Vertex m, Vertex n) {
 		if (idoms == null) {
-			throw new IllegalStateException(
-					"computeDominance must be called first");
+			throw new IllegalStateException("computeDominance must be called first");
 		}
 
 		return m == idoms.get(n);
@@ -275,8 +271,7 @@ public class CfgImpl extends GraphImpl implements Cfg {
 		CfgNode oldEntry = entry;
 		entry = newEntry;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.CFG__ENTRY, oldEntry, entry));
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.CFG__ENTRY, oldEntry, entry));
 	}
 
 	/**
@@ -287,8 +282,7 @@ public class CfgImpl extends GraphImpl implements Cfg {
 		CfgNode oldExit = exit;
 		exit = newExit;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.CFG__EXIT, oldExit, exit));
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.CFG__EXIT, oldExit, exit));
 	}
 
 } // CfgImpl

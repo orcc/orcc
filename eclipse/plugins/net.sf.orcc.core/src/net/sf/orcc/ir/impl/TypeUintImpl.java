@@ -179,8 +179,7 @@ public class TypeUintImpl extends TypeImpl implements TypeUint {
 		int oldSize = size;
 		size = newSize;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.TYPE_UINT__SIZE, oldSize, size));
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.TYPE_UINT__SIZE, oldSize, size));
 	}
 
 	@Override

@@ -75,8 +75,7 @@ public class ExprStringImpl extends ExpressionImpl implements ExprString {
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
 		case IrPackage.EXPR_STRING__VALUE:
-			return VALUE_EDEFAULT == null ? value != null : !VALUE_EDEFAULT
-					.equals(value);
+			return VALUE_EDEFAULT == null ? value != null : !VALUE_EDEFAULT.equals(value);
 		}
 		return super.eIsSet(featureID);
 	}
@@ -143,8 +142,7 @@ public class ExprStringImpl extends ExpressionImpl implements ExprString {
 		String oldValue = value;
 		value = newValue;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.EXPR_STRING__VALUE, oldValue, value));
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.EXPR_STRING__VALUE, oldValue, value));
 	}
 
 	/**

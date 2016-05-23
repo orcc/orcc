@@ -107,14 +107,12 @@ public class BlockIfImpl extends BlockImpl implements BlockIf {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetCondition(Expression newCondition,
-			NotificationChain msgs) {
+	public NotificationChain basicSetCondition(Expression newCondition, NotificationChain msgs) {
 		Expression oldCondition = condition;
 		condition = newCondition;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET, IrPackage.BLOCK_IF__CONDITION,
-					oldCondition, newCondition);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET,
+					IrPackage.BLOCK_IF__CONDITION, oldCondition, newCondition);
 			if (msgs == null)
 				msgs = notification;
 			else
@@ -127,14 +125,12 @@ public class BlockIfImpl extends BlockImpl implements BlockIf {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetJoinBlock(BlockBasic newJoinBlock,
-			NotificationChain msgs) {
+	public NotificationChain basicSetJoinBlock(BlockBasic newJoinBlock, NotificationChain msgs) {
 		BlockBasic oldJoinBlock = joinBlock;
 		joinBlock = newJoinBlock;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET, IrPackage.BLOCK_IF__JOIN_BLOCK,
-					oldJoinBlock, newJoinBlock);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET,
+					IrPackage.BLOCK_IF__JOIN_BLOCK, oldJoinBlock, newJoinBlock);
 			if (msgs == null)
 				msgs = notification;
 			else
@@ -169,19 +165,16 @@ public class BlockIfImpl extends BlockImpl implements BlockIf {
 	 * @generated
 	 */
 	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd,
-			int featureID, NotificationChain msgs) {
+	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
 		case IrPackage.BLOCK_IF__CONDITION:
 			return basicSetCondition(null, msgs);
 		case IrPackage.BLOCK_IF__ELSE_BLOCKS:
-			return ((InternalEList<?>) getElseBlocks()).basicRemove(otherEnd,
-					msgs);
+			return ((InternalEList<?>) getElseBlocks()).basicRemove(otherEnd, msgs);
 		case IrPackage.BLOCK_IF__JOIN_BLOCK:
 			return basicSetJoinBlock(null, msgs);
 		case IrPackage.BLOCK_IF__THEN_BLOCKS:
-			return ((InternalEList<?>) getThenBlocks()).basicRemove(otherEnd,
-					msgs);
+			return ((InternalEList<?>) getThenBlocks()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -285,8 +278,7 @@ public class BlockIfImpl extends BlockImpl implements BlockIf {
 	 */
 	public EList<Block> getElseBlocks() {
 		if (elseBlocks == null) {
-			elseBlocks = new EObjectContainmentEList<Block>(Block.class, this,
-					IrPackage.BLOCK_IF__ELSE_BLOCKS);
+			elseBlocks = new EObjectContainmentEList<Block>(Block.class, this, IrPackage.BLOCK_IF__ELSE_BLOCKS);
 		}
 		return elseBlocks;
 	}
@@ -313,8 +305,7 @@ public class BlockIfImpl extends BlockImpl implements BlockIf {
 	 */
 	public EList<Block> getThenBlocks() {
 		if (thenBlocks == null) {
-			thenBlocks = new EObjectContainmentEList<Block>(Block.class, this,
-					IrPackage.BLOCK_IF__THEN_BLOCKS);
+			thenBlocks = new EObjectContainmentEList<Block>(Block.class, this, IrPackage.BLOCK_IF__THEN_BLOCKS);
 		}
 		return thenBlocks;
 	}
@@ -359,18 +350,16 @@ public class BlockIfImpl extends BlockImpl implements BlockIf {
 			NotificationChain msgs = null;
 			if (condition != null)
 				msgs = ((InternalEObject) condition).eInverseRemove(this,
-						EOPPOSITE_FEATURE_BASE - IrPackage.BLOCK_IF__CONDITION,
-						null, msgs);
+						EOPPOSITE_FEATURE_BASE - IrPackage.BLOCK_IF__CONDITION, null, msgs);
 			if (newCondition != null)
 				msgs = ((InternalEObject) newCondition).eInverseAdd(this,
-						EOPPOSITE_FEATURE_BASE - IrPackage.BLOCK_IF__CONDITION,
-						null, msgs);
+						EOPPOSITE_FEATURE_BASE - IrPackage.BLOCK_IF__CONDITION, null, msgs);
 			msgs = basicSetCondition(newCondition, msgs);
 			if (msgs != null)
 				msgs.dispatch();
 		} else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.BLOCK_IF__CONDITION, newCondition, newCondition));
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.BLOCK_IF__CONDITION, newCondition,
+					newCondition));
 	}
 
 	/**
@@ -381,19 +370,17 @@ public class BlockIfImpl extends BlockImpl implements BlockIf {
 		if (newJoinBlock != joinBlock) {
 			NotificationChain msgs = null;
 			if (joinBlock != null)
-				msgs = ((InternalEObject) joinBlock)
-						.eInverseRemove(this, EOPPOSITE_FEATURE_BASE
-								- IrPackage.BLOCK_IF__JOIN_BLOCK, null, msgs);
+				msgs = ((InternalEObject) joinBlock).eInverseRemove(this,
+						EOPPOSITE_FEATURE_BASE - IrPackage.BLOCK_IF__JOIN_BLOCK, null, msgs);
 			if (newJoinBlock != null)
-				msgs = ((InternalEObject) newJoinBlock)
-						.eInverseAdd(this, EOPPOSITE_FEATURE_BASE
-								- IrPackage.BLOCK_IF__JOIN_BLOCK, null, msgs);
+				msgs = ((InternalEObject) newJoinBlock).eInverseAdd(this,
+						EOPPOSITE_FEATURE_BASE - IrPackage.BLOCK_IF__JOIN_BLOCK, null, msgs);
 			msgs = basicSetJoinBlock(newJoinBlock, msgs);
 			if (msgs != null)
 				msgs.dispatch();
 		} else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.BLOCK_IF__JOIN_BLOCK, newJoinBlock, newJoinBlock));
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.BLOCK_IF__JOIN_BLOCK, newJoinBlock,
+					newJoinBlock));
 	}
 
 	/**
@@ -404,8 +391,8 @@ public class BlockIfImpl extends BlockImpl implements BlockIf {
 		int oldLineNumber = lineNumber;
 		lineNumber = newLineNumber;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.BLOCK_IF__LINE_NUMBER, oldLineNumber, lineNumber));
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.BLOCK_IF__LINE_NUMBER, oldLineNumber,
+					lineNumber));
 	}
 
 	/**

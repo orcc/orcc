@@ -33,8 +33,7 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
  *
  * @generated
  */
-public class VarToPortMapEntryImpl extends EObjectImpl implements
-		BasicEMap.Entry<Var, Port> {
+public class VarToPortMapEntryImpl extends EObjectImpl implements BasicEMap.Entry<Var, Port> {
 	/**
 	 * The cached value of the '{@link #getTypedKey() <em>Key</em>}' reference.
 	 * <!-- begin-user-doc -->
@@ -85,8 +84,8 @@ public class VarToPortMapEntryImpl extends EObjectImpl implements
 			key = (Var) eResolveProxy(oldKey);
 			if (key != oldKey) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
-							DfPackage.VAR_TO_PORT_MAP_ENTRY__KEY, oldKey, key));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, DfPackage.VAR_TO_PORT_MAP_ENTRY__KEY,
+							oldKey, key));
 			}
 		}
 		return key;
@@ -110,8 +109,7 @@ public class VarToPortMapEntryImpl extends EObjectImpl implements
 		Var oldKey = key;
 		key = newKey;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					DfPackage.VAR_TO_PORT_MAP_ENTRY__KEY, oldKey, key));
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.VAR_TO_PORT_MAP_ENTRY__KEY, oldKey, key));
 	}
 
 	/**
@@ -125,9 +123,8 @@ public class VarToPortMapEntryImpl extends EObjectImpl implements
 			value = (Port) eResolveProxy(oldValue);
 			if (value != oldValue) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
-							DfPackage.VAR_TO_PORT_MAP_ENTRY__VALUE, oldValue,
-							value));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, DfPackage.VAR_TO_PORT_MAP_ENTRY__VALUE,
+							oldValue, value));
 			}
 		}
 		return value;
@@ -151,8 +148,8 @@ public class VarToPortMapEntryImpl extends EObjectImpl implements
 		Port oldValue = value;
 		value = newValue;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					DfPackage.VAR_TO_PORT_MAP_ENTRY__VALUE, oldValue, value));
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.VAR_TO_PORT_MAP_ENTRY__VALUE, oldValue,
+					value));
 	}
 
 	/**
@@ -302,8 +299,7 @@ public class VarToPortMapEntryImpl extends EObjectImpl implements
 	@SuppressWarnings("unchecked")
 	public EMap<Var, Port> getEMap() {
 		EObject container = eContainer();
-		return container == null ? null : (EMap<Var, Port>) container
-				.eGet(eContainmentFeature());
+		return container == null ? null : (EMap<Var, Port>) container.eGet(eContainmentFeature());
 	}
 
 } //VarToPortMapEntryImpl

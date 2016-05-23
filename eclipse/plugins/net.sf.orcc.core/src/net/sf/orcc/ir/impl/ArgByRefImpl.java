@@ -75,8 +75,8 @@ public class ArgByRefImpl extends ArgImpl implements ArgByRef {
 		Use oldUse = use;
 		use = newUse;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET, IrPackage.ARG_BY_REF__USE, oldUse, newUse);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.ARG_BY_REF__USE,
+					oldUse, newUse);
 			if (msgs == null)
 				msgs = notification;
 			else
@@ -107,12 +107,10 @@ public class ArgByRefImpl extends ArgImpl implements ArgByRef {
 	 * @generated
 	 */
 	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd,
-			int featureID, NotificationChain msgs) {
+	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
 		case IrPackage.ARG_BY_REF__INDEXES:
-			return ((InternalEList<?>) getIndexes())
-					.basicRemove(otherEnd, msgs);
+			return ((InternalEList<?>) getIndexes()).basicRemove(otherEnd, msgs);
 		case IrPackage.ARG_BY_REF__USE:
 			return basicSetUse(null, msgs);
 		}
@@ -190,8 +188,7 @@ public class ArgByRefImpl extends ArgImpl implements ArgByRef {
 	 */
 	public EList<Expression> getIndexes() {
 		if (indexes == null) {
-			indexes = new EObjectContainmentEList<Expression>(Expression.class,
-					this, IrPackage.ARG_BY_REF__INDEXES);
+			indexes = new EObjectContainmentEList<Expression>(Expression.class, this, IrPackage.ARG_BY_REF__INDEXES);
 		}
 		return indexes;
 	}
@@ -224,19 +221,16 @@ public class ArgByRefImpl extends ArgImpl implements ArgByRef {
 		if (newUse != use) {
 			NotificationChain msgs = null;
 			if (use != null)
-				msgs = ((InternalEObject) use).eInverseRemove(this,
-						EOPPOSITE_FEATURE_BASE - IrPackage.ARG_BY_REF__USE,
+				msgs = ((InternalEObject) use).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.ARG_BY_REF__USE,
 						null, msgs);
 			if (newUse != null)
-				msgs = ((InternalEObject) newUse).eInverseAdd(this,
-						EOPPOSITE_FEATURE_BASE - IrPackage.ARG_BY_REF__USE,
+				msgs = ((InternalEObject) newUse).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.ARG_BY_REF__USE,
 						null, msgs);
 			msgs = basicSetUse(newUse, msgs);
 			if (msgs != null)
 				msgs.dispatch();
 		} else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.ARG_BY_REF__USE, newUse, newUse));
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.ARG_BY_REF__USE, newUse, newUse));
 	}
 
 } //ArgByRefImpl

@@ -242,8 +242,8 @@ public class ActorImpl extends VertexImpl implements Actor {
 		FSM oldFsm = fsm;
 		fsm = newFsm;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET, DfPackage.ACTOR__FSM, oldFsm, newFsm);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, DfPackage.ACTOR__FSM, oldFsm,
+					newFsm);
 			if (msgs == null)
 				msgs = notification;
 			else
@@ -260,8 +260,8 @@ public class ActorImpl extends VertexImpl implements Actor {
 		MoC oldMoC = moC;
 		moC = newMoC;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET, DfPackage.ACTOR__MO_C, oldMoC, newMoC);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, DfPackage.ACTOR__MO_C,
+					oldMoC, newMoC);
 			if (msgs == null)
 				msgs = notification;
 			else
@@ -314,32 +314,26 @@ public class ActorImpl extends VertexImpl implements Actor {
 	 * @generated
 	 */
 	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd,
-			int featureID, NotificationChain msgs) {
+	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
 		case DfPackage.ACTOR__ACTIONS:
-			return ((InternalEList<?>) getActions())
-					.basicRemove(otherEnd, msgs);
+			return ((InternalEList<?>) getActions()).basicRemove(otherEnd, msgs);
 		case DfPackage.ACTOR__FSM:
 			return basicSetFsm(null, msgs);
 		case DfPackage.ACTOR__INITIALIZES:
-			return ((InternalEList<?>) getInitializes()).basicRemove(otherEnd,
-					msgs);
+			return ((InternalEList<?>) getInitializes()).basicRemove(otherEnd, msgs);
 		case DfPackage.ACTOR__INPUTS:
 			return ((InternalEList<?>) getInputs()).basicRemove(otherEnd, msgs);
 		case DfPackage.ACTOR__MO_C:
 			return basicSetMoC(null, msgs);
 		case DfPackage.ACTOR__OUTPUTS:
-			return ((InternalEList<?>) getOutputs())
-					.basicRemove(otherEnd, msgs);
+			return ((InternalEList<?>) getOutputs()).basicRemove(otherEnd, msgs);
 		case DfPackage.ACTOR__PARAMETERS:
-			return ((InternalEList<?>) getParameters()).basicRemove(otherEnd,
-					msgs);
+			return ((InternalEList<?>) getParameters()).basicRemove(otherEnd, msgs);
 		case DfPackage.ACTOR__PROCS:
 			return ((InternalEList<?>) getProcs()).basicRemove(otherEnd, msgs);
 		case DfPackage.ACTOR__STATE_VARS:
-			return ((InternalEList<?>) getStateVars()).basicRemove(otherEnd,
-					msgs);
+			return ((InternalEList<?>) getStateVars()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -356,8 +350,7 @@ public class ActorImpl extends VertexImpl implements Actor {
 		case DfPackage.ACTOR__ACTIONS_OUTSIDE_FSM:
 			return actionsOutsideFsm != null && !actionsOutsideFsm.isEmpty();
 		case DfPackage.ACTOR__FILE_NAME:
-			return FILE_NAME_EDEFAULT == null ? fileName != null
-					: !FILE_NAME_EDEFAULT.equals(fileName);
+			return FILE_NAME_EDEFAULT == null ? fileName != null : !FILE_NAME_EDEFAULT.equals(fileName);
 		case DfPackage.ACTOR__FSM:
 			return fsm != null;
 		case DfPackage.ACTOR__INITIALIZES:
@@ -371,8 +364,7 @@ public class ActorImpl extends VertexImpl implements Actor {
 		case DfPackage.ACTOR__NATIVE:
 			return native_ != NATIVE_EDEFAULT;
 		case DfPackage.ACTOR__NAME:
-			return NAME_EDEFAULT == null ? getName() != null : !NAME_EDEFAULT
-					.equals(getName());
+			return NAME_EDEFAULT == null ? getName() != null : !NAME_EDEFAULT.equals(getName());
 		case DfPackage.ACTOR__OUTPUTS:
 			return outputs != null && !outputs.isEmpty();
 		case DfPackage.ACTOR__PARAMETERS:
@@ -399,8 +391,7 @@ public class ActorImpl extends VertexImpl implements Actor {
 			return;
 		case DfPackage.ACTOR__ACTIONS_OUTSIDE_FSM:
 			getActionsOutsideFsm().clear();
-			getActionsOutsideFsm().addAll(
-					(Collection<? extends Action>) newValue);
+			getActionsOutsideFsm().addAll((Collection<? extends Action>) newValue);
 			return;
 		case DfPackage.ACTOR__FILE_NAME:
 			setFileName((String) newValue);
@@ -517,8 +508,7 @@ public class ActorImpl extends VertexImpl implements Actor {
 	@Override
 	public EList<Action> getActions() {
 		if (actions == null) {
-			actions = new EObjectContainmentEList<Action>(Action.class, this,
-					DfPackage.ACTOR__ACTIONS);
+			actions = new EObjectContainmentEList<Action>(Action.class, this, DfPackage.ACTOR__ACTIONS);
 		}
 		return actions;
 	}
@@ -530,8 +520,8 @@ public class ActorImpl extends VertexImpl implements Actor {
 	@Override
 	public EList<Action> getActionsOutsideFsm() {
 		if (actionsOutsideFsm == null) {
-			actionsOutsideFsm = new EObjectResolvingEList<Action>(Action.class,
-					this, DfPackage.ACTOR__ACTIONS_OUTSIDE_FSM);
+			actionsOutsideFsm = new EObjectResolvingEList<Action>(Action.class, this,
+					DfPackage.ACTOR__ACTIONS_OUTSIDE_FSM);
 		}
 		return actionsOutsideFsm;
 	}
@@ -541,8 +531,7 @@ public class ActorImpl extends VertexImpl implements Actor {
 	public <T> T getAdapter(Class<T> type) {
 		if (type == Entity.class) {
 			if (cachedAdaptedEntity == null) {
-				cachedAdaptedEntity = new EntityImpl(this, getAttributes(),
-						getInputs(), getOutputs(), getParameters());
+				cachedAdaptedEntity = new EntityImpl(this, getAttributes(), getInputs(), getOutputs(), getParameters());
 			}
 
 			return (T) cachedAdaptedEntity;
@@ -585,8 +574,7 @@ public class ActorImpl extends VertexImpl implements Actor {
 	@Override
 	public EList<Action> getInitializes() {
 		if (initializes == null) {
-			initializes = new EObjectContainmentEList<Action>(Action.class,
-					this, DfPackage.ACTOR__INITIALIZES);
+			initializes = new EObjectContainmentEList<Action>(Action.class, this, DfPackage.ACTOR__INITIALIZES);
 		}
 		return initializes;
 	}
@@ -607,8 +595,7 @@ public class ActorImpl extends VertexImpl implements Actor {
 	 */
 	public EList<Port> getInputs() {
 		if (inputs == null) {
-			inputs = new EObjectContainmentEList<Port>(Port.class, this,
-					DfPackage.ACTOR__INPUTS);
+			inputs = new EObjectContainmentEList<Port>(Port.class, this, DfPackage.ACTOR__INPUTS);
 		}
 		return inputs;
 	}
@@ -654,8 +641,7 @@ public class ActorImpl extends VertexImpl implements Actor {
 	 */
 	public EList<Port> getOutputs() {
 		if (outputs == null) {
-			outputs = new EObjectContainmentEList<Port>(Port.class, this,
-					DfPackage.ACTOR__OUTPUTS);
+			outputs = new EObjectContainmentEList<Port>(Port.class, this, DfPackage.ACTOR__OUTPUTS);
 		}
 		return outputs;
 	}
@@ -681,8 +667,7 @@ public class ActorImpl extends VertexImpl implements Actor {
 	 */
 	public EList<Var> getParameters() {
 		if (parameters == null) {
-			parameters = new EObjectContainmentEList<Var>(Var.class, this,
-					DfPackage.ACTOR__PARAMETERS);
+			parameters = new EObjectContainmentEList<Var>(Var.class, this, DfPackage.ACTOR__PARAMETERS);
 		}
 		return parameters;
 	}
@@ -714,8 +699,7 @@ public class ActorImpl extends VertexImpl implements Actor {
 	@Override
 	public EList<Procedure> getProcs() {
 		if (procs == null) {
-			procs = new EObjectContainmentEList<Procedure>(Procedure.class,
-					this, DfPackage.ACTOR__PROCS);
+			procs = new EObjectContainmentEList<Procedure>(Procedure.class, this, DfPackage.ACTOR__PROCS);
 		}
 		return procs;
 	}
@@ -737,8 +721,7 @@ public class ActorImpl extends VertexImpl implements Actor {
 	@Override
 	public EList<Var> getStateVars() {
 		if (stateVars == null) {
-			stateVars = new EObjectContainmentEList<Var>(Var.class, this,
-					DfPackage.ACTOR__STATE_VARS);
+			stateVars = new EObjectContainmentEList<Var>(Var.class, this, DfPackage.ACTOR__STATE_VARS);
 		}
 		return stateVars;
 	}
@@ -817,8 +800,7 @@ public class ActorImpl extends VertexImpl implements Actor {
 		String oldFileName = fileName;
 		fileName = newFileName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					DfPackage.ACTOR__FILE_NAME, oldFileName, fileName));
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.ACTOR__FILE_NAME, oldFileName, fileName));
 	}
 
 	/**
@@ -830,19 +812,16 @@ public class ActorImpl extends VertexImpl implements Actor {
 		if (newFsm != fsm) {
 			NotificationChain msgs = null;
 			if (fsm != null)
-				msgs = ((InternalEObject) fsm).eInverseRemove(this,
-						EOPPOSITE_FEATURE_BASE - DfPackage.ACTOR__FSM, null,
+				msgs = ((InternalEObject) fsm).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - DfPackage.ACTOR__FSM, null,
 						msgs);
 			if (newFsm != null)
-				msgs = ((InternalEObject) newFsm).eInverseAdd(this,
-						EOPPOSITE_FEATURE_BASE - DfPackage.ACTOR__FSM, null,
+				msgs = ((InternalEObject) newFsm).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - DfPackage.ACTOR__FSM, null,
 						msgs);
 			msgs = basicSetFsm(newFsm, msgs);
 			if (msgs != null)
 				msgs.dispatch();
 		} else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					DfPackage.ACTOR__FSM, newFsm, newFsm));
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.ACTOR__FSM, newFsm, newFsm));
 	}
 
 	/**
@@ -854,8 +833,8 @@ public class ActorImpl extends VertexImpl implements Actor {
 		int oldLineNumber = lineNumber;
 		lineNumber = newLineNumber;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					DfPackage.ACTOR__LINE_NUMBER, oldLineNumber, lineNumber));
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.ACTOR__LINE_NUMBER, oldLineNumber,
+					lineNumber));
 	}
 
 	/**
@@ -867,19 +846,16 @@ public class ActorImpl extends VertexImpl implements Actor {
 		if (newMoC != moC) {
 			NotificationChain msgs = null;
 			if (moC != null)
-				msgs = ((InternalEObject) moC).eInverseRemove(this,
-						EOPPOSITE_FEATURE_BASE - DfPackage.ACTOR__MO_C, null,
-						msgs);
+				msgs = ((InternalEObject) moC).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - DfPackage.ACTOR__MO_C,
+						null, msgs);
 			if (newMoC != null)
-				msgs = ((InternalEObject) newMoC).eInverseAdd(this,
-						EOPPOSITE_FEATURE_BASE - DfPackage.ACTOR__MO_C, null,
-						msgs);
+				msgs = ((InternalEObject) newMoC).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - DfPackage.ACTOR__MO_C,
+						null, msgs);
 			msgs = basicSetMoC(newMoC, msgs);
 			if (msgs != null)
 				msgs.dispatch();
 		} else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					DfPackage.ACTOR__MO_C, newMoC, newMoC));
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.ACTOR__MO_C, newMoC, newMoC));
 	}
 
 	/**
@@ -898,8 +874,7 @@ public class ActorImpl extends VertexImpl implements Actor {
 		boolean oldNative = native_;
 		native_ = newNative;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					DfPackage.ACTOR__NATIVE, oldNative, native_));
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.ACTOR__NATIVE, oldNative, native_));
 	}
 
 	/**

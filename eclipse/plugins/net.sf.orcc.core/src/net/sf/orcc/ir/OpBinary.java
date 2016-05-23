@@ -279,10 +279,8 @@ public enum OpBinary implements Enumerator {
 	 */
 	TIMES(19, "TIMES", "TIMES");
 
-	private static final boolean[] ASSOCIATIVITIES_ARRAY = new boolean[] {
-			false, false, false, false, false, false, true, false, false,
-			false, false, false, false, false, false, false, false, false,
-			false, false };
+	private static final boolean[] ASSOCIATIVITIES_ARRAY = new boolean[] { false, false, false, false, false, false,
+			true, false, false, false, false, false, false, false, false, false, false, false, false, false };
 
 	/**
 	 * The '<em><b>BITAND</b></em>' literal value.
@@ -509,9 +507,8 @@ public enum OpBinary implements Enumerator {
 	 */
 	public static final int MOD_VALUE = 14;
 
-	private static final String[] NAMES_ARRAY = new String[] { "&", "|", "^",
-			"/", "div", "==", "**", ">=", ">", "<=", "&&", "||", "<", "-", "%",
-			"!=", "+", "<<", ">>", "*" };
+	private static final String[] NAMES_ARRAY = new String[] { "&", "|", "^", "/", "div", "==", "**", ">=", ">", "<=",
+			"&&", "||", "<", "-", "%", "!=", "+", "<<", ">>", "*" };
 
 	/**
 	 * The '<em><b>NE</b></em>' literal value.
@@ -545,8 +542,8 @@ public enum OpBinary implements Enumerator {
 	 */
 	public static final int PLUS_VALUE = 16;
 
-	private static final int[] PRECEDENCES_ARRAY = new int[] { 10, 12, 11, 5,
-			5, 9, 3, 8, 8, 8, 13, 14, 8, 6, 5, 9, 6, 7, 7, 5 };
+	private static final int[] PRECEDENCES_ARRAY = new int[] { 10, 12, 11, 5, 5, 9, 3, 8, 8, 8, 13, 14, 8, 6, 5, 9, 6,
+			7, 7, 5 };
 
 	/**
 	 * The '<em><b>SHIFT LEFT</b></em>' literal value.
@@ -599,17 +596,15 @@ public enum OpBinary implements Enumerator {
 	 * 
 	 * @generated
 	 */
-	private static final OpBinary[] VALUES_ARRAY = new OpBinary[] { BITAND,
-			BITOR, BITXOR, DIV, DIV_INT, EQ, EXP, GE, GT, LE, LOGIC_AND,
-			LOGIC_OR, LT, MINUS, MOD, NE, PLUS, SHIFT_LEFT, SHIFT_RIGHT, TIMES, };
+	private static final OpBinary[] VALUES_ARRAY = new OpBinary[] { BITAND, BITOR, BITXOR, DIV, DIV_INT, EQ, EXP, GE,
+			GT, LE, LOGIC_AND, LOGIC_OR, LT, MINUS, MOD, NE, PLUS, SHIFT_LEFT, SHIFT_RIGHT, TIMES, };
 
 	/**
 	 * A public read-only list of all the '<em><b>Op Binary</b></em>' enumerators.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public static final List<OpBinary> VALUES = Collections
-			.unmodifiableList(Arrays.asList(VALUES_ARRAY));
+	public static final List<OpBinary> VALUES = Collections.unmodifiableList(Arrays.asList(VALUES_ARRAY));
 
 	static {
 		for (OpBinary op : OpBinary.values()) {
@@ -863,7 +858,7 @@ public enum OpBinary implements Enumerator {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Returns true if this operator is a logical operator.
 	 * 

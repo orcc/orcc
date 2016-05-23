@@ -32,8 +32,7 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
  *
  * @generated
  */
-public class PortToEIntegerObjectMapEntryImpl extends EObjectImpl implements
-		BasicEMap.Entry<Port, Integer> {
+public class PortToEIntegerObjectMapEntryImpl extends EObjectImpl implements BasicEMap.Entry<Port, Integer> {
 	/**
 	 * The cached value of the '{@link #getTypedKey() <em>Key</em>}' reference.
 	 * <!-- begin-user-doc -->
@@ -95,8 +94,7 @@ public class PortToEIntegerObjectMapEntryImpl extends EObjectImpl implements
 			if (key != oldKey) {
 				if (eNotificationRequired())
 					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
-							DfPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__KEY,
-							oldKey, key));
+							DfPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__KEY, oldKey, key));
 			}
 		}
 		return key;
@@ -120,9 +118,8 @@ public class PortToEIntegerObjectMapEntryImpl extends EObjectImpl implements
 		Port oldKey = key;
 		key = newKey;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					DfPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__KEY, oldKey,
-					key));
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__KEY,
+					oldKey, key));
 	}
 
 	/**
@@ -143,8 +140,7 @@ public class PortToEIntegerObjectMapEntryImpl extends EObjectImpl implements
 		Integer oldValue = value;
 		value = newValue;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					DfPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__VALUE,
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__VALUE,
 					oldValue, value));
 	}
 
@@ -213,8 +209,7 @@ public class PortToEIntegerObjectMapEntryImpl extends EObjectImpl implements
 		case DfPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__KEY:
 			return key != null;
 		case DfPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__VALUE:
-			return VALUE_EDEFAULT == null ? value != null : !VALUE_EDEFAULT
-					.equals(value);
+			return VALUE_EDEFAULT == null ? value != null : !VALUE_EDEFAULT.equals(value);
 		}
 		return super.eIsSet(featureID);
 	}
@@ -311,8 +306,7 @@ public class PortToEIntegerObjectMapEntryImpl extends EObjectImpl implements
 	@SuppressWarnings("unchecked")
 	public EMap<Port, Integer> getEMap() {
 		EObject container = eContainer();
-		return container == null ? null : (EMap<Port, Integer>) container
-				.eGet(eContainmentFeature());
+		return container == null ? null : (EMap<Port, Integer>) container.eGet(eContainmentFeature());
 	}
 
 } //PortToEIntegerObjectMapEntryImpl

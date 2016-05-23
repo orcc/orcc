@@ -81,12 +81,10 @@ public class BlockBasicImpl extends BlockImpl implements BlockBasic {
 	 * @generated
 	 */
 	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd,
-			int featureID, NotificationChain msgs) {
+	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
 		case IrPackage.BLOCK_BASIC__INSTRUCTIONS:
-			return ((InternalEList<?>) getInstructions()).basicRemove(otherEnd,
-					msgs);
+			return ((InternalEList<?>) getInstructions()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -114,8 +112,7 @@ public class BlockBasicImpl extends BlockImpl implements BlockBasic {
 		switch (featureID) {
 		case IrPackage.BLOCK_BASIC__INSTRUCTIONS:
 			getInstructions().clear();
-			getInstructions().addAll(
-					(Collection<? extends Instruction>) newValue);
+			getInstructions().addAll((Collection<? extends Instruction>) newValue);
 			return;
 		}
 		super.eSet(featureID, newValue);
@@ -150,8 +147,7 @@ public class BlockBasicImpl extends BlockImpl implements BlockBasic {
 	 */
 	public EList<Instruction> getInstructions() {
 		if (instructions == null) {
-			instructions = new EObjectContainmentEList<Instruction>(
-					Instruction.class, this,
+			instructions = new EObjectContainmentEList<Instruction>(Instruction.class, this,
 					IrPackage.BLOCK_BASIC__INSTRUCTIONS);
 		}
 		return instructions;

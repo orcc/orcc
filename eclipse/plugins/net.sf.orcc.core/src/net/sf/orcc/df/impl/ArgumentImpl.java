@@ -86,14 +86,12 @@ public class ArgumentImpl extends EObjectImpl implements Argument {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetValue(Expression newValue,
-			NotificationChain msgs) {
+	public NotificationChain basicSetValue(Expression newValue, NotificationChain msgs) {
 		Expression oldValue = value;
 		value = newValue;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET, DfPackage.ARGUMENT__VALUE, oldValue,
-					newValue);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, DfPackage.ARGUMENT__VALUE,
+					oldValue, newValue);
 			if (msgs == null)
 				msgs = notification;
 			else
@@ -112,18 +110,15 @@ public class ArgumentImpl extends EObjectImpl implements Argument {
 			NotificationChain msgs = null;
 			if (value != null)
 				msgs = ((InternalEObject) value).eInverseRemove(this,
-						EOPPOSITE_FEATURE_BASE - DfPackage.ARGUMENT__VALUE,
-						null, msgs);
+						EOPPOSITE_FEATURE_BASE - DfPackage.ARGUMENT__VALUE, null, msgs);
 			if (newValue != null)
 				msgs = ((InternalEObject) newValue).eInverseAdd(this,
-						EOPPOSITE_FEATURE_BASE - DfPackage.ARGUMENT__VALUE,
-						null, msgs);
+						EOPPOSITE_FEATURE_BASE - DfPackage.ARGUMENT__VALUE, null, msgs);
 			msgs = basicSetValue(newValue, msgs);
 			if (msgs != null)
 				msgs.dispatch();
 		} else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					DfPackage.ARGUMENT__VALUE, newValue, newValue));
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.ARGUMENT__VALUE, newValue, newValue));
 	}
 
 	/**
@@ -137,8 +132,8 @@ public class ArgumentImpl extends EObjectImpl implements Argument {
 			variable = (Var) eResolveProxy(oldVariable);
 			if (variable != oldVariable) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
-							DfPackage.ARGUMENT__VARIABLE, oldVariable, variable));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, DfPackage.ARGUMENT__VARIABLE, oldVariable,
+							variable));
 			}
 		}
 		return variable;
@@ -162,8 +157,7 @@ public class ArgumentImpl extends EObjectImpl implements Argument {
 		Var oldVariable = variable;
 		variable = newVariable;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					DfPackage.ARGUMENT__VARIABLE, oldVariable, variable));
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.ARGUMENT__VARIABLE, oldVariable, variable));
 	}
 
 	/**
@@ -172,8 +166,7 @@ public class ArgumentImpl extends EObjectImpl implements Argument {
 	 * @generated
 	 */
 	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd,
-			int featureID, NotificationChain msgs) {
+	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
 		case DfPackage.ARGUMENT__VALUE:
 			return basicSetValue(null, msgs);

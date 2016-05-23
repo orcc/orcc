@@ -192,8 +192,7 @@ public class EntityImpl extends AttributableImpl implements Entity {
 	 * @param parameters
 	 *            a list of parameters
 	 */
-	public EntityImpl(String name, EList<Port> inputs, EList<Port> outputs,
-			EList<Var> parameters) {
+	public EntityImpl(String name, EList<Port> inputs, EList<Port> outputs, EList<Var> parameters) {
 		super();
 
 		this.name = name;
@@ -217,8 +216,8 @@ public class EntityImpl extends AttributableImpl implements Entity {
 	 * @param parameters
 	 *            a list of parameters
 	 */
-	public EntityImpl(Vertex vertex, EList<Attribute> attributes,
-			EList<Port> inputs, EList<Port> outputs, EList<Var> parameters) {
+	public EntityImpl(Vertex vertex, EList<Attribute> attributes, EList<Port> inputs, EList<Port> outputs,
+			EList<Var> parameters) {
 		super();
 
 		this.vertex = vertex;
@@ -242,8 +241,7 @@ public class EntityImpl extends AttributableImpl implements Entity {
 	 *            the entity that the new entity will be based on
 	 */
 	protected EntityImpl(Vertex vertex, Entity entity) {
-		this(vertex, entity.getAttributes(), entity.getInputs(), entity
-				.getOutputs(), entity.getParameters());
+		this(vertex, entity.getAttributes(), entity.getInputs(), entity.getOutputs(), entity.getParameters());
 	}
 
 	/**
@@ -252,8 +250,8 @@ public class EntityImpl extends AttributableImpl implements Entity {
 	private void computeIncomingPortMap() {
 		incomingPortMap = new HashMap<Port, Connection>();
 		if (vertex == null) {
-			throw new IllegalArgumentException("cannot compute incoming port "
-					+ "map on an entity that is not associated with a vertex");
+			throw new IllegalArgumentException(
+					"cannot compute incoming port " + "map on an entity that is not associated with a vertex");
 		}
 
 		for (Edge edge : vertex.getIncoming()) {
@@ -270,8 +268,8 @@ public class EntityImpl extends AttributableImpl implements Entity {
 	private void computeOutgoingPortMap() {
 		outgoingPortMap = new HashMap<Port, List<Connection>>();
 		if (vertex == null) {
-			throw new IllegalArgumentException("cannot compute outgoing port "
-					+ "map on an entity that is not associated with a vertex");
+			throw new IllegalArgumentException(
+					"cannot compute outgoing port " + "map on an entity that is not associated with a vertex");
 		}
 
 		for (Edge edge : vertex.getOutgoing()) {
@@ -323,8 +321,7 @@ public class EntityImpl extends AttributableImpl implements Entity {
 		case DfPackage.ENTITY__INPUTS:
 			return inputs != null && !inputs.isEmpty();
 		case DfPackage.ENTITY__NAME:
-			return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT
-					.equals(name);
+			return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
 		case DfPackage.ENTITY__OUTGOING_PORT_MAP:
 			return outgoingPortMap != null;
 		case DfPackage.ENTITY__OUTPUTS:
@@ -380,8 +377,7 @@ public class EntityImpl extends AttributableImpl implements Entity {
 	 */
 	public EList<Port> getInputs() {
 		if (inputs == null) {
-			inputs = new EObjectResolvingEList<Port>(Port.class, this,
-					DfPackage.ENTITY__INPUTS);
+			inputs = new EObjectResolvingEList<Port>(Port.class, this, DfPackage.ENTITY__INPUTS);
 		}
 		return inputs;
 	}
@@ -421,8 +417,7 @@ public class EntityImpl extends AttributableImpl implements Entity {
 	 */
 	public EList<Port> getOutputs() {
 		if (outputs == null) {
-			outputs = new EObjectResolvingEList<Port>(Port.class, this,
-					DfPackage.ENTITY__OUTPUTS);
+			outputs = new EObjectResolvingEList<Port>(Port.class, this, DfPackage.ENTITY__OUTPUTS);
 		}
 		return outputs;
 	}
@@ -443,8 +438,7 @@ public class EntityImpl extends AttributableImpl implements Entity {
 	 */
 	public EList<Var> getParameters() {
 		if (parameters == null) {
-			parameters = new EObjectResolvingEList<Var>(Var.class, this,
-					DfPackage.ENTITY__PARAMETERS);
+			parameters = new EObjectResolvingEList<Var>(Var.class, this, DfPackage.ENTITY__PARAMETERS);
 		}
 		return parameters;
 	}

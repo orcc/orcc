@@ -119,8 +119,7 @@ public enum OpUnary implements Enumerator {
 	 */
 	public static final int MINUS_VALUE = 2;
 
-	private static final String[] NAMES_ARRAY = new String[] { "~", "!", "-",
-			"#" };
+	private static final String[] NAMES_ARRAY = new String[] { "~", "!", "-", "#" };
 
 	/**
 	 * The '<em><b>NUM ELTS</b></em>' literal value.
@@ -145,16 +144,14 @@ public enum OpUnary implements Enumerator {
 	 * 
 	 * @generated
 	 */
-	private static final OpUnary[] VALUES_ARRAY = new OpUnary[] { BITNOT,
-			LOGIC_NOT, MINUS, NUM_ELTS, };
+	private static final OpUnary[] VALUES_ARRAY = new OpUnary[] { BITNOT, LOGIC_NOT, MINUS, NUM_ELTS, };
 
 	/**
 	 * A public read-only list of all the '<em><b>Op Unary</b></em>' enumerators.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public static final List<OpUnary> VALUES = Collections
-			.unmodifiableList(Arrays.asList(VALUES_ARRAY));
+	public static final List<OpUnary> VALUES = Collections.unmodifiableList(Arrays.asList(VALUES_ARRAY));
 
 	static {
 		for (OpUnary op : OpUnary.values()) {

@@ -84,14 +84,12 @@ public class TypeListImpl extends TypeImpl implements TypeList {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetSizeExpr(Expression newSizeExpr,
-			NotificationChain msgs) {
+	public NotificationChain basicSetSizeExpr(Expression newSizeExpr, NotificationChain msgs) {
 		Expression oldSizeExpr = sizeExpr;
 		sizeExpr = newSizeExpr;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET, IrPackage.TYPE_LIST__SIZE_EXPR,
-					oldSizeExpr, newSizeExpr);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET,
+					IrPackage.TYPE_LIST__SIZE_EXPR, oldSizeExpr, newSizeExpr);
 			if (msgs == null)
 				msgs = notification;
 			else
@@ -108,9 +106,8 @@ public class TypeListImpl extends TypeImpl implements TypeList {
 		Type oldType = type;
 		type = newType;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET, IrPackage.TYPE_LIST__TYPE, oldType,
-					newType);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.TYPE_LIST__TYPE,
+					oldType, newType);
 			if (msgs == null)
 				msgs = notification;
 			else
@@ -139,8 +136,7 @@ public class TypeListImpl extends TypeImpl implements TypeList {
 	 * @generated
 	 */
 	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd,
-			int featureID, NotificationChain msgs) {
+	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
 		case IrPackage.TYPE_LIST__SIZE_EXPR:
 			return basicSetSizeExpr(null, msgs);
@@ -169,8 +165,7 @@ public class TypeListImpl extends TypeImpl implements TypeList {
 	public boolean equals(Object obj) {
 		if (obj instanceof TypeList) {
 			TypeList list = (TypeList) obj;
-			return this.getSize() == list.getSize()
-					&& type.equals(list.getType());
+			return this.getSize() == list.getSize() && type.equals(list.getType());
 		} else {
 			return false;
 		}
@@ -294,19 +289,17 @@ public class TypeListImpl extends TypeImpl implements TypeList {
 		if (newSizeExpr != sizeExpr) {
 			NotificationChain msgs = null;
 			if (sizeExpr != null)
-				msgs = ((InternalEObject) sizeExpr)
-						.eInverseRemove(this, EOPPOSITE_FEATURE_BASE
-								- IrPackage.TYPE_LIST__SIZE_EXPR, null, msgs);
+				msgs = ((InternalEObject) sizeExpr).eInverseRemove(this,
+						EOPPOSITE_FEATURE_BASE - IrPackage.TYPE_LIST__SIZE_EXPR, null, msgs);
 			if (newSizeExpr != null)
-				msgs = ((InternalEObject) newSizeExpr)
-						.eInverseAdd(this, EOPPOSITE_FEATURE_BASE
-								- IrPackage.TYPE_LIST__SIZE_EXPR, null, msgs);
+				msgs = ((InternalEObject) newSizeExpr).eInverseAdd(this,
+						EOPPOSITE_FEATURE_BASE - IrPackage.TYPE_LIST__SIZE_EXPR, null, msgs);
 			msgs = basicSetSizeExpr(newSizeExpr, msgs);
 			if (msgs != null)
 				msgs.dispatch();
 		} else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.TYPE_LIST__SIZE_EXPR, newSizeExpr, newSizeExpr));
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.TYPE_LIST__SIZE_EXPR, newSizeExpr,
+					newSizeExpr));
 	}
 
 	@Override
@@ -314,19 +307,16 @@ public class TypeListImpl extends TypeImpl implements TypeList {
 		if (newType != type) {
 			NotificationChain msgs = null;
 			if (type != null)
-				msgs = ((InternalEObject) type).eInverseRemove(this,
-						EOPPOSITE_FEATURE_BASE - IrPackage.TYPE_LIST__TYPE,
+				msgs = ((InternalEObject) type).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.TYPE_LIST__TYPE,
 						null, msgs);
 			if (newType != null)
-				msgs = ((InternalEObject) newType).eInverseAdd(this,
-						EOPPOSITE_FEATURE_BASE - IrPackage.TYPE_LIST__TYPE,
+				msgs = ((InternalEObject) newType).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.TYPE_LIST__TYPE,
 						null, msgs);
 			msgs = basicSetType(newType, msgs);
 			if (msgs != null)
 				msgs.dispatch();
 		} else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.TYPE_LIST__TYPE, newType, newType));
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.TYPE_LIST__TYPE, newType, newType));
 	}
 
 	@Override

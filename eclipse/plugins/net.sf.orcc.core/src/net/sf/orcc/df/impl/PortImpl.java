@@ -108,8 +108,8 @@ public class PortImpl extends VertexImpl implements Port {
 		Type oldType = type;
 		type = newType;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET, DfPackage.PORT__TYPE, oldType, newType);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, DfPackage.PORT__TYPE,
+					oldType, newType);
 			if (msgs == null)
 				msgs = notification;
 			else
@@ -142,8 +142,7 @@ public class PortImpl extends VertexImpl implements Port {
 	 * @generated
 	 */
 	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd,
-			int featureID, NotificationChain msgs) {
+	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
 		case DfPackage.PORT__TYPE:
 			return basicSetType(null, msgs);
@@ -159,8 +158,7 @@ public class PortImpl extends VertexImpl implements Port {
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
 		case DfPackage.PORT__NAME:
-			return NAME_EDEFAULT == null ? getName() != null : !NAME_EDEFAULT
-					.equals(getName());
+			return NAME_EDEFAULT == null ? getName() != null : !NAME_EDEFAULT.equals(getName());
 		case DfPackage.PORT__NUM_TOKENS_CONSUMED:
 			return numTokensConsumed != NUM_TOKENS_CONSUMED_EDEFAULT;
 		case DfPackage.PORT__NUM_TOKENS_PRODUCED:
@@ -311,9 +309,8 @@ public class PortImpl extends VertexImpl implements Port {
 		int oldNumTokensConsumed = numTokensConsumed;
 		numTokensConsumed = newNumTokensConsumed;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					DfPackage.PORT__NUM_TOKENS_CONSUMED, oldNumTokensConsumed,
-					numTokensConsumed));
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.PORT__NUM_TOKENS_CONSUMED,
+					oldNumTokensConsumed, numTokensConsumed));
 	}
 
 	/**
@@ -324,9 +321,8 @@ public class PortImpl extends VertexImpl implements Port {
 		int oldNumTokensProduced = numTokensProduced;
 		numTokensProduced = newNumTokensProduced;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					DfPackage.PORT__NUM_TOKENS_PRODUCED, oldNumTokensProduced,
-					numTokensProduced));
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.PORT__NUM_TOKENS_PRODUCED,
+					oldNumTokensProduced, numTokensProduced));
 	}
 
 	/**
@@ -337,19 +333,16 @@ public class PortImpl extends VertexImpl implements Port {
 		if (newType != type) {
 			NotificationChain msgs = null;
 			if (type != null)
-				msgs = ((InternalEObject) type).eInverseRemove(this,
-						EOPPOSITE_FEATURE_BASE - DfPackage.PORT__TYPE, null,
-						msgs);
+				msgs = ((InternalEObject) type).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - DfPackage.PORT__TYPE,
+						null, msgs);
 			if (newType != null)
-				msgs = ((InternalEObject) newType).eInverseAdd(this,
-						EOPPOSITE_FEATURE_BASE - DfPackage.PORT__TYPE, null,
-						msgs);
+				msgs = ((InternalEObject) newType).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - DfPackage.PORT__TYPE,
+						null, msgs);
 			msgs = basicSetType(newType, msgs);
 			if (msgs != null)
 				msgs.dispatch();
 		} else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					DfPackage.PORT__TYPE, newType, newType));
+			eNotify(new ENotificationImpl(this, Notification.SET, DfPackage.PORT__TYPE, newType, newType));
 	}
 
 	/**

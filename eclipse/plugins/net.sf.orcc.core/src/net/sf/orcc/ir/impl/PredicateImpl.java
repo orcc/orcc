@@ -101,8 +101,7 @@ public class PredicateImpl extends EObjectImpl implements Predicate {
 		switch (featureID) {
 		case IrPackage.PREDICATE__EXPRESSIONS:
 			getExpressions().clear();
-			getExpressions()
-					.addAll((Collection<? extends Expression>) newValue);
+			getExpressions().addAll((Collection<? extends Expression>) newValue);
 			return;
 		}
 		super.eSet(featureID, newValue);
@@ -137,8 +136,8 @@ public class PredicateImpl extends EObjectImpl implements Predicate {
 	 */
 	public EList<Expression> getExpressions() {
 		if (expressions == null) {
-			expressions = new EObjectContainmentEList<Expression>(
-					Expression.class, this, IrPackage.PREDICATE__EXPRESSIONS);
+			expressions = new EObjectContainmentEList<Expression>(Expression.class, this,
+					IrPackage.PREDICATE__EXPRESSIONS);
 		}
 		return expressions;
 	}
@@ -148,12 +147,10 @@ public class PredicateImpl extends EObjectImpl implements Predicate {
 	 * @generated
 	 */
 	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd,
-			int featureID, NotificationChain msgs) {
+	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
 		case IrPackage.PREDICATE__EXPRESSIONS:
-			return ((InternalEList<?>) getExpressions()).basicRemove(otherEnd,
-					msgs);
+			return ((InternalEList<?>) getExpressions()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -178,14 +175,12 @@ public class PredicateImpl extends EObjectImpl implements Predicate {
 		Expression e2 = otherExprs.get(0);
 		if (e1.isExprUnary()) {
 			ExprUnary unary = (ExprUnary) e1;
-			if (unary.getOp() == OpUnary.LOGIC_NOT
-					&& EcoreUtil.equals(unary.getExpr(), e2)) {
+			if (unary.getOp() == OpUnary.LOGIC_NOT && EcoreUtil.equals(unary.getExpr(), e2)) {
 				return true;
 			}
 		} else if (e2.isExprUnary()) {
 			ExprUnary unary = (ExprUnary) e2;
-			if (unary.getOp() == OpUnary.LOGIC_NOT
-					&& EcoreUtil.equals(unary.getExpr(), e1)) {
+			if (unary.getOp() == OpUnary.LOGIC_NOT && EcoreUtil.equals(unary.getExpr(), e1)) {
 				return true;
 			}
 		}

@@ -80,14 +80,12 @@ public class InstLoadImpl extends InstructionImpl implements InstLoad {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetSource(Use newSource,
-			NotificationChain msgs) {
+	public NotificationChain basicSetSource(Use newSource, NotificationChain msgs) {
 		Use oldSource = source;
 		source = newSource;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET, IrPackage.INST_LOAD__SOURCE, oldSource,
-					newSource);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.INST_LOAD__SOURCE,
+					oldSource, newSource);
 			if (msgs == null)
 				msgs = notification;
 			else
@@ -100,14 +98,12 @@ public class InstLoadImpl extends InstructionImpl implements InstLoad {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetTarget(Def newTarget,
-			NotificationChain msgs) {
+	public NotificationChain basicSetTarget(Def newTarget, NotificationChain msgs) {
 		Def oldTarget = target;
 		target = newTarget;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET, IrPackage.INST_LOAD__TARGET, oldTarget,
-					newTarget);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.INST_LOAD__TARGET,
+					oldTarget, newTarget);
 			if (msgs == null)
 				msgs = notification;
 			else
@@ -138,12 +134,10 @@ public class InstLoadImpl extends InstructionImpl implements InstLoad {
 	 * @generated
 	 */
 	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd,
-			int featureID, NotificationChain msgs) {
+	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
 		case IrPackage.INST_LOAD__INDEXES:
-			return ((InternalEList<?>) getIndexes())
-					.basicRemove(otherEnd, msgs);
+			return ((InternalEList<?>) getIndexes()).basicRemove(otherEnd, msgs);
 		case IrPackage.INST_LOAD__SOURCE:
 			return basicSetSource(null, msgs);
 		case IrPackage.INST_LOAD__TARGET:
@@ -226,8 +220,7 @@ public class InstLoadImpl extends InstructionImpl implements InstLoad {
 	 */
 	public EList<Expression> getIndexes() {
 		if (indexes == null) {
-			indexes = new EObjectContainmentEList<Expression>(Expression.class,
-					this, IrPackage.INST_LOAD__INDEXES);
+			indexes = new EObjectContainmentEList<Expression>(Expression.class, this, IrPackage.INST_LOAD__INDEXES);
 		}
 		return indexes;
 	}
@@ -287,18 +280,15 @@ public class InstLoadImpl extends InstructionImpl implements InstLoad {
 			NotificationChain msgs = null;
 			if (source != null)
 				msgs = ((InternalEObject) source).eInverseRemove(this,
-						EOPPOSITE_FEATURE_BASE - IrPackage.INST_LOAD__SOURCE,
-						null, msgs);
+						EOPPOSITE_FEATURE_BASE - IrPackage.INST_LOAD__SOURCE, null, msgs);
 			if (newSource != null)
 				msgs = ((InternalEObject) newSource).eInverseAdd(this,
-						EOPPOSITE_FEATURE_BASE - IrPackage.INST_LOAD__SOURCE,
-						null, msgs);
+						EOPPOSITE_FEATURE_BASE - IrPackage.INST_LOAD__SOURCE, null, msgs);
 			msgs = basicSetSource(newSource, msgs);
 			if (msgs != null)
 				msgs.dispatch();
 		} else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.INST_LOAD__SOURCE, newSource, newSource));
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.INST_LOAD__SOURCE, newSource, newSource));
 	}
 
 	/**
@@ -310,26 +300,23 @@ public class InstLoadImpl extends InstructionImpl implements InstLoad {
 			NotificationChain msgs = null;
 			if (target != null)
 				msgs = ((InternalEObject) target).eInverseRemove(this,
-						EOPPOSITE_FEATURE_BASE - IrPackage.INST_LOAD__TARGET,
-						null, msgs);
+						EOPPOSITE_FEATURE_BASE - IrPackage.INST_LOAD__TARGET, null, msgs);
 			if (newTarget != null)
 				msgs = ((InternalEObject) newTarget).eInverseAdd(this,
-						EOPPOSITE_FEATURE_BASE - IrPackage.INST_LOAD__TARGET,
-						null, msgs);
+						EOPPOSITE_FEATURE_BASE - IrPackage.INST_LOAD__TARGET, null, msgs);
 			msgs = basicSetTarget(newTarget, msgs);
 			if (msgs != null)
 				msgs.dispatch();
 		} else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.INST_LOAD__TARGET, newTarget, newTarget));
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.INST_LOAD__TARGET, newTarget, newTarget));
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append(super.toString());
-		builder.append("Load(").append(getNameSSA(getTarget().getVariable()))
-				.append(", ").append(getSource().getVariable().getName());
+		builder.append("Load(").append(getNameSSA(getTarget().getVariable())).append(", ")
+				.append(getSource().getVariable().getName());
 		for (Expression index : getIndexes()) {
 			builder.append("[");
 			builder.append(new ExpressionPrinter().doSwitch(index));

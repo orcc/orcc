@@ -56,8 +56,8 @@ public class ExprVarImpl extends ExpressionImpl implements ExprVar {
 		Use oldUse = use;
 		use = newUse;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET, IrPackage.EXPR_VAR__USE, oldUse, newUse);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.EXPR_VAR__USE,
+					oldUse, newUse);
 			if (msgs == null)
 				msgs = notification;
 			else
@@ -84,8 +84,7 @@ public class ExprVarImpl extends ExpressionImpl implements ExprVar {
 	 * @generated
 	 */
 	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd,
-			int featureID, NotificationChain msgs) {
+	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
 		case IrPackage.EXPR_VAR__USE:
 			return basicSetUse(null, msgs);
@@ -169,19 +168,16 @@ public class ExprVarImpl extends ExpressionImpl implements ExprVar {
 		if (newUse != use) {
 			NotificationChain msgs = null;
 			if (use != null)
-				msgs = ((InternalEObject) use).eInverseRemove(this,
-						EOPPOSITE_FEATURE_BASE - IrPackage.EXPR_VAR__USE, null,
-						msgs);
+				msgs = ((InternalEObject) use).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.EXPR_VAR__USE,
+						null, msgs);
 			if (newUse != null)
-				msgs = ((InternalEObject) newUse).eInverseAdd(this,
-						EOPPOSITE_FEATURE_BASE - IrPackage.EXPR_VAR__USE, null,
-						msgs);
+				msgs = ((InternalEObject) newUse).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.EXPR_VAR__USE,
+						null, msgs);
 			msgs = basicSetUse(newUse, msgs);
 			if (msgs != null)
 				msgs.dispatch();
 		} else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.EXPR_VAR__USE, newUse, newUse));
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.EXPR_VAR__USE, newUse, newUse));
 	}
 
 } // ExprVarImpl

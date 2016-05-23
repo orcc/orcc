@@ -114,8 +114,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public String convertOpBinaryToString(EDataType eDataType,
-			Object instanceValue) {
+	public String convertOpBinaryToString(EDataType eDataType, Object instanceValue) {
 		return instanceValue == null ? null : instanceValue.toString();
 	}
 
@@ -123,8 +122,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public String convertOpUnaryToString(EDataType eDataType,
-			Object instanceValue) {
+	public String convertOpUnaryToString(EDataType eDataType, Object instanceValue) {
 		return instanceValue == null ? null : instanceValue.toString();
 	}
 
@@ -140,8 +138,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		case IrPackage.OP_UNARY:
 			return convertOpUnaryToString(eDataType, instanceValue);
 		default:
-			throw new IllegalArgumentException("The datatype '"
-					+ eDataType.getName() + "' is not a valid classifier");
+			throw new IllegalArgumentException("The datatype '" + eDataType.getName() + "' is not a valid classifier");
 		}
 	}
 
@@ -221,8 +218,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		case IrPackage.CFG_NODE:
 			return createCfgNode();
 		default:
-			throw new IllegalArgumentException("The class '" + eClass.getName()
-					+ "' is not a valid classifier");
+			throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
 	}
 
@@ -343,8 +339,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	@Override
-	public ExprBinary createExprBinary(Expression e1, OpBinary op,
-			Expression e2, Type type) {
+	public ExprBinary createExprBinary(Expression e1, OpBinary op, Expression e2, Type type) {
 		ExprBinaryImpl exprBinary = new ExprBinaryImpl();
 		exprBinary.setE1(e1);
 		exprBinary.setE2(e2);
@@ -469,8 +464,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	@Override
-	public ExprUnary createExprUnary(OpUnary op, Expression expression,
-			Type type) {
+	public ExprUnary createExprUnary(OpUnary op, Expression expression, Type type) {
 		ExprUnaryImpl exprUnary = new ExprUnaryImpl();
 		exprUnary.setExpr(expression);
 		exprUnary.setOp(op);
@@ -513,8 +507,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		case IrPackage.OP_UNARY:
 			return createOpUnaryFromString(eDataType, initialValue);
 		default:
-			throw new IllegalArgumentException("The datatype '"
-					+ eDataType.getName() + "' is not a valid classifier");
+			throw new IllegalArgumentException("The datatype '" + eDataType.getName() + "' is not a valid classifier");
 		}
 	}
 
@@ -528,8 +521,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	@Override
-	public InstAssign createInstAssign(int lineNumber, Var target,
-			Expression value) {
+	public InstAssign createInstAssign(int lineNumber, Var target, Expression value) {
 		InstAssignImpl instAssign = new InstAssignImpl();
 		instAssign.setLineNumber(lineNumber);
 		instAssign.setTarget(IrFactory.eINSTANCE.createDef(target));
@@ -567,8 +559,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	@Override
-	public InstCall createInstCall(int lineNumber, Var target,
-			Procedure procedure, List<Expression> parameters) {
+	public InstCall createInstCall(int lineNumber, Var target, Procedure procedure, List<Expression> parameters) {
 		InstCallImpl instCall = new InstCallImpl();
 		instCall.setLineNumber(lineNumber);
 		if (target != null) {
@@ -583,8 +574,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	@Override
-	public InstCall createInstCall(Var target, Procedure procedure,
-			List<Expression> parameters) {
+	public InstCall createInstCall(Var target, Procedure procedure, List<Expression> parameters) {
 		return createInstCall(0, target, procedure, parameters);
 	}
 
@@ -598,8 +588,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	@Override
-	public InstLoad createInstLoad(int lineNumber, Def target, Use source,
-			List<Expression> indexes) {
+	public InstLoad createInstLoad(int lineNumber, Def target, Use source, List<Expression> indexes) {
 		InstLoadImpl instLoad = new InstLoadImpl();
 		instLoad.setLineNumber(lineNumber);
 		instLoad.setTarget(target);
@@ -609,11 +598,9 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	@Override
-	public InstLoad createInstLoad(int lineNumber, Var target, Var source,
-			List<Expression> indexes) {
-		return createInstLoad(lineNumber,
-				IrFactory.eINSTANCE.createDef(target),
-				IrFactory.eINSTANCE.createUse(source), indexes);
+	public InstLoad createInstLoad(int lineNumber, Var target, Var source, List<Expression> indexes) {
+		return createInstLoad(lineNumber, IrFactory.eINSTANCE.createDef(target), IrFactory.eINSTANCE.createUse(source),
+				indexes);
 	}
 
 	@Override
@@ -632,10 +619,8 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	@Override
-	public InstLoad createInstLoad(Var target, Var source,
-			List<Expression> indexes) {
-		return createInstLoad(0, IrFactory.eINSTANCE.createDef(target),
-				IrFactory.eINSTANCE.createUse(source), indexes);
+	public InstLoad createInstLoad(Var target, Var source, List<Expression> indexes) {
+		return createInstLoad(0, IrFactory.eINSTANCE.createDef(target), IrFactory.eINSTANCE.createUse(source), indexes);
 	}
 
 	/**
@@ -648,8 +633,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	@Override
-	public InstPhi createInstPhi(int lineNumber, Def target,
-			List<Expression> values) {
+	public InstPhi createInstPhi(int lineNumber, Def target, List<Expression> values) {
 		InstPhiImpl instPhi = new InstPhiImpl();
 		instPhi.setLineNumber(lineNumber);
 		instPhi.setTarget(target);
@@ -658,10 +642,8 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	@Override
-	public InstPhi createInstPhi(int lineNumber, Var target,
-			List<Expression> values) {
-		return createInstPhi(lineNumber, IrFactory.eINSTANCE.createDef(target),
-				values);
+	public InstPhi createInstPhi(int lineNumber, Var target, List<Expression> values) {
+		return createInstPhi(lineNumber, IrFactory.eINSTANCE.createDef(target), values);
 	}
 
 	@Override
@@ -703,8 +685,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	@Override
-	public InstStore createInstStore(int lineNumber, Def target,
-			Collection<Expression> indexes, Expression value) {
+	public InstStore createInstStore(int lineNumber, Def target, Collection<Expression> indexes, Expression value) {
 		InstStoreImpl instStore = new InstStoreImpl();
 		instStore.setLineNumber(lineNumber);
 		instStore.setTarget(target);
@@ -714,10 +695,8 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	@Override
-	public InstStore createInstStore(int lineNumber, Var target,
-			Collection<Expression> indexes, Expression value) {
-		return createInstStore(lineNumber,
-				IrFactory.eINSTANCE.createDef(target), indexes, value);
+	public InstStore createInstStore(int lineNumber, Var target, Collection<Expression> indexes, Expression value) {
+		return createInstStore(lineNumber, IrFactory.eINSTANCE.createDef(target), indexes, value);
 	}
 
 	@Override
@@ -748,20 +727,17 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	@Override
-	public InstStore createInstStore(Var target, List<Expression> indexes,
-			Expression value) {
+	public InstStore createInstStore(Var target, List<Expression> indexes, Expression value) {
 		return createInstStore(0, target, indexes, value);
 	}
 
 	@Override
-	public InstStore createInstStore(Var target, List<Expression> indexes,
-			int value) {
+	public InstStore createInstStore(Var target, List<Expression> indexes, int value) {
 		return createInstStore(target, indexes, createExprInt(value));
 	}
 
 	@Override
-	public InstStore createInstStore(Var target, List<Expression> indexes,
-			Var source) {
+	public InstStore createInstStore(Var target, List<Expression> indexes, Var source) {
 		return createInstStore(target, indexes, createExprVar(source));
 	}
 
@@ -788,13 +764,11 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public OpBinary createOpBinaryFromString(EDataType eDataType,
-			String initialValue) {
+	public OpBinary createOpBinaryFromString(EDataType eDataType, String initialValue) {
 		OpBinary result = OpBinary.get(initialValue);
 		if (result == null)
-			throw new IllegalArgumentException("The value '" + initialValue
-					+ "' is not a valid enumerator of '" + eDataType.getName()
-					+ "'");
+			throw new IllegalArgumentException(
+					"The value '" + initialValue + "' is not a valid enumerator of '" + eDataType.getName() + "'");
 		return result;
 	}
 
@@ -802,13 +776,11 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public OpUnary createOpUnaryFromString(EDataType eDataType,
-			String initialValue) {
+	public OpUnary createOpUnaryFromString(EDataType eDataType, String initialValue) {
 		OpUnary result = OpUnary.get(initialValue);
 		if (result == null)
-			throw new IllegalArgumentException("The value '" + initialValue
-					+ "' is not a valid enumerator of '" + eDataType.getName()
-					+ "'");
+			throw new IllegalArgumentException(
+					"The value '" + initialValue + "' is not a valid enumerator of '" + eDataType.getName() + "'");
 		return result;
 	}
 
@@ -847,8 +819,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	@Override
-	public Procedure createProcedure(String name, int lineNumber,
-			Type returnType) {
+	public Procedure createProcedure(String name, int lineNumber, Type returnType) {
 		ProcedureImpl procedure = new ProcedureImpl();
 
 		procedure.setLineNumber(lineNumber);
@@ -1001,8 +972,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	@Override
-	public Var createVar(int lineNumber, Type type, String name,
-			boolean assignable) {
+	public Var createVar(int lineNumber, Type type, String name, boolean assignable) {
 		VarImpl var = new VarImpl();
 		var.setAssignable(assignable);
 		var.setLineNumber(lineNumber);
@@ -1012,8 +982,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	@Override
-	public Var createVar(int lineNumber, Type type, String name,
-			boolean assignable, Expression initialValue) {
+	public Var createVar(int lineNumber, Type type, String name, boolean assignable, Expression initialValue) {
 		VarImpl var = new VarImpl();
 		var.setAssignable(assignable);
 		var.setInitialValue(initialValue);
@@ -1024,8 +993,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	@Override
-	public Var createVar(int lineNumber, Type type, String name,
-			boolean assignable, int index) {
+	public Var createVar(int lineNumber, Type type, String name, boolean assignable, int index) {
 		VarImpl var = new VarImpl();
 		var.setAssignable(assignable);
 		var.setIndex(index);
