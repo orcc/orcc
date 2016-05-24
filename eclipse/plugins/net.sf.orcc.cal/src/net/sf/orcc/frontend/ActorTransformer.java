@@ -37,6 +37,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.util.EcoreUtil;
+
 import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstEntity;
@@ -90,9 +93,6 @@ import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.util.EcoreHelper;
-
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
  * This class transforms an AST actor to its IR equivalent.
@@ -434,6 +434,8 @@ public class ActorTransformer extends CalSwitch<Actor> {
 
 				procedure.getBlocks().add(blockWhile);
 			}
+		}else{
+			
 		}
 	}
 
@@ -717,16 +719,19 @@ public class ActorTransformer extends CalSwitch<Actor> {
 		}
 
 		// evaluates token consumption
-		Expression repeat = null;
+		Expression repeat = eINSTANCE.createExprInt(1);
 		if (astRepeat != null) {
 			repeat = Evaluator.getValue(astRepeat);
 			// totalConsumption *= repeat;
 		}
 		irPattern.getExprTokensMap().put(port, repeat);
+		irPattern.getRepeatExpressions().add(repeat);
 
 		// create port variable
 		Var variable = createPortVariable(procedure.getLineNumber(), port, totalConsumption);
 		irPattern.getPortToVarMap().put(port, variable);
+		irPattern.getVarToPortMap().put(variable, port);
+		irPattern.getVariables().add(variable);
 
 		// load/store tokens (depending on the type of pattern)
 		if (astPattern instanceof InputPattern) {

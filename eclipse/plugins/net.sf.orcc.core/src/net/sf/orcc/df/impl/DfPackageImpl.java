@@ -636,7 +636,16 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	public EReference getPattern_ExprTokensMap() {
-		return (EReference) patternEClass.getEStructuralFeatures().get(0);
+		return (EReference) patternEClass.getEStructuralFeatures().get(4);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getPattern_RepeatExpressions() {
+		return (EReference) patternEClass.getEStructuralFeatures().get(5);
 	}
 
 	/**
@@ -644,7 +653,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	public EReference getPattern_Ports() {
-		return (EReference) patternEClass.getEStructuralFeatures().get(1);
+		return (EReference) patternEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -652,7 +661,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	public EReference getPattern_PortToVarMap() {
-		return (EReference) patternEClass.getEStructuralFeatures().get(2);
+		return (EReference) patternEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -660,7 +669,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	public EReference getPattern_Variables() {
-		return (EReference) patternEClass.getEStructuralFeatures().get(3);
+		return (EReference) patternEClass.getEStructuralFeatures().get(2);
 	}
 
 	/**
@@ -668,7 +677,7 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 	 * @generated
 	 */
 	public EReference getPattern_VarToPortMap() {
-		return (EReference) patternEClass.getEStructuralFeatures().get(4);
+		return (EReference) patternEClass.getEStructuralFeatures().get(3);
 	}
 
 	/**
@@ -1034,11 +1043,12 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 		createEReference(fsmEClass, FSM__INITIAL_STATE);
 
 		patternEClass = createEClass(PATTERN);
-		createEReference(patternEClass, PATTERN__EXPR_TOKENS_MAP);
 		createEReference(patternEClass, PATTERN__PORTS);
 		createEReference(patternEClass, PATTERN__PORT_TO_VAR_MAP);
 		createEReference(patternEClass, PATTERN__VARIABLES);
 		createEReference(patternEClass, PATTERN__VAR_TO_PORT_MAP);
+		createEReference(patternEClass, PATTERN__EXPR_TOKENS_MAP);
+		createEReference(patternEClass, PATTERN__REPEAT_EXPRESSIONS);
 
 		stateEClass = createEClass(STATE);
 
@@ -1291,9 +1301,6 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(patternEClass, Pattern.class, "Pattern", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getPattern_ExprTokensMap(), this.getPortToExpressionMapEntry(), null, "exprTokensMap", null, 0,
-				-1, Pattern.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
-				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getPattern_Ports(), this.getPort(), null, "ports", null, 0, -1, Pattern.class, !IS_TRANSIENT,
 				!IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED,
 				IS_ORDERED);
@@ -1305,6 +1312,12 @@ public class DfPackageImpl extends EPackageImpl implements DfPackage {
 				IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getPattern_VarToPortMap(), this.getVarToPortMapEntry(), null, "varToPortMap", null, 0, -1,
 				Pattern.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getPattern_ExprTokensMap(), this.getPortToExpressionMapEntry(), null, "exprTokensMap", null, 0,
+				-1, Pattern.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
+				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getPattern_RepeatExpressions(), theIrPackage.getExpression(), null, "repeatExpressions", null, 0,
+				-1, Pattern.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
 				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(stateEClass, State.class, "State", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);

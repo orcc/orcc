@@ -115,8 +115,6 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="initialState" eType="#//State"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Pattern">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="exprTokensMap" upperBound="-1"
-        eType="#//PortToExpressionMapEntry" containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="ports" upperBound="-1"
         eType="#//Port"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="portToVarMap" upperBound="-1"
@@ -125,6 +123,10 @@
         eType="ecore:EClass Ir.ecore#//Var" containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="varToPortMap" upperBound="-1"
         eType="#//VarToPortMapEntry" containment="true" resolveProxies="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="exprTokensMap" upperBound="-1"
+        eType="#//PortToExpressionMapEntry" containment="true" resolveProxies="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="repeatExpressions" upperBound="-1"
+        eType="ecore:EClass Ir.ecore#//Expression" containment="true" resolveProxies="false"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="State" eSuperTypes="../../net.sf.orcc.models/model/Graph.ecore#//Vertex"/>
   <eClassifiers xsi:type="ecore:EClass" name="Tag">

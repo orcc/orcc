@@ -46,11 +46,12 @@ import org.eclipse.emf.ecore.EObject;
  * <p>
  * The following features are supported:
  * <ul>
- *   <li>{@link net.sf.orcc.df.Pattern#getExprTokensMap <em>Expr Tokens Map</em>}</li>
  *   <li>{@link net.sf.orcc.df.Pattern#getPorts <em>Ports</em>}</li>
  *   <li>{@link net.sf.orcc.df.Pattern#getPortToVarMap <em>Port To Var Map</em>}</li>
  *   <li>{@link net.sf.orcc.df.Pattern#getVariables <em>Variables</em>}</li>
  *   <li>{@link net.sf.orcc.df.Pattern#getVarToPortMap <em>Var To Port Map</em>}</li>
+ *   <li>{@link net.sf.orcc.df.Pattern#getExprTokensMap <em>Expr Tokens Map</em>}</li>
+ *   <li>{@link net.sf.orcc.df.Pattern#getRepeatExpressions <em>Repeat Expressions</em>}</li>
  * </ul>
  * </p>
  *
@@ -75,6 +76,22 @@ public interface Pattern extends EObject {
 	 * @generated
 	 */
 	EMap<Port, Expression> getExprTokensMap();
+
+	/**
+	 * Returns the value of the '<em><b>Repeat Expressions</b></em>' containment reference list.
+	 * The list contents are of type {@link net.sf.orcc.ir.Expression}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Repeat Expressions</em>' containment reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Repeat Expressions</em>' containment reference list.
+	 * @see net.sf.orcc.df.DfPackage#getPattern_RepeatExpressions()
+	 * @model containment="true"
+	 * @generated
+	 */
+	EList<Expression> getRepeatExpressions();
 
 	/**
 	 * Returns the value of the '<em><b>Ports</b></em>' reference list.

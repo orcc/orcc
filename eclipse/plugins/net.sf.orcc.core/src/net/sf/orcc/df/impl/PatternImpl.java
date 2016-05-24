@@ -62,27 +62,18 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link net.sf.orcc.df.impl.PatternImpl#getExprTokensMap <em>Expr Tokens Map</em>}</li>
  *   <li>{@link net.sf.orcc.df.impl.PatternImpl#getPorts <em>Ports</em>}</li>
  *   <li>{@link net.sf.orcc.df.impl.PatternImpl#getPortToVarMap <em>Port To Var Map</em>}</li>
  *   <li>{@link net.sf.orcc.df.impl.PatternImpl#getVariables <em>Variables</em>}</li>
  *   <li>{@link net.sf.orcc.df.impl.PatternImpl#getVarToPortMap <em>Var To Port Map</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.PatternImpl#getExprTokensMap <em>Expr Tokens Map</em>}</li>
+ *   <li>{@link net.sf.orcc.df.impl.PatternImpl#getRepeatExpressions <em>Repeat Expressions</em>}</li>
  * </ul>
  * </p>
  *
  * @generated
  */
 public class PatternImpl extends EObjectImpl implements Pattern {
-	/**
-	 * The cached value of the '{@link #getExprTokensMap() <em>Expr Tokens Map</em>}' map.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getExprTokensMap()
-	 * @generated
-	 * @ordered
-	 */
-	protected EMap<Port, Expression> exprTokensMap;
-
 	/**
 	 * The cached value of the '{@link #getPorts() <em>Ports</em>}' reference list.
 	 * <!-- begin-user-doc -->
@@ -124,6 +115,26 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 	protected EMap<Var, Port> varToPortMap;
 
 	/**
+	 * The cached value of the '{@link #getExprTokensMap() <em>Expr Tokens Map</em>}' map.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getExprTokensMap()
+	 * @generated
+	 * @ordered
+	 */
+	protected EMap<Port, Expression> exprTokensMap;
+
+	/**
+	 * The cached value of the '{@link #getRepeatExpressions() <em>Repeat Expressions</em>}' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getRepeatExpressions()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Expression> repeatExpressions;
+
+	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -153,6 +164,19 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 					PortToExpressionMapEntryImpl.class, this, DfPackage.PATTERN__EXPR_TOKENS_MAP);
 		}
 		return exprTokensMap;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<Expression> getRepeatExpressions() {
+		if (repeatExpressions == null) {
+			repeatExpressions = new EObjectContainmentEList<Expression>(Expression.class, this,
+					DfPackage.PATTERN__REPEAT_EXPRESSIONS);
+		}
+		return repeatExpressions;
 	}
 
 	/**
@@ -213,14 +237,16 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
-		case DfPackage.PATTERN__EXPR_TOKENS_MAP:
-			return ((InternalEList<?>) getExprTokensMap()).basicRemove(otherEnd, msgs);
 		case DfPackage.PATTERN__PORT_TO_VAR_MAP:
 			return ((InternalEList<?>) getPortToVarMap()).basicRemove(otherEnd, msgs);
 		case DfPackage.PATTERN__VARIABLES:
 			return ((InternalEList<?>) getVariables()).basicRemove(otherEnd, msgs);
 		case DfPackage.PATTERN__VAR_TO_PORT_MAP:
 			return ((InternalEList<?>) getVarToPortMap()).basicRemove(otherEnd, msgs);
+		case DfPackage.PATTERN__EXPR_TOKENS_MAP:
+			return ((InternalEList<?>) getExprTokensMap()).basicRemove(otherEnd, msgs);
+		case DfPackage.PATTERN__REPEAT_EXPRESSIONS:
+			return ((InternalEList<?>) getRepeatExpressions()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -233,11 +259,6 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-		case DfPackage.PATTERN__EXPR_TOKENS_MAP:
-			if (coreType)
-				return getExprTokensMap();
-			else
-				return getExprTokensMap().map();
 		case DfPackage.PATTERN__PORTS:
 			return getPorts();
 		case DfPackage.PATTERN__PORT_TO_VAR_MAP:
@@ -252,6 +273,13 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 				return getVarToPortMap();
 			else
 				return getVarToPortMap().map();
+		case DfPackage.PATTERN__EXPR_TOKENS_MAP:
+			if (coreType)
+				return getExprTokensMap();
+			else
+				return getExprTokensMap().map();
+		case DfPackage.PATTERN__REPEAT_EXPRESSIONS:
+			return getRepeatExpressions();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -265,9 +293,6 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-		case DfPackage.PATTERN__EXPR_TOKENS_MAP:
-			((EStructuralFeature.Setting) getExprTokensMap()).set(newValue);
-			return;
 		case DfPackage.PATTERN__PORTS:
 			getPorts().clear();
 			getPorts().addAll((Collection<? extends Port>) newValue);
@@ -282,6 +307,13 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 		case DfPackage.PATTERN__VAR_TO_PORT_MAP:
 			((EStructuralFeature.Setting) getVarToPortMap()).set(newValue);
 			return;
+		case DfPackage.PATTERN__EXPR_TOKENS_MAP:
+			((EStructuralFeature.Setting) getExprTokensMap()).set(newValue);
+			return;
+		case DfPackage.PATTERN__REPEAT_EXPRESSIONS:
+			getRepeatExpressions().clear();
+			getRepeatExpressions().addAll((Collection<? extends Expression>) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -294,9 +326,6 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-		case DfPackage.PATTERN__EXPR_TOKENS_MAP:
-			getExprTokensMap().clear();
-			return;
 		case DfPackage.PATTERN__PORTS:
 			getPorts().clear();
 			return;
@@ -308,6 +337,12 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 			return;
 		case DfPackage.PATTERN__VAR_TO_PORT_MAP:
 			getVarToPortMap().clear();
+			return;
+		case DfPackage.PATTERN__EXPR_TOKENS_MAP:
+			getExprTokensMap().clear();
+			return;
+		case DfPackage.PATTERN__REPEAT_EXPRESSIONS:
+			getRepeatExpressions().clear();
 			return;
 		}
 		super.eUnset(featureID);
@@ -321,8 +356,6 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-		case DfPackage.PATTERN__EXPR_TOKENS_MAP:
-			return exprTokensMap != null && !exprTokensMap.isEmpty();
 		case DfPackage.PATTERN__PORTS:
 			return ports != null && !ports.isEmpty();
 		case DfPackage.PATTERN__PORT_TO_VAR_MAP:
@@ -331,6 +364,10 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 			return variables != null && !variables.isEmpty();
 		case DfPackage.PATTERN__VAR_TO_PORT_MAP:
 			return varToPortMap != null && !varToPortMap.isEmpty();
+		case DfPackage.PATTERN__EXPR_TOKENS_MAP:
+			return exprTokensMap != null && !exprTokensMap.isEmpty();
+		case DfPackage.PATTERN__REPEAT_EXPRESSIONS:
+			return repeatExpressions != null && !repeatExpressions.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}

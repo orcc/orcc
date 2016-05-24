@@ -1220,22 +1220,13 @@ public interface DfPackage extends EPackage {
 	int FSM_FEATURE_COUNT = GraphPackage.GRAPH_FEATURE_COUNT + 1;
 
 	/**
-	 * The feature id for the '<em><b>Expr Tokens Map</b></em>' map.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int PATTERN__EXPR_TOKENS_MAP = 0;
-
-	/**
 	 * The feature id for the '<em><b>Ports</b></em>' reference list. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int PATTERN__PORTS = 1;
+	int PATTERN__PORTS = 0;
 
 	/**
 	 * The feature id for the '<em><b>Port To Var Map</b></em>' map. <!--
@@ -1244,7 +1235,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PATTERN__PORT_TO_VAR_MAP = 2;
+	int PATTERN__PORT_TO_VAR_MAP = 1;
 
 	/**
 	 * The feature id for the '<em><b>Variables</b></em>' containment reference list.
@@ -1252,7 +1243,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PATTERN__VARIABLES = 3;
+	int PATTERN__VARIABLES = 2;
 
 	/**
 	 * The feature id for the '<em><b>Var To Port Map</b></em>' map. <!--
@@ -1261,7 +1252,25 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PATTERN__VAR_TO_PORT_MAP = 4;
+	int PATTERN__VAR_TO_PORT_MAP = 3;
+
+	/**
+	 * The feature id for the '<em><b>Expr Tokens Map</b></em>' map.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PATTERN__EXPR_TOKENS_MAP = 4;
+
+	/**
+	 * The feature id for the '<em><b>Repeat Expressions</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PATTERN__REPEAT_EXPRESSIONS = 5;
 
 	/**
 	 * The number of structural features of the '<em>Pattern</em>' class. <!--
@@ -1270,7 +1279,7 @@ public interface DfPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PATTERN_FEATURE_COUNT = 5;
+	int PATTERN_FEATURE_COUNT = 6;
 
 	/**
 	 * The feature id for the '<em><b>Attributes</b></em>' containment reference list.
@@ -2139,6 +2148,17 @@ public interface DfPackage extends EPackage {
 	EReference getPattern_ExprTokensMap();
 
 	/**
+	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.df.Pattern#getRepeatExpressions <em>Repeat Expressions</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference list '<em>Repeat Expressions</em>'.
+	 * @see net.sf.orcc.df.Pattern#getRepeatExpressions()
+	 * @see #getPattern()
+	 * @generated
+	 */
+	EReference getPattern_RepeatExpressions();
+
+	/**
 	 * Returns the meta object for the reference list '
 	 * {@link net.sf.orcc.df.Pattern#getPorts <em>Ports</em>}'. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
@@ -2959,6 +2979,14 @@ public interface DfPackage extends EPackage {
 		 * @generated
 		 */
 		EReference PATTERN__EXPR_TOKENS_MAP = eINSTANCE.getPattern_ExprTokensMap();
+
+		/**
+		 * The meta object literal for the '<em><b>Repeat Expressions</b></em>' containment reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference PATTERN__REPEAT_EXPRESSIONS = eINSTANCE.getPattern_RepeatExpressions();
 
 		/**
 		 * The meta object literal for the '<em><b>Ports</b></em>' reference list feature.
