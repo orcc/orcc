@@ -187,18 +187,12 @@ class InstanceCSPrinter extends CTemplate {
 			«FOR variable : action.body.locals»
 				«variable.declare»;
 			«ENDFOR»
-			«FOR port : action.getInputPattern.getPorts»
-				TOKEN_«port.name»_t *rbuf«port.name» = (TOKEN_«port.name»_t *)DAL_read_begin(PORT_«port.name», sizeof(TOKEN_«port.name»_t), TOKEN_«port.name»_RATE, _p);
-			«ENDFOR»
 			«FOR block : action.body.blocks»
 				«IF block.isBlockWhile»
 					«(block as BlockWhile).forEach(action.getOutputPattern.getPorts.get(0))»
 				«ELSE»
 					«block.doSwitch»
 				«ENDIF»
-			«ENDFOR»
-			«FOR port : action.getInputPattern.getPorts»
-				DAL_read_end(PORT_«port.name», rbuf«port.name», _p);
 			«ENDFOR»
 		'''
 		currentAction = null
@@ -359,12 +353,7 @@ class InstanceCSPrinter extends CTemplate {
 	}
 
 	def forEach(BlockWhile blockWhile, Port port)'''
-		//int BLOCK_loopIterations_COUNT = «blockWhile.printIterations» + 1;
-		#ifdef LOCAL_MODE
-		for («blockWhile.printIterand» = get_local_id(0) * (BLOCK_«port.name»_COUNT / get_local_size(0)); «blockWhile.printIterand» < (get_local_id(0) + 1) * (BLOCK_«port.name»_COUNT / get_local_size(0)); ) // block!
-		#else
-		DAL_foreach (blk : PORT_«port.name»)
-		#endif
+		for («blockWhile.printIterand» = get_global_id(0) * (BLOCK_«port.name»_COUNT / get_global_size(0)); «blockWhile.printIterand» < (get_global_id(0) + 1) * (BLOCK_«port.name»_COUNT / get_global_size(0)); ) // block!
 		{
 			«FOR block : blockWhile.blocks»
 				«block.doSwitch»
@@ -408,7 +397,7 @@ class InstanceCSPrinter extends CTemplate {
 		val srcPort = load.source.variable.getPort
 		'''
 			«IF srcPort != null»
-				«load.target.variable.name» = rbuf«srcPort.name»[«load.indexes.head.doSwitch»];
+				«load.target.variable.name» = PORT_«srcPort.name»_name[«load.indexes.head.doSwitch»];
 			«ELSE»
 				«IF load.source.variable.isGlobal == true && load.source.variable.assignable == true»
 					«load.target.variable.name» = _p->local->«load.source.variable.name»«load.indexes.printArrayIndexes»;
@@ -426,9 +415,7 @@ class InstanceCSPrinter extends CTemplate {
 			«IF currentAction.outputPattern.varToPortMap.get(store.target.variable).native»
 				printf("«trgtPort.name» = %i\n", «store.value.doSwitch»);
 			«ELSE»
-				TOKEN_«trgtPort.name»_t *wbuf«trgtPort.name» = (TOKEN_«trgtPort.name»_t *)DAL_write_begin(PORT_«trgtPort.name», sizeof(TOKEN_«trgtPort.name»_t), TOKEN_«trgtPort.name»_RATE, BLOCK_«trgtPort.name»_SIZE, «store.indexes.head.doSwitch», _p);
-				*wbuf«trgtPort.name» = «store.value.doSwitch»;
-				DAL_write_end(PORT_«trgtPort.name», wbuf«trgtPort.name», _p);
+				PORT_«trgtPort.name»_name[«store.indexes.head.doSwitch»] = «store.value.doSwitch»;
 			«ENDIF»
 		«ELSE»
 			«IF store.target.variable.isGlobal == true»

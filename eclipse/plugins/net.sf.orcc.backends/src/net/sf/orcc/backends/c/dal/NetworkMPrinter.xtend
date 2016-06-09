@@ -3,6 +3,7 @@ package net.sf.orcc.backends.c.dal
 import java.util.Map
 import net.sf.orcc.backends.c.CTemplate
 import net.sf.orcc.df.Network
+import net.sf.orcc.df.Actor
 
 /**
  * Generate and print actor mapping file for DAL backend.
@@ -36,7 +37,7 @@ class NetworkMPrinter extends CTemplate {
 							<processor name="«mapping.get(network.name + "_" + vertex.label)»"/>
 						«ENDIF»
 						«IF mapping.get(network.name + "_" + vertex.label).startsWith("gpu_")»
-							<target><opencl workgroups="«fifoSize»" workitems="256"/></target>
+							<target><opencl workgroups="1" workitems="«(vertex as Actor).getActions().get(0).getOutputPattern().getNumTokens((vertex as Actor).getOutputs().get(0))»"/></target>
 						«ENDIF»
 					«ELSE»
 						<processor name="core_0"/>
