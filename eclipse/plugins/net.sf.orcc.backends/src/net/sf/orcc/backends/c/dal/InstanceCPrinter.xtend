@@ -363,7 +363,7 @@ class InstanceCPrinter extends CTemplate {
 	def private printStateLabel(State state) '''
 	l_«state.name»:
 		«IF state.outgoing.empty»
-			printf("Stuck in state "«state.name»" in «entityName»\n");
+			printf("Stuck in state \"«state.name»\" in «entityName»\n");
 		«ELSE»
 			«state.printStateTransitions»
 		«ENDIF»

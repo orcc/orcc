@@ -574,7 +574,7 @@ class InstancePrinter extends CTemplate {
 			i += si->num_firings;
 		«ENDIF»
 		«IF state.outgoing.empty»
-			printf("Stuck in state "«state.name»" in «entityName»\n");
+			printf("Stuck in state \"«state.name»\" in «entityName»\n");
 			exit(1);
 		«ELSE»
 			«state.printStateTransitions»

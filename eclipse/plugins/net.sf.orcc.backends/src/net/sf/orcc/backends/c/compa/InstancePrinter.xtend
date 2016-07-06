@@ -58,7 +58,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 				i += «entityName»_outside_FSM_scheduler();
 			«ENDIF»
 			«IF state.outgoing.empty»
-				xil_printf("Stuck in state "«state.name»" in the instance «entityName»\n");
+				xil_printf("Stuck in state \"«state.name»\" in the instance «entityName»\n");
 				exit(1);
 			«ELSE»
 				«state.printStateTransitions»
