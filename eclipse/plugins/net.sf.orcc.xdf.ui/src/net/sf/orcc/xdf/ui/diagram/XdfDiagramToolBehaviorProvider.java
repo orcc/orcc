@@ -36,6 +36,7 @@ import net.sf.orcc.xdf.ui.features.InstanceDblClickFeature;
 import net.sf.orcc.xdf.ui.features.OpenPropertiesFeature;
 import net.sf.orcc.xdf.ui.features.UngroupNetworkFeature;
 import net.sf.orcc.xdf.ui.features.UpdateRefinementFeature;
+import net.sf.orcc.xdf.ui.features.XronosProfileFeature;
 import net.sf.orcc.xdf.ui.patterns.InputNetworkPortPattern;
 import net.sf.orcc.xdf.ui.patterns.NetworkPortPattern;
 
@@ -163,6 +164,12 @@ public class XdfDiagramToolBehaviorProvider extends DefaultToolBehaviorProvider 
 		entry.setText("Transformations");
 		entry.add(new ContextMenuEntry(new GroupInstancesFeature(getFeatureProvider()), context));
 		entry.add(new ContextMenuEntry(new UngroupNetworkFeature(getFeatureProvider()), context));
+		contextMenuEntries.add(entry);
+
+		// 'Highlight costs' menu entry
+		entry = new ContextMenuEntry(null, context);
+		entry.setText("Highlight costs");
+		entry.add(new ContextMenuEntry(new XronosProfileFeature(getFeatureProvider()), context));
 		contextMenuEntries.add(entry);
 
 		entry = new ContextMenuEntry(new OpenPropertiesFeature(

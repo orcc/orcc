@@ -111,7 +111,14 @@ public class XdfGradients extends PredefinedColoredAreas {
 		return agca;
 	}
 
-
+	public static AdaptedGradientColoredAreas actorGradient() {
+		final AdaptedGradientColoredAreas agca = StylesFactory.eINSTANCE.createAdaptedGradientColoredAreas();
+		agca.setDefinedStyleId(ACTOR_ID);
+		agca.setGradientType(IGradientType.VERTICAL);
+		agca.getAdaptedGradientColoredAreas().add(STYLE_ADAPTATION_DEFAULT, actorGradientAreas());
+		return agca;
+	}
+	
 	private static GradientColoredAreas actorGradientAreas() {
 		final GradientColoredAreas gradientColoredAreas = StylesFactory.eINSTANCE.createGradientColoredAreas();
 		final EList<GradientColoredArea> gcas = gradientColoredAreas.getGradientColor();
@@ -124,12 +131,39 @@ public class XdfGradients extends PredefinedColoredAreas {
 		gradientColoredAreas.setStyleAdaption(IPredefinedRenderingStyle.STYLE_ADAPTATION_DEFAULT);
 		return gradientColoredAreas;
 	}
-
-	public static AdaptedGradientColoredAreas actorGradient() {
+	
+	public static AdaptedGradientColoredAreas actorGradientColour(GradientColoredAreas colouredAreas) {
 		final AdaptedGradientColoredAreas agca = StylesFactory.eINSTANCE.createAdaptedGradientColoredAreas();
 		agca.setDefinedStyleId(ACTOR_ID);
 		agca.setGradientType(IGradientType.VERTICAL);
-		agca.getAdaptedGradientColoredAreas().add(STYLE_ADAPTATION_DEFAULT, actorGradientAreas());
+		agca.getAdaptedGradientColoredAreas().add(STYLE_ADAPTATION_DEFAULT, colouredAreas);
 		return agca;
 	}
+	
+	public static AdaptedGradientColoredAreas actorGradientOrange() {
+		return actorGradientColour(actorGradientAreasOrange("E6FF00"));
+	}
+	
+	public static AdaptedGradientColoredAreas actorGradientYellow() {
+		return actorGradientColour(actorGradientAreasOrange("FFB300"));
+	}
+	
+	public static AdaptedGradientColoredAreas actorGradientGreen() {
+		return actorGradientColour(actorGradientAreasOrange("4CFF00"));
+	}
+
+	private static GradientColoredAreas actorGradientAreasOrange(String colourHex) {
+		final GradientColoredAreas gradientColoredAreas = StylesFactory.eINSTANCE.createGradientColoredAreas();
+		final EList<GradientColoredArea> gcas = gradientColoredAreas.getGradientColor();
+
+		addGradientColoredArea(gcas, colourHex, 0, LocationType.LOCATION_TYPE_ABSOLUTE_START, colourHex, 4,
+				LocationType.LOCATION_TYPE_ABSOLUTE_START);
+		addGradientColoredArea(gcas, colourHex, 4, LocationType.LOCATION_TYPE_ABSOLUTE_START, colourHex, 0,
+				LocationType.LOCATION_TYPE_ABSOLUTE_END);
+
+		gradientColoredAreas.setStyleAdaption(IPredefinedRenderingStyle.STYLE_ADAPTATION_DEFAULT);
+		return gradientColoredAreas;
+	}
+	
+	
 }

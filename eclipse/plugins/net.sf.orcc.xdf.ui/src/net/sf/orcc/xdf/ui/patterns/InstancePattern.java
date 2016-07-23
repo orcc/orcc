@@ -93,7 +93,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 public class InstancePattern extends AbstractPattern {
 
 	// Minimal and default width for an instance shape
-	private static final int TOTAL_MIN_WIDTH = 120;
+	public static final int TOTAL_MIN_WIDTH = 120;
 	// Minimal and default height for an instance shape
 	private static final int TOTAL_MIN_HEIGHT = 80;
 	// Height of instance label (displaying instance name)

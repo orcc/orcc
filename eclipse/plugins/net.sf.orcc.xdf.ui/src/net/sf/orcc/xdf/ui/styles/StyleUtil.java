@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.xdf.ui.styles;
 
+import org.eclipse.graphiti.mm.algorithms.styles.AdaptedGradientColoredAreas;
 import org.eclipse.graphiti.mm.algorithms.styles.LineStyle;
 import org.eclipse.graphiti.mm.algorithms.styles.Orientation;
 import org.eclipse.graphiti.mm.algorithms.styles.Style;
@@ -135,6 +136,32 @@ public class StyleUtil {
 		return style;
 	}
 
+	public static Style actorInstanceShapeColour(final Diagram diagram, AdaptedGradientColoredAreas gradientColour) {
+		final String styleId = "ACTOR_INSTANCE";
+		final IGaService gaService = Graphiti.getGaService();
+
+		// this is a child style of the common-values-style
+		final Style parentStyle = commonStyle(diagram);
+		Style style = gaService.findStyle(parentStyle, styleId);
+
+		style = gaService.createPlainStyle(parentStyle, styleId);
+		gaService.setRenderingStyle(style, gradientColour);
+
+		return style;
+	}
+	
+	public static Style actorInstanceShapeGreen(final Diagram diagram) {
+		return actorInstanceShapeColour(diagram, XdfGradients.actorGradientGreen());
+	}
+
+	public static Style actorInstanceShapeYellow(final Diagram diagram) {
+		return actorInstanceShapeColour(diagram, XdfGradients.actorGradientYellow());
+	}
+	
+	public static Style actorInstanceShapeOrange(final Diagram diagram) {
+		return actorInstanceShapeColour(diagram, XdfGradients.actorGradientOrange());
+	}
+	
 	/**
 	 * Return the style used for ports displayed inside an Instance Shape.
 	 * 
@@ -266,6 +293,21 @@ public class StyleUtil {
 			style.setVerticalAlignment(Orientation.ALIGNMENT_MIDDLE);
 			style.setFont(gaService.manageFont(diagram, "Arial", 9, false, true));
 		}
+		return style;
+	}
+	
+	public static Style costsText(final Diagram diagram) {
+		final String styleId = "INSTANCE_TEXT";
+		final IGaService gaService = Graphiti.getGaService();
+
+		final Style parentStyle = commonTextStyle(diagram);
+		Style style = gaService.findStyle(parentStyle, styleId);
+
+		style = gaService.createPlainStyle(parentStyle, styleId);
+		style.setFilled(false);
+		style.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
+		style.setVerticalAlignment(Orientation.ALIGNMENT_MIDDLE);
+		style.setFont(gaService.manageFont(diagram, "Arial", 7, false, true));
 		return style;
 	}
 
