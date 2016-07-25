@@ -141,7 +141,6 @@ public class XronosProfileFeature extends AbstractTimeConsumingCustomFeature {
 		dialog.setMessage("Select the rtl/report/ director");
 		dialog.setText("Select the rtl/report/ directory");
 		String selectedDirectoryName = dialog.open();
-		System.out.println("report directory: " + selectedDirectoryName);
 		xronosReportsDir = selectedDirectoryName;
 	}
 
@@ -352,15 +351,14 @@ public class XronosProfileFeature extends AbstractTimeConsumingCustomFeature {
 	 */
 	private int brams(String instanceName) {
 		String reportFile = xronosReportsDir + "/" + instanceName + "_ResourceUtilizationReport.html";
-		String prefix = "Number of Block Rams:                            ";
+		String prefix = "Number of Block Rams:";
 		int bram = 0;
 		try {
 			/* parse each line for this standard lexical structure */
 			List<String> readAllLines = Files.readAllLines(Paths.get(reportFile));
 			for (String line : readAllLines) {
 				if (line.startsWith(prefix)) {
-					String numS = line.split(prefix)[1];
-					bram += Integer.parseInt(numS);
+					bram += parseBramLine(line);
 				}
 			}
 		} catch (IOException e) {
@@ -369,6 +367,15 @@ public class XronosProfileFeature extends AbstractTimeConsumingCustomFeature {
 		return bram;
 	}
 
+	private int parseBramLine(String line){
+		String[] ss = line.split("Number of Block Rams:");
+		String s = ss[1];
+		while (s.charAt(0) == ' ' ) {
+			s = s.substring(1, s.length());
+		}
+		return Integer.parseInt(s);
+	}
+	
 	/**
 	 *
 	 * @param instanceName
