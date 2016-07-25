@@ -141,11 +141,11 @@ public class XdfGradients extends PredefinedColoredAreas {
 	}
 	
 	public static AdaptedGradientColoredAreas actorGradientOrange() {
-		return actorGradientColour(actorGradientAreasOrange("E6FF00"));
+		return actorGradientColour(actorGradientAreasOrange("FFB300"));
 	}
 	
 	public static AdaptedGradientColoredAreas actorGradientYellow() {
-		return actorGradientColour(actorGradientAreasOrange("FFB300"));
+		return actorGradientColour(actorGradientAreasOrange("E6FF00"));
 	}
 	
 	public static AdaptedGradientColoredAreas actorGradientGreen() {

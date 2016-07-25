@@ -296,10 +296,10 @@ public class XronosProfileFeature extends AbstractTimeConsumingCustomFeature {
 						shape.getGraphicsAlgorithm().setStyle(StyleUtil.actorInstanceShapeGreen(diagram));
 						break;
 					case HIGH:
-						shape.getGraphicsAlgorithm().setStyle(StyleUtil.actorInstanceShapeOrange(diagram));
+						shape.getGraphicsAlgorithm().setStyle(StyleUtil.actorInstanceShapeYellow(diagram));
 						break;
 					case HIGHEST:
-						shape.getGraphicsAlgorithm().setStyle(StyleUtil.actorInstanceShapeYellow(diagram));
+						shape.getGraphicsAlgorithm().setStyle(StyleUtil.actorInstanceShapeOrange(diagram));
 						break;
 					}
 
