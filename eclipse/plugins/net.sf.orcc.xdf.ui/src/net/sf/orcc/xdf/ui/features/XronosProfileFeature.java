@@ -30,9 +30,11 @@ package net.sf.orcc.xdf.ui.features;
 
 import net.sf.orcc.xdf.ui.patterns.InstancePattern;
 import net.sf.orcc.xdf.ui.styles.StyleUtil;
+
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -355,12 +357,14 @@ public class XronosProfileFeature extends AbstractTimeConsumingCustomFeature {
 		int bram = 0;
 		try {
 			/* parse each line for this standard lexical structure */
-			List<String> readAllLines = Files.readAllLines(Paths.get(reportFile));
-			for (String line : readAllLines) {
+			BufferedReader br = new BufferedReader(new FileReader(reportFile));
+			String line = null;
+			while ((line = br.readLine()) != null) {
 				if (line.startsWith(prefix)) {
 					bram += parseBramLine(line);
 				}
 			}
+			br.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
