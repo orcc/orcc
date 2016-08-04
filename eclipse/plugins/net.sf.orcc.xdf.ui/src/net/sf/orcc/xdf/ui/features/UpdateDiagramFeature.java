@@ -187,7 +187,7 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 	 * @param messagesList
 	 * @return true if something has been modified in the network
 	 */
-	private boolean fixNetwork(final Network network, final List<String> messagesList) {
+	public boolean fixNetwork(final Network network, final List<String> messagesList) {
 		// In this list, we will store all invalid objects which needs to be
 		// deleted
 		final List<EObject> toDelete = new ArrayList<EObject>();
@@ -289,7 +289,7 @@ public class UpdateDiagramFeature extends DefaultUpdateDiagramFeature {
 	 * @param diagram
 	 * @return
 	 */
-	private boolean initializeDiagramFromNetwork(final Network network, final Diagram diagram) {
+	public boolean initializeDiagramFromNetwork(final Network network, final Diagram diagram) {
 
 		final XdfDiagramFeatureProvider xdfFeatureProvider = (XdfDiagramFeatureProvider) getFeatureProvider();
 
