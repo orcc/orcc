@@ -57,6 +57,13 @@ public interface OptionBrowseFile extends Option {
 	 * @return whether we should browse the workspace or the file system
 	 */
 	boolean isWorkspace();
+	
+	/**
+	 * Returns whether the file is not required by the configuration. 
+	 * 
+	 * @return whether the file is not required by the configuration
+	 */
+	boolean isOptional();
 
 	/**
 	 * Sets the extension that this "input file" should have.
@@ -81,4 +88,12 @@ public interface OptionBrowseFile extends Option {
 	 *            whether we should browse the workspace or the file system
 	 */
 	void setWorkspace(boolean workspace);
+	
+	/**
+	 * Sets whether a file is not required.
+	 * 
+	 * @param required
+	 *            whether a file is not required
+	 */
+	void setOptional(boolean optional);
 }

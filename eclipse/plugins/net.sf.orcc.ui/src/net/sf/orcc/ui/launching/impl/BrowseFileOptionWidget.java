@@ -319,6 +319,10 @@ public class BrowseFileOptionWidget implements ModifyListener, OptionWidget {
 	 * @return a boolean representing the validation of the option
 	 */
 	public boolean isValid(ILaunchConfiguration launchConfig) {
+		if (option.isOptional() && value.isEmpty()) {
+			return true;
+		}
+		
 		if (value.isEmpty()) {
 			launchConfigurationTab.setErrorMessage("The \"" + option.getName()
 					+ "\" field is empty");

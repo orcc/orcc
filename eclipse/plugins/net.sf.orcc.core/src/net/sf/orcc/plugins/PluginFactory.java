@@ -128,6 +128,9 @@ public class PluginFactory {
 
 		String workspace = element.getAttribute("workspace");
 		option.setWorkspace(Boolean.parseBoolean(workspace));
+		
+		String optional = element.getAttribute("optional");
+		option.setOptional(Boolean.parseBoolean(optional));
 		return option;
 	}
 

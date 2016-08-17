@@ -48,6 +48,16 @@
          </browseFile>
       </option>
       <option
+            description="Output data to be pushed from the CAL network we want to simulate"
+            id="net.sf.orcc.simulators.outputFile"
+            name="Output file directory">
+         <browseFile
+               folder="true"
+               workspace="false"
+               optional="true">
+         </browseFile>
+      </option>
+      <option
             defaultValue="false"
             description="Shanges size of variable to fit types of general-purpose programming language such as C, C++ or Java"
             id="net.sf.orcc.core.transform.typeResizer"
@@ -107,6 +117,9 @@
          </option>
          <option
                id="net.sf.orcc.simulators.inputStimulus">
+         </option>
+         <option
+               id="net.sf.orcc.simulators.outputFile">
          </option>
          <option
                id="net.sf.orcc.simulators.goldenReference">

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, IETR/INSA of Rennes
+ * Copyright (c) 2016, Heriot-Watt University
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -26,72 +26,55 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.plugins.impl;
+package net.sf.orcc.simulators.runtime.std.stdio.impl;
 
-import net.sf.orcc.plugins.OptionBrowseFile;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.math.BigInteger;
+
+import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.simulators.runtime.impl.GenericWriter;
 
 /**
- * This class defines the implementation of a plugin option.
+ * This class defines native functions for the Writer actor.
  * 
- * @author Matthieu Wipliez
+ * @author Rob Stewart
+ * 
  */
-public class OptionBrowseFileImpl extends PluginOptionImpl implements
-		OptionBrowseFile {
+public class Writer extends GenericWriter {
 
-	private String extension;
+	private static RandomAccessFile out;
 
-	private boolean folder;
-
-	private boolean workspace;
-	
-	private boolean optional;
-
-	@Override
-	public String getExtension() {
-		return extension;
+	public static void Writer_init() {
+		try {
+			File oldFile = new File(outputFile);
+			if (oldFile.exists()) {
+				oldFile.delete();
+			}
+			out = new RandomAccessFile(outputFile, "rw");
+		} catch (FileNotFoundException e) {
+			String msg = "Cannot write to file: \"" + outputFile + "\"";
+			throw new OrccRuntimeException(msg, e);
+		}
 	}
 
-	@Override
-	public boolean isFolder() {
-		return folder;
+	public static void Writer_write(BigInteger b) {
+		try {
+			out.writeByte(b.byteValue());
+		} catch (IOException e) {
+			String msg = "Cannot write " + b + " to " + outputFile;
+			throw new OrccRuntimeException(msg, e);
+		}
 	}
 
-	@Override
-	public boolean isWorkspace() {
-		return workspace;
+	public static void Writer_close() {
+		try {
+			out.close();
+		} catch (IOException e) {
+			String msg = "Cannot close " + outputFile;
+			throw new OrccRuntimeException(msg, e);
+		}
 	}
-
-	@Override
-	public void setExtension(String extension) {
-		this.extension = extension;
-	}
-
-	@Override
-	public void setFolder(boolean folder) {
-		this.folder = folder;
-	}
-
-	@Override
-	public void setWorkspace(boolean workspace) {
-		this.workspace = workspace;
-	}
-
-	@Override
-	public String toString() {
-		return super.toString() + ", extension: " + getExtension()
-				+ ", isWorkspace: " + isWorkspace();
-	}
-
-	@Override
-	public boolean isOptional() {
-		return optional;
-	}
-
-	@Override
-	public void setOptional(boolean optional) {
-		this.optional = optional;
-		
-	}
-
-
 }

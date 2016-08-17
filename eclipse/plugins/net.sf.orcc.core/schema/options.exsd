@@ -111,6 +111,13 @@
                </documentation>
             </annotation>
          </attribute>
+         <attribute name="optional" type="boolean">
+            <annotation>
+               <documentation>
+                  Whether the file is required for a configuration.
+               </documentation>
+            </annotation>
+         </attribute>
       </complexType>
    </element>
 

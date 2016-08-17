@@ -40,6 +40,7 @@ import static net.sf.orcc.simulators.SimulatorsConstants.GOLDEN_REFERENCE;
 import static net.sf.orcc.simulators.SimulatorsConstants.GOLDEN_REFERENCE_FILE;
 import static net.sf.orcc.simulators.SimulatorsConstants.INPUT_STIMULUS;
 import static net.sf.orcc.simulators.SimulatorsConstants.LOOP_NUMBER;
+import static net.sf.orcc.simulators.SimulatorsConstants.OUTPUT_FILE;
 import static net.sf.orcc.simulators.SimulatorsConstants.PROFILE;
 import static net.sf.orcc.simulators.SimulatorsConstants.PROFILE_FOLDER;
 import static net.sf.orcc.simulators.SimulatorsConstants.TYPE_RESIZER;
@@ -68,6 +69,7 @@ import net.sf.orcc.simulators.AbstractSimulator;
 import net.sf.orcc.simulators.SimulatorDescriptor;
 import net.sf.orcc.simulators.runtime.impl.GenericDisplay;
 import net.sf.orcc.simulators.runtime.impl.GenericSource;
+import net.sf.orcc.simulators.runtime.impl.GenericWriter;
 import net.sf.orcc.simulators.runtime.std.video.impl.Display;
 import net.sf.orcc.tools.stats.StatisticsPrinter;
 import net.sf.orcc.util.FilesManager;
@@ -112,6 +114,8 @@ public class SlowSimulator extends AbstractSimulator {
 
 	private String stimulusFile;
 
+	private String outputFile;
+	
 	private String traceFolder;
 
 	private String profileFolder;
@@ -212,6 +216,8 @@ public class SlowSimulator extends AbstractSimulator {
 		GenericSource.setInputStimulus(stimulusFile);
 
 		GenericSource.setNbLoops(loopsNumber);
+		
+		GenericWriter.setOutputFile(outputFile);
 
 		if (hasGoldenReference) {
 			GenericDisplay.setGoldenReference(goldenReferenceFile);
@@ -231,6 +237,8 @@ public class SlowSimulator extends AbstractSimulator {
 	@Override
 	protected void initializeOptions() {
 		stimulusFile = getAttribute(INPUT_STIMULUS, "");
+		String outputDir = getAttribute(OUTPUT_FILE, "");
+		outputFile = outputDir.equals("") ? "" : outputDir + "/orcc-simulation-out";
 		hasGoldenReference = getAttribute(GOLDEN_REFERENCE, false);
 		goldenReferenceFile = getAttribute(GOLDEN_REFERENCE_FILE, "");
 		xdfFile = getAttribute(XDF_FILE, "");

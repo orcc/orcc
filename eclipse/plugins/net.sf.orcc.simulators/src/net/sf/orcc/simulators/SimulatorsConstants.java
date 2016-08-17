@@ -57,6 +57,11 @@ public class SimulatorsConstants {
 	public static final String INPUT_STIMULUS = "net.sf.orcc.simulators.inputStimulus";
 
 	/**
+	 * Output file associated with an Orcc configuration.
+	 */
+	public static final String OUTPUT_FILE = "net.sf.orcc.simulators.outputFile";
+	
+	/**
 	 * Parameter used to set max number of times an input file is read.
 	 */
 	public static final String LOOP_NUMBER = "net.sf.orcc.simulators.loopNumber";

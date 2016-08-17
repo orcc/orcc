@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, IETR/INSA of Rennes
+ * Copyright (c) 2016, Heriot-Watt University Edinburgh
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -10,7 +10,7 @@
  *   * Redistributions in binary form must reproduce the above copyright notice,
  *     this list of conditions and the following disclaimer in the documentation
  *     and/or other materials provided with the distribution.
- *   * Neither the name of the IETR/INSA of Rennes nor the names of its
+ *   * Neither the name of the EPFL nor the names of its
  *     contributors may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
  * 
@@ -26,72 +26,21 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.plugins.impl;
 
-import net.sf.orcc.plugins.OptionBrowseFile;
+package net.sf.orcc.simulators.runtime.impl;
 
-/**
- * This class defines the implementation of a plugin option.
- * 
- * @author Matthieu Wipliez
- */
-public class OptionBrowseFileImpl extends PluginOptionImpl implements
-		OptionBrowseFile {
+public class GenericWriter {
 
-	private String extension;
+	protected static String outputFile = "";
 
-	private boolean folder;
-
-	private boolean workspace;
-	
-	private boolean optional;
-
-	@Override
-	public String getExtension() {
-		return extension;
+	/** 
+	 * @return file to be written to by the Writer actor
+	 */
+	public static String getOutputFile() {
+		return outputFile;
 	}
 
-	@Override
-	public boolean isFolder() {
-		return folder;
+	public static void setOutputFile(String fileName) {
+		GenericWriter.outputFile = fileName;
 	}
-
-	@Override
-	public boolean isWorkspace() {
-		return workspace;
-	}
-
-	@Override
-	public void setExtension(String extension) {
-		this.extension = extension;
-	}
-
-	@Override
-	public void setFolder(boolean folder) {
-		this.folder = folder;
-	}
-
-	@Override
-	public void setWorkspace(boolean workspace) {
-		this.workspace = workspace;
-	}
-
-	@Override
-	public String toString() {
-		return super.toString() + ", extension: " + getExtension()
-				+ ", isWorkspace: " + isWorkspace();
-	}
-
-	@Override
-	public boolean isOptional() {
-		return optional;
-	}
-
-	@Override
-	public void setOptional(boolean optional) {
-		this.optional = optional;
-		
-	}
-
-
 }
