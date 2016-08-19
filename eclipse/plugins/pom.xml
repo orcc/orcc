@@ -10,10 +10,10 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<tycho-version>0.23.0</tycho-version>
-		<eclipse-repository>http://download.eclipse.org/releases/mars</eclipse-repository>
+		<eclipse-repository>http://download.eclipse.org/releases/neon</eclipse-repository>
 		<xtext-repository>http://download.eclipse.org/modeling/tmf/xtext/updates/composite/releases</xtext-repository>
 		<xtend-repository>http://build.eclipse.org/common/xtend/maven/</xtend-repository>
-		<xtext-version>2.9.0</xtext-version>
+		<xtext-version>2.10.0</xtext-version>
 	</properties>
 
 	<repositories>

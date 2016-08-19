@@ -30,7 +30,7 @@ package net.sf.orcc.tests.main
 
 import com.google.inject.Inject
 import net.sf.orcc.cal.CalInjectorProvider
-import net.sf.orcc.cal.validation.CalJavaValidator
+import net.sf.orcc.cal.validation.CalValidator
 import net.sf.orcc.cal.validation.StructuralValidator
 import net.sf.orcc.cal.validation.TypeValidator
 import net.sf.orcc.cal.validation.WarningValidator
@@ -54,7 +54,7 @@ class CalValidationTests extends CalTestsHelper {
 
 	@Inject extension ValidationTestHelper
 	@Inject
-	protected CalJavaValidator defaultValidator
+	protected CalValidator defaultValidator
 	@Inject
 	protected StructuralValidator structuralValidator
 	@Inject
@@ -69,7 +69,7 @@ class CalValidationTests extends CalTestsHelper {
 	 */
 
 	def private defaultValidation(EObject object) {
-		new ValidatorTester<CalJavaValidator>(defaultValidator, injector).validate(object)
+		new ValidatorTester<CalValidator>(defaultValidator, injector).validate(object)
 	}
 	def private structuralValidation(EObject object) {
 		new ValidatorTester<StructuralValidator>(structuralValidator, injector).validate(object)
