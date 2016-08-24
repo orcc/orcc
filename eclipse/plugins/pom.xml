@@ -18,7 +18,7 @@
 
 	<repositories>
 		<repository>
-			<id>mars</id>
+			<id>eclipse</id>
 			<layout>p2</layout>
 			<url>${eclipse-repository}</url>
 		</repository>
