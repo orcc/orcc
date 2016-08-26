@@ -48,6 +48,10 @@ if(WIN32)
     )
 endif()
 
+# use the FindSDL2.cmake , which resolves SDL.h not found
+# error in Ubuntu 16.04 machines that have libsdl2-dev installed.
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/libs/cmake/Modules/")
+
 # Try to find SDL on the user system
 find_package(SDL2 QUIET)
 find_package(SDL QUIET)
