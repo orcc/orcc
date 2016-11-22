@@ -1,0 +1,15 @@
+language: java
+
+jdk: oraclejdk8
+
+os: linux
+
+before_install:
+  - rm ~/.m2/settings.xml
+  
+before_script:
+  - echo "MAVEN_OPTS='-Xmx2g -XX:MaxPermSize=512m'" > ~/.mavenrc
+  
+script:
+  - cd eclipse/plugins
+  - mvn install
