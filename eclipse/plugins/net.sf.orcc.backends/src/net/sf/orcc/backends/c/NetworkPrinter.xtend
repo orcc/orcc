@@ -118,9 +118,6 @@ class NetworkPrinter extends CTemplate {
 		«printNativeLibHeaders(linkNativeLibHeaders)»
 
 		«ENDIF»
-		
-		#define SIZE «fifoSize»
-
 		/////////////////////////////////////////////////
 		// FIFO allocation
 		«FOR child : network.children»
@@ -247,7 +244,7 @@ class NetworkPrinter extends CTemplate {
 	'''
 	
 	def protected allocateFifo(Connection conn, int nbReaders) '''
-		DECLARE_FIFO(«conn.sourcePort.type.doSwitch», «if (conn.size != null) conn.size else "SIZE"», «conn.<Object>getValueAsObject("idNoBcast")», «nbReaders»)
+		DECLARE_FIFO(«conn.sourcePort.type.doSwitch», «if (conn.size != null) conn.size else fifoSize», «conn.<Object>getValueAsObject("idNoBcast")», «nbReaders»)
 	'''
 	
 	def protected allocateGenWeightsActionData(Vertex vertex) '''

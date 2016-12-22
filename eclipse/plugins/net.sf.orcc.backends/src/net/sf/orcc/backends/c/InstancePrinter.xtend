@@ -289,7 +289,6 @@ class InstancePrinter extends CTemplate {
 		«printNativeLibHeaders(linkNativeLibHeaders)»
 
 		«ENDIF»
-		#define SIZE «fifoSize»
 		«IF instance != null»
 			«instance.printAttributes»
 		«ELSE»
@@ -1304,7 +1303,7 @@ class InstancePrinter extends CTemplate {
 		'''«entityName»_«port.name»'''
 
 	def protected sizeOrDefaultSize(Connection conn) {
-		if(conn == null || conn.size == null) "SIZE"
+		if(conn == null || conn.size == null) fifoSize
 		else conn.size
 	}
 

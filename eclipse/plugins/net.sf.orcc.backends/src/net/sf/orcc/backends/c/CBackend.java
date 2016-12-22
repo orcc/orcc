@@ -139,6 +139,8 @@ public class CBackend extends AbstractBackend {
 		if (mergeActors) {
 			networkTransfos.add(new FifoSizePropagator(fifoSize));
 			networkTransfos.add(new BroadcastAdder());
+		} else {
+			networkTransfos.add(new FifoSizePropagator(fifoSize, true));
 		}
 		networkTransfos.add(new Instantiator(true));
 		networkTransfos.add(new NetworkFlattener());
