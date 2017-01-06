@@ -16,7 +16,6 @@ xtend-gen
 src-gen
 .metadata
 .settings
-.classpath
 
 # Specific rules to ignore Xtext arifacts
 plugin.xml_gen
