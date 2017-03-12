@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Heriot-Watt University, Edinburgh
+ * Copyright (c) 2014 - 2017, Heriot-Watt University, Edinburgh
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,6 @@
 
 /*
  * Author: Rob Stewart, R.Stewart@hw.ac.uk
- * Date: 22.08.2014
  *
  * Description: Uses the OpenCV library to provide @native two
  * procedures for RVC-CAL programs compiled with Orcc. The first is
@@ -94,6 +93,40 @@ void source_camera_init(int local_width, int local_height){
     height=local_height;
 }
 
+IplImage* imgDisplay;
+void initDisplayGray(int width, int height) {
+  cvNamedWindow( "image" , CV_WINDOW_AUTOSIZE );
+  imgDisplay = cvCreateImage(cvSize(width,height),IPL_DEPTH_8U,1);
+}
+
+void initDisplayRGB(int width, int height) {
+  cvNamedWindow( "image" , CV_WINDOW_AUTOSIZE );
+  imgDisplay = cvCreateImage(cvSize(width,height),IPL_DEPTH_8U,3);
+}
+
+void displayGray(int w, int h, uchar *grayArr){
+  for (int y = 0; y < h; y++) {
+    uchar* rowPtr = (uchar*) ( imgDisplay->imageData + y * imgDisplay->widthStep );
+    for (int x = 0; x < w; x++) {
+      rowPtr[x] = grayArr[w*y+x];
+    }
+  }
+  cvShowImage("image",imgDisplay);
+  cvWaitKey(1);
+}
+
+void displayRGB(int w, int h, uchar *rArr, uchar *gArr, uchar *bArr){
+  for (int y = 0; y < h; y++) {
+    uchar* rowPtr = (uchar*) ( imgDisplay->imageData + y * imgDisplay->widthStep );
+    for (int x = 0; x < w; x++) {
+      rowPtr[3*x+0] = bArr[w*y+x];
+      rowPtr[3*x+1] = gArr[w*y+x];
+      rowPtr[3*x+2] = rArr[w*y+x];
+    }
+  }
+  cvShowImage("image",imgDisplay);
+  cvWaitKey(1);
+}
 
 /*
  * Uncomment this main to test a camera connection and the OpenCV
@@ -101,7 +134,7 @@ void source_camera_init(int local_width, int local_height){
  * camera can see. The WIDTH and HEIGHT constants must be set to the
  * resolution of the source camera. Compile in Linux with
  *
- * $ gcc `pkg-config --cflags --libs opencv` -lm source_camera.c
+ * $ gcc opencv.c `pkg-config --cflags --libs opencv`
  * $ ./a.out
  */
 
