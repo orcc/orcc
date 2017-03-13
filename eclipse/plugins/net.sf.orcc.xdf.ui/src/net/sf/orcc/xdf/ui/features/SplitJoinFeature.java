@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.xdf.ui.features.fanout;
+package net.sf.orcc.xdf.ui.features;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -42,25 +42,29 @@ import net.sf.orcc.backends.cal.InstancePrinter;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
-import net.sf.orcc.df.transform.FanOutFanIn;
+import net.sf.orcc.df.transform.SplitJoin;
 import net.sf.orcc.util.FilesManager;
-import net.sf.orcc.xdf.ui.features.AbstractTimeConsumingCustomFeature;
-import net.sf.orcc.xdf.ui.features.UpdateDiagramFeature;
 
 /*
 * @author Rob Stewart
 * @author Idris Ibrahim
 */
-abstract public class FanOutFanInFeature extends AbstractTimeConsumingCustomFeature {
+
+public class SplitJoinFeature extends AbstractTimeConsumingCustomFeature {
 
 	List<Instance> selectedInstances;
 	private IFeatureProvider thisFeature;
 	int parallelDegree;
 
-	public FanOutFanInFeature(IFeatureProvider fp, int parallelDegree) {
+	public SplitJoinFeature(IFeatureProvider fp, int parallelDegree) {
 		super(fp);
 		this.thisFeature = fp;
 		this.parallelDegree = parallelDegree;
+	}
+	
+	@Override
+	public String getName() {
+		return Integer.toString(this.parallelDegree);
 	}
 
 	@Override
@@ -82,7 +86,7 @@ abstract public class FanOutFanInFeature extends AbstractTimeConsumingCustomFeat
 		}
 
 		if (selectedInstances.size() > 0) {
-			canWeExecute = FanOutFanIn.canFire(currentNetwork, selectedInstances);
+			canWeExecute = SplitJoin.canFire(currentNetwork, selectedInstances);
 		}
 
 		return canWeExecute;
@@ -91,7 +95,8 @@ abstract public class FanOutFanInFeature extends AbstractTimeConsumingCustomFeat
 	@Override
 	public void execute(ICustomContext context, IProgressMonitor parentMonitor) {
 
-		FanOutFanIn fanOutInTransformation = new FanOutFanIn(parallelDegree, selectedInstances);
+		/* assume only one actor is selected */
+		SplitJoin fanOutInTransformation = new SplitJoin(parallelDegree, selectedInstances.get(0));
 
 		Network currentNetwork = (Network) getBusinessObjectForPictogramElement(getDiagram());
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Heriot-Watt University Edinburgh
+ * Copyright (c) 2016-2017, Heriot-Watt University Edinburgh
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.df.transform;
 
+import static net.sf.orcc.ir.IrFactory.eINSTANCE;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,17 +37,21 @@ import net.sf.orcc.df.Action;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
 import net.sf.orcc.df.DfFactory;
+import net.sf.orcc.df.FSM;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Pattern;
 import net.sf.orcc.df.Port;
+import net.sf.orcc.df.State;
 import net.sf.orcc.df.util.DfUtil;
 import net.sf.orcc.df.util.DfVisitor;
 import net.sf.orcc.graph.Edge;
 import net.sf.orcc.graph.Vertex;
 import net.sf.orcc.ir.BlockBasic;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstStore;
+import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
@@ -59,17 +65,17 @@ import net.sf.orcc.df.util.TransformPreconditionPredicates;
 * @author Rob Stewart
 * @author Idris Ibrahim
 */
-public class FanOutFanIn extends DfVisitor<Void> {
+public class SplitJoin extends DfVisitor<Void> {
 	private static DfFactory dfFactory = DfFactory.eINSTANCE;
 	private static IrFactory irFactory = IrFactory.eINSTANCE;
 
 	int dataParallelismCopies;
-	List<Instance> instancesToTransform;
+	Instance instanceToTransform;
 	List<Actor> actorsToWriteToFile = new ArrayList<Actor>();
 
-	public FanOutFanIn(int numDataParallelCopies, List<Instance> instancesToTransform) {
+	public SplitJoin(int numDataParallelCopies, Instance instanceToTransform) {
 		dataParallelismCopies = numDataParallelCopies;
-		this.instancesToTransform = instancesToTransform;
+		this.instanceToTransform = instanceToTransform;
 	}
 
 	/**
@@ -134,9 +140,12 @@ public class FanOutFanIn extends DfVisitor<Void> {
 			}
 		}
 
-		Instance leftMost = leftMostInstance(allInstances, instancesToTransform);
-		Instance rightMost = rightMostInstance(allInstances, instancesToTransform);
-		List<Instance> leftToRight = leftToRight(leftMost, instancesToTransform, allInstances);
+		/* this code was originally designed for pipelines of selected actor */
+		List<Instance> selected = new ArrayList<>();
+		selected.add(instanceToTransform);
+		Instance leftMost = leftMostInstance(allInstances, selected);
+		Instance rightMost = rightMostInstance(allInstances, selected);
+		List<Instance> leftToRight = leftToRight(leftMost, selected, allInstances);
 
 		/*
 		 * look at the network to find the actor that is feeding data into the
@@ -159,7 +168,7 @@ public class FanOutFanIn extends DfVisitor<Void> {
 		 */
 		Type fanOutTokenType = leftMost.getActor().getInputs().get(0).getType();
 
-		String fanOutName = "FanOut" + leftMost.getSimpleName() + rightMost.getSimpleName();
+		String fanOutName = "split" + leftMost.getSimpleName() + rightMost.getSimpleName();
 
 		/*
 		 * remove previous versions of fan out between left most and right most
@@ -178,13 +187,18 @@ public class FanOutFanIn extends DfVisitor<Void> {
 			}
 		}
 
-		Actor FanOut = createFanOutActor(fanOutName, dataParallelismCopies, fanOutTokenType, projectRoot);
-		Instance FanOutInstance = dfFactory.createInstance(DfUtil.getSimpleName(FanOut.getName()), FanOut);
-		network.add(FanOutInstance);
+		/* assumes that the selected actor instance has one action */
+		int consumptionRate = consumptionRate(instanceToTransform.getActor().getActions().get(0));
+		int productionRate = productionRate(instanceToTransform.getActor().getActions().get(0));
 
+		Actor splitActor = createSplitActor(fanOutName, dataParallelismCopies, fanOutTokenType, consumptionRate,
+				projectRoot);
+		Instance splitInstance = dfFactory.createInstance(DfUtil.getSimpleName(splitActor.getName()), splitActor);
+		network.add(splitActor);
+		network.add(splitInstance);
 		/* the ports between predecessor and the fanout actor */
 		Port outputPortFromPredecessor = predecessor.getOutgoingPortMap().entrySet().iterator().next().getKey();
-		Port inputPortOfFanOutActor = FanOut.getInputs().get(0);
+		Port inputPortOfFanOutActor = splitActor.getInputs().get(0);
 
 		/* remove existing connection between predecessor and leftMost actor */
 		int i = 0;
@@ -203,12 +217,12 @@ public class FanOutFanIn extends DfVisitor<Void> {
 		}
 
 		Connection connBetweenPredecessorAndFanOut = dfFactory.createConnection(predecessor, outputPortFromPredecessor,
-				FanOutInstance, inputPortOfFanOutActor);
+				splitInstance, inputPortOfFanOutActor);
 		network.getConnections().add(connBetweenPredecessorAndFanOut);
 
 		Type fanInTokenType = rightMost.getActor().getOutputs().get(0).getType();
 
-		String fanInName = "FanIn" + leftMost.getSimpleName() + rightMost.getSimpleName();
+		String fanInName = "join" + leftMost.getSimpleName() + rightMost.getSimpleName();
 
 		/*
 		 * remove previous versions of fan in between left most and right most
@@ -227,15 +241,17 @@ public class FanOutFanIn extends DfVisitor<Void> {
 			}
 		}
 
-		Actor FanIn = createFanInActor(fanInName, dataParallelismCopies, fanInTokenType, projectRoot);
-		Instance FanInInstance = dfFactory.createInstance(DfUtil.getSimpleName(FanIn.getName()), FanIn);
-		network.add(FanInInstance);
+		Actor joinActor = createJoinActor(fanInName, dataParallelismCopies, fanInTokenType, productionRate,
+				projectRoot);
+		Instance joinInstance = dfFactory.createInstance(DfUtil.getSimpleName(joinActor.getName()), joinActor);
+		network.add(joinActor);
+		network.add(joinInstance);
 
 		/* the ports between fanin actor and the sucessor */
 		Port inputPortofSucessor = successor.getIncomingPortMap().entrySet().iterator().next().getKey();
-		Port outputPortFromFanInActor = FanIn.getOutputs().get(0);
+		Port outputPortFromFanInActor = joinActor.getOutputs().get(0);
 
-		Connection connBetweensuccessorAndFanIn = dfFactory.createConnection(FanInInstance, outputPortFromFanInActor,
+		Connection connBetweensuccessorAndFanIn = dfFactory.createConnection(joinInstance, outputPortFromFanInActor,
 				successor, inputPortofSucessor);
 		network.getConnections().add(connBetweensuccessorAndFanIn);
 
@@ -247,10 +263,10 @@ public class FanOutFanIn extends DfVisitor<Void> {
 		List<Instance> predecessors = new ArrayList<Instance>();
 		List<Port> predecessorPorts = new ArrayList<Port>();
 
-		/* initialise with fanout details */
+		/* initialise with split details */
 		for (int k = 0; k < dataParallelismCopies; k++) {
-			predecessors.add(k, FanOutInstance);
-			predecessorPorts.add(k, FanOut.getOutputs().get(k));
+			predecessors.add(k, splitInstance);
+			predecessorPorts.add(k, splitActor.getOutputs().get(k));
 		}
 
 		/*
@@ -276,12 +292,32 @@ public class FanOutFanIn extends DfVisitor<Void> {
 
 		/* complete the process by connecting predecessors with fanin actor */
 		for (int k = 0; k < dataParallelismCopies; k++) {
-			Connection conn = dfFactory.createConnection(predecessors.get(k), predecessorPorts.get(k), FanInInstance,
-					FanIn.getInputs().get(k));
+			Connection conn = dfFactory.createConnection(predecessors.get(k), predecessorPorts.get(k), joinInstance,
+					joinActor.getInputs().get(k));
 			network.add(conn);
 		}
 
 		return null;
+	}
+
+	private int consumptionRate(Action action) {
+		int rate = 0;
+		for (Instruction inst : action.getBody().getFirst().getInstructions()) {
+			if (inst.isInstStore()) {
+				rate++;
+			}
+		}
+		return rate;
+	}
+
+	private int productionRate(Action action) {
+		int rate = 0;
+		for (Instruction inst : action.getBody().getFirst().getInstructions()) {
+			if (inst.isInstLoad()) {
+				rate++;
+			}
+		}
+		return rate;
 	}
 
 	/**
@@ -439,70 +475,103 @@ public class FanOutFanIn extends DfVisitor<Void> {
 	 *            how many data parallel actors
 	 * @param tokenType
 	 *            the type of the tokens to be fanned out
+	 * @param consumptionRate
+	 *            how many tokens are consumed by the one action in each replica
 	 * @param projectRoot
 	 *            needed to create filename for the new actor
 	 * @return the fan out actor
 	 */
-	private Actor createFanOutActor(String name, int parallelismDegree, Type tokenType, String projectRoot) {
+	private Actor createSplitActor(String name, int parallelismDegree, Type tokenType, int consumptionRate,
+			String projectRoot) {
 		/* Create a new actor */
-		Actor fanOutActor = dfFactory.createActor();
-		fanOutActor.setName("gen." + name);
+		Actor splitActor = dfFactory.createActor();
+		splitActor.setName("gen." + name);
 
-		/* create one fan out input port */
+		/* create one split input port */
 		Port inputPort = dfFactory.createPort(tokenType, "In1");
-		fanOutActor.getInputs().add(inputPort);
+		splitActor.getInputs().add(inputPort);
 
-		/* create fan out output ports */
-		Port outputPort = null;
+		/* create multiple split output ports */
 		for (int n = 1; n <= parallelismDegree; n++) {
-			outputPort = dfFactory.createPort(tokenType, "Out" + n);
-			fanOutActor.getOutputs().add(outputPort);
+			Port outputPort = dfFactory.createPort(tokenType, "Out" + n);
+			splitActor.getOutputs().add(outputPort);
 		}
 
-		Procedure proc = irFactory.createProcedure("fan_out", 0, irFactory.createTypeVoid());
-		BlockBasic blockFanOut = IrUtil.getLast(proc.getBlocks());
+		// create output Pattern
+		Pattern splitOutPattern = null;
 
-		/* create input Pattern */
-		Pattern inputPatternNew_Actor = dfFactory.createPattern();
-		Var inputokenVar = irFactory.createVar(tokenType, "In1", false, 0);
-		for (int i = 0; i < parallelismDegree; i++) {
-			Port p = fanOutActor.getInputs().get(0);
-			inputPatternNew_Actor.getPorts().add(p);
-			inputPatternNew_Actor.setNumTokens(p, parallelismDegree);
-			Var v = irFactory.createVar(tokenType, "v" + i, false, 0);
-			InstLoad instLoad = irFactory.createInstLoad(v, inputokenVar, i);
-			blockFanOut.add(instLoad);
+		List<Action> actionsForFSM = new ArrayList<Action>();
+		for (int n = 1; n <= parallelismDegree; n++) {
+			/* create action */
+			Procedure proc = irFactory.createProcedure("split" + n, 0, irFactory.createTypeVoid());
+			BlockBasic blockSplit = IrUtil.getLast(proc.getBlocks());
+
+			/* create input Pattern */
+			Pattern splitInPattern = dfFactory.createPattern();
+			splitInPattern.setNumTokens(inputPort, consumptionRate);
+
+			/* create the output pattern */
+			splitOutPattern = dfFactory.createPattern();
+			splitOutPattern.setNumTokens(splitActor.getPort("Out" + n), consumptionRate);
+
+			// create port variable
+			Var variableIn = eINSTANCE.createVar(0, eINSTANCE.createTypeList(consumptionRate, inputPort.getType()),
+					inputPort.getName(), true, 0);
+
+			Var variableOut = eINSTANCE.createVar(0, eINSTANCE.createTypeList(consumptionRate, inputPort.getType()),
+					splitActor.getPort("Out" + n).getName(), true, 0);
+
+			splitInPattern.setVariable(inputPort, variableIn);
+
+			for (int i = 0; i < consumptionRate; i++) {
+				List<Expression> indexesIn = new ArrayList<Expression>(1);
+				indexesIn.add(eINSTANCE.createExprInt(i));
+				int lineNumber = variableIn.getLineNumber();
+				splitInPattern.setVariable(inputPort, variableIn);
+				Var vIn = irFactory.createVar(tokenType, "v" + i, false, 0);
+				InstLoad instLoad = eINSTANCE.createInstLoad(lineNumber, vIn, variableIn, indexesIn);
+				blockSplit.add(instLoad);
+
+				Var vOut = irFactory.createVar(tokenType, "v" + i, false, 0);
+				List<Expression> indexesOut = new ArrayList<Expression>(1);
+				indexesOut.add(eINSTANCE.createExprInt(i));
+				Expression vOutExpr = irFactory.createExprVar(vOut);
+				InstStore instStore = eINSTANCE.createInstStore(lineNumber, variableOut, indexesOut, vOutExpr);
+				blockSplit.add(instStore);
+			}
+
+			Procedure splitScheduler = irFactory.createProcedure("isSchedulable_split" + n, 0,
+					irFactory.createTypeBool());
+
+			/* add the action */
+			Action splitAction = dfFactory.createAction("split" + n, splitInPattern, splitOutPattern,
+					dfFactory.createPattern(), splitScheduler, proc);
+
+			splitAction.getBody().getBlocks().add(blockSplit);
+			splitActor.getActions().add(splitAction);
+			actionsForFSM.add(splitAction);
 		}
 
-		/* create output Pattern */
-		Pattern outputPatternNew_Actor = dfFactory.createPattern();
-		int i = 0;
-		for (Port p : fanOutActor.getOutputs()) {
-			outputPatternNew_Actor.getPorts().add(p);
-			outputPatternNew_Actor.setNumTokens(p, 1);
-			Var outputTokenVar = irFactory.createVar(tokenType, "Out" + (i + 1), false, 0);
-			Var v = irFactory.createVar(tokenType, "v" + i, false, 0);
-			InstStore instStore = irFactory.createInstStore(outputTokenVar, 0, v);
-			blockFanOut.add(instStore);
-			i++;
+		/* create the split pipelining FSM */
+		FSM splitFSM = dfFactory.createFSM();
+		splitFSM.setInitialState(dfFactory.createState("s0"));
+		for (int s = 0; s < parallelismDegree - 1; s++) {
+			State srcState = dfFactory.createState("s" + s);
+			State destState = dfFactory.createState("s" + (s + 1));
+			splitFSM.addTransition(srcState, actionsForFSM.get(s), destState);
 		}
+		/* loop back to the initial state */
+		State srcState = dfFactory.createState("s" + (parallelismDegree - 1));
+		State destState = dfFactory.createState("s0");
+		splitFSM.addTransition(srcState, actionsForFSM.get((parallelismDegree - 1)), destState);
 
-		/* add a scheduler */
-		Procedure schedulerFanInOutActors = irFactory.createProcedure("isSchedulable_fan_out", 0,
-				irFactory.createTypeBool());
+		splitActor.setFsm(splitFSM);
 
-		/* add an action */
-		Action actionFanOutActor = dfFactory.createAction("fan_out", inputPatternNew_Actor, outputPatternNew_Actor,
-				dfFactory.createPattern(), schedulerFanInOutActors, proc);
-
-		fanOutActor.getActions().add(actionFanOutActor);
-
-		/* writes fan in actor to src/gen/FanIn.cal */
-		String actorFilename = projectRoot + "/src/gen/" + DfUtil.getSimpleName(fanOutActor.getName()) + ".cal";
-		fanOutActor.setFileName(actorFilename);
-		actorsToWriteToFile.add(fanOutActor);
-		network.add(fanOutActor);
-		return fanOutActor;
+		/* writes split actor to src/gen/ */
+		String actorFilename = projectRoot + "/src/gen/" + DfUtil.getSimpleName(splitActor.getName()) + ".cal";
+		splitActor.setFileName(actorFilename);
+		actorsToWriteToFile.add(splitActor);
+		return splitActor;
 	}
 
 	/**
@@ -511,69 +580,104 @@ public class FanOutFanIn extends DfVisitor<Void> {
 	 *            how many data parallel actors
 	 * @param tokenType
 	 *            the type of the tokens to be fanned in
+	 * @param productionRate
+	 *            how many tokens are produced by the one action in each replica
 	 * @param projectRoot
 	 *            needed to create filename for the new actor
 	 * @return the fan in actor
 	 */
-	private Actor createFanInActor(String name, int parallelismDegree, Type tokenType, String projectRoot) {
+	private Actor createJoinActor(String name, int parallelismDegree, Type tokenType, int productionRate,
+			String projectRoot) {
+		/* Create a new actor */
+		Actor joinActor = dfFactory.createActor();
+		joinActor.setName("gen." + name);
 
-		/* create a new actor */
-		Actor fanInActor = dfFactory.createActor();
-		fanInActor.setName("gen." + name);
-
-		/* create fan in inport ports */
-		Port inputPort = null;
+		/* create multiple join input port */
 		for (int n = 1; n <= parallelismDegree; n++) {
-			inputPort = dfFactory.createPort(tokenType, "In" + n);
-			fanInActor.getInputs().add(inputPort);
+			Port inputPort = dfFactory.createPort(tokenType, "In" + n);
+			joinActor.getInputs().add(inputPort);
 		}
 
-		/* create one fan in output port */
+		/* create one join output ports */
 		Port outputPort = dfFactory.createPort(tokenType, "Out1");
-		fanInActor.getOutputs().add(outputPort);
+		joinActor.getOutputs().add(outputPort);
 
-		Procedure bodyNew_actor = irFactory.createProcedure("fan_in", 0, irFactory.createTypeVoid());
-		BlockBasic blockFanIn = IrUtil.getLast(bodyNew_actor.getBlocks());
+		// create output Pattern
+		Pattern joinOutPattern = null;
 
-		/* create input pattern */
-		Pattern inPatt = dfFactory.createPattern();
-		int i = 0;
-		for (Port p : fanInActor.getInputs()) {
-			inPatt.getPorts().add(p);
-			inPatt.setNumTokens(p, 1);
-			Var outputTokenVar = irFactory.createVar(tokenType, "In" + (i + 1), false, 0);
-			Var v = irFactory.createVar(tokenType, "v" + i, false, 0);
-			InstLoad instStore = irFactory.createInstLoad(v, outputTokenVar, 0);
-			blockFanIn.add(instStore);
-			i++;
+		List<Action> actionsForFSM = new ArrayList<Action>();
+		for (int n = 1; n <= parallelismDegree; n++) {
+			/* create action */
+			Procedure proc = irFactory.createProcedure("join" + n, 0, irFactory.createTypeVoid());
+			BlockBasic blockJoin = IrUtil.getLast(proc.getBlocks());
+
+			/* create output Pattern */
+			Pattern joinInPattern = dfFactory.createPattern();
+			joinInPattern.setNumTokens(outputPort, productionRate);
+
+			/* create the inp[ut pattern */
+			joinOutPattern = dfFactory.createPattern();
+			joinOutPattern.setNumTokens(joinActor.getPort("In" + n), productionRate);
+
+			// create port variable
+			Var variableIn = eINSTANCE.createVar(0, eINSTANCE.createTypeList(productionRate, outputPort.getType()),
+					joinActor.getPort("In" + n).getName(), true, 0);
+
+			Var variableOut = eINSTANCE.createVar(0, eINSTANCE.createTypeList(productionRate, outputPort.getType()),
+					outputPort.getName(), true, 0);
+
+			joinOutPattern.setVariable(outputPort, variableIn);
+
+			for (int i = 0; i < productionRate; i++) {
+				List<Expression> indexesIn = new ArrayList<Expression>(1);
+				indexesIn.add(eINSTANCE.createExprInt(i));
+				int lineNumber = variableIn.getLineNumber();
+				joinInPattern.setVariable(outputPort, variableIn);
+				Var vIn = irFactory.createVar(tokenType, "v" + i, false, 0);
+				InstLoad instLoad = eINSTANCE.createInstLoad(lineNumber, vIn, variableIn, indexesIn);
+				blockJoin.add(instLoad);
+
+				Var vOut = irFactory.createVar(tokenType, "v" + i, false, 0);
+				List<Expression> indexesOut = new ArrayList<Expression>(1);
+				indexesOut.add(eINSTANCE.createExprInt(i));
+				Expression vOutExpr = irFactory.createExprVar(vOut);
+				InstStore instStore = eINSTANCE.createInstStore(lineNumber, variableOut, indexesOut, vOutExpr);
+				blockJoin.add(instStore);
+			}
+
+			Procedure joinScheduler = irFactory.createProcedure("isSchedulable_join" + n, 0,
+					irFactory.createTypeBool());
+
+			/* add the action */
+			Action joinAction = dfFactory.createAction("join" + n, joinInPattern, joinOutPattern,
+					dfFactory.createPattern(), joinScheduler, proc);
+
+			joinAction.getBody().getBlocks().add(blockJoin);
+
+			joinActor.getActions().add(joinAction);
+			actionsForFSM.add(joinAction);
 		}
 
-		/* create output pattern */
-		Pattern outPatt = dfFactory.createPattern();
-		Var outputTokenVar = irFactory.createVar(tokenType, "Out1", false, 0);
-		for (int j = 0; j < parallelismDegree; j++) {
-			Port p = fanInActor.getInputs().get(0);
-			outPatt.getPorts().add(p);
-			outPatt.setNumTokens(p, parallelismDegree);
-			Var v = irFactory.createVar(tokenType, "v" + j, false, 0);
-			InstStore instStore = irFactory.createInstStore(outputTokenVar, j, v);
-			blockFanIn.add(instStore);
+		/* create the split pipelining FSM */
+		FSM splitFSM = dfFactory.createFSM();
+		splitFSM.setInitialState(dfFactory.createState("s0"));
+		for (int s = 0; s < parallelismDegree - 1; s++) {
+			State srcState = dfFactory.createState("s" + s);
+			State destState = dfFactory.createState("s" + (s + 1));
+			splitFSM.addTransition(srcState, actionsForFSM.get(s), destState);
 		}
+		/* loop back to the initial state */
+		State srcState = dfFactory.createState("s" + (parallelismDegree - 1));
+		State destState = dfFactory.createState("s0");
+		splitFSM.addTransition(srcState, actionsForFSM.get((parallelismDegree - 1)), destState);
 
-		/* add a scheduler */
-		Procedure schedulerFanInOutActors = irFactory.createProcedure("isSchedulable_myActionInNewFanInOutActor", 0,
-				irFactory.createTypeBool());
+		joinActor.setFsm(splitFSM);
 
-		/* add an action */
-		Action actionFanIn = dfFactory.createAction("fan_in", inPatt, outPatt, dfFactory.createPattern(),
-				schedulerFanInOutActors, bodyNew_actor);
-		fanInActor.getActions().add(actionFanIn);
-
-		/* writes fan in actor to src/gen/FanIn.cal */
-		String actorFilename = projectRoot + "/src/gen/" + DfUtil.getSimpleName(fanInActor.getName()) + ".cal";
-		fanInActor.setFileName(actorFilename);
-		actorsToWriteToFile.add(fanInActor);
-		network.add(fanInActor);
-		return fanInActor;
+		/* writes split actor to src/gen/ */
+		String actorFilename = projectRoot + "/src/gen/" + DfUtil.getSimpleName(joinActor.getName()) + ".cal";
+		joinActor.setFileName(actorFilename);
+		actorsToWriteToFile.add(joinActor);
+		return joinActor;
 	}
+
 }
