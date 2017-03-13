@@ -78,8 +78,8 @@ import org.eclipse.emf.common.util.EList
 
 /**
  * Generate and print instance source files for the CAL actors,
- * primarily to serve the dataflow transformations driven by
- * the Graphiti interface.
+ * primarily to serve the dataflow transformations in 
+ * net.sf.orcc.df.transform driven by the Graphiti interface.
  *  
  * @author Rob Stewart
  * 
@@ -106,22 +106,22 @@ package «actor.package»;
 	
 actor «actorName» ()
 	
+	«IF numInputs > 0»
+		  «printType(actor.getInputs().get(0).type)» «actor.getInputs().get(0).name»
+	«ENDIF»
 	«IF numInputs > 1»
-	«FOR input : actor.getInputs().subList(0,numInputs - 1)»
-	  «printType(input.type)» «input.name»,
+	«FOR input : actor.getInputs().subList(1,numInputs)»
+	, «printType(input.type)» «input.name»
     «ENDFOR»
-    «ENDIF»
-    «IF numInputs > 0»
-      «printType(actor.getInputs().get(numInputs-1).type)» «actor.getInputs().get(numInputs-1).name»
     «ENDIF»
     ==>
-    «IF numOutputs > 1»
-    «FOR output : actor.getOutputs().subList(0,numOutputs - 1)»
-	  «printType(output.type)»  «output.name»,
-    «ENDFOR»
-    «ENDIF»
     «IF numOutputs > 0»
-      «printType(actor.getOutputs().get(numOutputs-1).type)» «actor.getOutputs().get(numOutputs-1).name»
+    	  «printType(actor.getOutputs().get(0).type)»  «actor.getOutputs().get(0).name»
+    «ENDIF»
+    «IF numOutputs > 1»
+    «FOR output : actor.getOutputs().subList(1,numOutputs)»
+    , «printType(output.type)»  «output.name»
+    «ENDFOR»
     «ENDIF»
   :
   «FOR theVar : actor.stateVars»
@@ -130,8 +130,16 @@ actor «actorName» ()
 
   «FOR action : actor.actions»
    «printAction(action)»
-   
   «ENDFOR»
+  
+  «IF actor.fsm != null»
+  schedule fsm «actor.fsm.initialState.name» :
+  «FOR trans : actor.fsm.transitions»
+    «trans.source.name» («trans.action.name») --> «trans.target.name»; 
+  «ENDFOR»
+  «ENDIF»
+  end
+  
 end
 	'''
 
@@ -241,7 +249,7 @@ end
 			TypeString: "string"
 			TypeUint: "uint(size=" + theType.size + ")"
 			TypeVoid: "void"
-			default: "int(size=" + 8 + ")" // why? 
+			default: "int(size=8)" // why?
 		}
 	}
 
@@ -480,17 +488,17 @@ end
 			}
 		}
 
-		var List<String> outputPattern = newArrayList
+		var List<String> inputPattern = newArrayList
 		for (Entry<String,List<String>> entry : inputMap.entrySet) {
-			outputPattern.add(entry.key + ":[" + delimitWith(entry.value, ",") + "]")
+			inputPattern.add(entry.key + ":[" + delimitWith(entry.value, ",") + "]")
 		}
 
-		val outputPatternStr = if (!outputPattern.isEmpty)
-				delimitWith(outputPattern, ",")
+		val inputPatternStr = if (!inputPattern.isEmpty)
+				delimitWith(inputPattern, ",")
 			else ""
 
 		'''
-			«outputPatternStr»
+			«inputPatternStr»
 		'''
 	}
 
@@ -516,7 +524,6 @@ end
 								new HashMap
 							else
 								storeLookup.get(instStore.target.variable.name)
-
 						varListAtPort.put(intFromExpr(instStore.indexes.get(0)), instStore.value)
 						storeLookup.put(instStore.target.variable.name, varListAtPort)
 					}
