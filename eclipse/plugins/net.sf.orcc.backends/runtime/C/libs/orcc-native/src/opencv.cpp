@@ -48,6 +48,8 @@ using namespace cv;
 Mat img, imgDisplay;
 VideoCapture capture;
 int width, height;
+int mousePositionX = -1;
+int mousePositionY = -1;
 
 const int R = 2;
 const int G = 1;
@@ -81,17 +83,27 @@ extern "C" void source_camera_init(int local_width, int local_height){
   height=local_height;
 }
 
+void clickCallBack(int event, int x, int y, int flags, void* userdata)
+{
+  if  ( event == EVENT_LBUTTONDOWN ) {
+    mousePositionX = x;
+    mousePositionY = y;
+  }
+}
+
 extern "C" void initDisplayGray(int width, int height) {
   namedWindow( "image" , WINDOW_AUTOSIZE );
+  setMouseCallback("image", clickCallBack, NULL);
   imgDisplay = Mat(height,width, CV_8UC1);
 }
 
 extern "C" void initDisplayRGB(int width, int height) {
   namedWindow( "image" , WINDOW_AUTOSIZE );
+  setMouseCallback("image", clickCallBack, NULL);
   imgDisplay = Mat(height,width, CV_8UC3);
 }
 
-extern "C" void displayGray(int w, int h, uchar *grayArr){
+extern "C" void displayGray(int w, int h, uchar *grayArr, int *mousePositions){
   for (int y = 0; y < h; y++) {
     for (int x = 0; x < w; x++) {
       imgDisplay.at<uchar>(y,x) = grayArr[w*y+x];
@@ -99,9 +111,17 @@ extern "C" void displayGray(int w, int h, uchar *grayArr){
   }
   imshow("image",imgDisplay);
   waitKey(1);
+
+  /* tell the actor the X and Y position of the pixel clicked */
+  mousePositions[0] = mousePositionX;
+  mousePositions[1] = mousePositionY;
+  mousePositionX = -1;
+  mousePositionY = -1;
+
 }
 
-extern "C" void displayRGB(int w, int h, uchar *rArr, uchar *gArr, uchar *bArr){
+extern "C" void displayRGB(int w, int h, uchar *rArr, uchar *gArr,
+                           uchar *bArr, int *mousePositions){
   for (int y = 0; y < h; y++) {
     for (int x = 0; x < w; x++) {
       imgDisplay.at<Vec3b>(Point(x,y)) = Vec3b(bArr[w*y+x],gArr[w*y+x],rArr[w*y+x]);
@@ -109,6 +129,13 @@ extern "C" void displayRGB(int w, int h, uchar *rArr, uchar *gArr, uchar *bArr){
   }
   imshow("image",imgDisplay);
   waitKey(1);
+
+  /* tell the actor the X and Y position of the pixel clicked */
+  mousePositions[0] = mousePositionX;
+  mousePositions[1] = mousePositionY;
+  mousePositionX = -1;
+  mousePositionY = -1;
+  
 }
 
 /*
