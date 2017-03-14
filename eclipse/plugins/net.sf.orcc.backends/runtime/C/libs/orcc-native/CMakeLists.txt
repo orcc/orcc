@@ -23,7 +23,7 @@ endif()
 # Try to find openCV
 find_package(OpenCV QUIET)
 if(OpenCV_FOUND)
-    list(APPEND orcc_native_sources src/opencv.c)
+    list(APPEND orcc_native_sources src/opencv.cpp)
     list(APPEND extra_includes ${OpenCV_INCLUDE_DIRS})
     list(APPEND extra_libraries ${OpenCV_LIBS})
 else()

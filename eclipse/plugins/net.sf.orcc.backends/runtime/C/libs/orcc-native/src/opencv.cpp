@@ -42,90 +42,73 @@
  * this file in isolation.
  */
 
-#include "cv.h"
-#include "highgui.h"
-#include <stdio.h>
-#include <stdlib.h>
+#include "opencv2/opencv.hpp"
+using namespace cv;
 
-IplImage* img;
-CvCapture* capture;
+Mat img, imgDisplay;
+VideoCapture capture;
 int width, height;
+
+const int R = 2;
+const int G = 1;
+const int B = 0;
 
 /* read the next camera frame to R G and B chanel arrays to be then
  * used by an RVC-CAL actor compiled with Orcc */
-void readCameraFrame(uchar *rArr, uchar *gArr, uchar *bArr){
-
-    /* for loop initalisation variables */
-    int h, w;
-
-    /* try and grab the next frame */
-    if(!cvGrabFrame(capture)){
-        printf("Could not grab a camera frame\n");
-        exit(0);
+extern "C" void readCameraFrame(uchar *rArr, uchar *gArr, uchar *bArr){
+  capture >> img;
+  /* loop over all pixels, writing the R G and B channel uchar values
+   * to its corresponding array */
+  for (int h=0; h < height; h++){
+    for (int w = 0; w < width; w++){
+      Vec3b & color = img.at<Vec3b>(h,w);
+      bArr[h*width+w] = color[B];
+      gArr[h*width+w] = color[G];
+      rArr[h*width+w] = color[R];
     }
-    img=cvRetrieveFrame(capture,0);
-    int nchannels = img->nChannels;
-    int step      = img->widthStep;
-    uchar *frame = ( uchar* )img->imageData;
-
-    /* loop over all pixels, writing the R G and B channel uchar values
-    * to its corresponding array */
-    const int R = 2;
-    const int G = 1;
-    const int B = 0;
-    int pixelCount=0;
-    for (h=0; h < height; h++){
-        for (w = 0; w < width; w++){
-            char* rgb = frame + step * h + w * 3;
-            bArr[pixelCount] = rgb[B];
-            gArr[pixelCount] = rgb[G];
-            rArr[pixelCount] = rgb[R];
-            pixelCount++;
-        }
-    }
+  }
 }
 
 /* must be called before `readCameraFrame` to initalise the camera */
-void source_camera_init(int local_width, int local_height){
-    capture = cvCaptureFromCAM(0);
-    img = 0;
-    width=local_width;
-    height=local_height;
+extern "C" void source_camera_init(int local_width, int local_height){
+  /* try and grab the next frame */
+  capture = VideoCapture(0);
+  if(!capture.isOpened()){
+    printf("Could not grab a camera frame\n");
+    exit(0);
+  }
+  width=local_width;
+  height=local_height;
 }
 
-IplImage* imgDisplay;
-void initDisplayGray(int width, int height) {
-  cvNamedWindow( "image" , CV_WINDOW_AUTOSIZE );
-  imgDisplay = cvCreateImage(cvSize(width,height),IPL_DEPTH_8U,1);
+extern "C" void initDisplayGray(int width, int height) {
+  namedWindow( "image" , WINDOW_AUTOSIZE );
+  imgDisplay = Mat(height,width, CV_8UC1);
 }
 
-void initDisplayRGB(int width, int height) {
-  cvNamedWindow( "image" , CV_WINDOW_AUTOSIZE );
-  imgDisplay = cvCreateImage(cvSize(width,height),IPL_DEPTH_8U,3);
+extern "C" void initDisplayRGB(int width, int height) {
+  namedWindow( "image" , WINDOW_AUTOSIZE );
+  imgDisplay = Mat(height,width, CV_8UC3);
 }
 
-void displayGray(int w, int h, uchar *grayArr){
+extern "C" void displayGray(int w, int h, uchar *grayArr){
   for (int y = 0; y < h; y++) {
-    uchar* rowPtr = (uchar*) ( imgDisplay->imageData + y * imgDisplay->widthStep );
     for (int x = 0; x < w; x++) {
-      rowPtr[x] = grayArr[w*y+x];
+      imgDisplay.at<uchar>(y,x) = grayArr[w*y+x];
     }
   }
-  cvShowImage("image",imgDisplay);
-  cvWaitKey(1);
+  imshow("image",imgDisplay);
+  waitKey(1);
 }
 
-void displayRGB(int w, int h, uchar *rArr, uchar *gArr, uchar *bArr){
+extern "C" void displayRGB(int w, int h, uchar *rArr, uchar *gArr, uchar *bArr){
   for (int y = 0; y < h; y++) {
-    uchar* rowPtr = (uchar*) ( imgDisplay->imageData + y * imgDisplay->widthStep );
     for (int x = 0; x < w; x++) {
-      rowPtr[3*x+0] = bArr[w*y+x];
-      rowPtr[3*x+1] = gArr[w*y+x];
-      rowPtr[3*x+2] = rArr[w*y+x];
+      imgDisplay.at<Vec3b>(Point(x,y)) = Vec3b(bArr[w*y+x],gArr[w*y+x],rArr[w*y+x]);
     }
   }
-  cvShowImage("image",imgDisplay);
-  cvWaitKey(1);
+  imshow("image",imgDisplay);
+  waitKey(1);
 }
 
 /*
@@ -134,7 +117,7 @@ void displayRGB(int w, int h, uchar *rArr, uchar *gArr, uchar *bArr){
  * camera can see. The WIDTH and HEIGHT constants must be set to the
  * resolution of the source camera. Compile in Linux with
  *
- * $ gcc opencv.c `pkg-config --cflags --libs opencv`
+ * $ g++ opencv.cpp `pkg-config --cflags --libs opencv`
  * $ ./a.out
  */
 
@@ -145,18 +128,17 @@ void displayRGB(int w, int h, uchar *rArr, uchar *gArr, uchar *bArr){
 
 int main()
 {
-    source_camera_init(WIDTH,HEIGHT);
-    static uchar rArr[PIXELS];
-    static uchar gArr[PIXELS];
-    static uchar bArr[PIXELS];
+  source_camera_init(WIDTH,HEIGHT);
+  static uchar rArr[PIXELS];
+  static uchar gArr[PIXELS];
+  static uchar bArr[PIXELS];
 
-    cvNamedWindow("image", CV_WINDOW_AUTOSIZE);
-
-    for (;;){
-        readCameraFrame(rArr,gArr,bArr);
-        cvShowImage("image", img);
-        if(cvWaitKey(30) >= 0) break;
-    }
-    cvDestroyWindow("image");
+  namedWindow("image", WINDOW_AUTOSIZE);
+  for (;;){
+    readCameraFrame(rArr,gArr,bArr);
+    imshow("image", img);
+    if(waitKey(30) >= 0) break;
+  }
+  cvDestroyWindow("image");
 }
 */
