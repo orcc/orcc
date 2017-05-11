@@ -22,6 +22,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Connection;
+import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
 import net.sf.orcc.df.Port;
 import net.sf.orcc.df.transform.NetworkFlattener;
@@ -74,24 +75,19 @@ public class XmlBufferSizeConfiguration {
 
 		@Override
 		public Void caseConnection(Connection connection) {
-
-			if (connection.getSource() instanceof Actor && connection.getTarget() instanceof Actor) {
-
-				int size = defaultSize;
-				for (XmlConnection c : connections) {
-					if (c.equal(connection)) {
-						size = c.size;
-						if (forcePow2 && !ValueUtil.isPowerOfTwo(size)) {
-							OrccLogger
-									.warnln("Buffer size of " + connection + " is not pow of two. It will be rounded");
-							size = roundPow2(size);
-						}
-						break;
+			int size = defaultSize;
+			for (XmlConnection c : connections) {
+				if (c.equal(connection)) {
+					size = c.size;
+					if (forcePow2 && !ValueUtil.isPowerOfTwo(size)) {
+						OrccLogger.warnln("Buffer size of " + connection + " is not pow of two. It will be rounded");
+						size = roundPow2(size);
 					}
+					break;
 				}
-
-				connection.setSize(size);
 			}
+			
+			connection.setSize(size);
 
 			return null;
 		}
@@ -155,27 +151,21 @@ public class XmlBufferSizeConfiguration {
 		}
 
 		private boolean equal(Connection connection) {
-			if (connection.getSource() instanceof Actor && connection.getTarget() instanceof Actor) {
-				if (!((Actor) connection.getSource()).getName().equals(sourceActor)) {
-					return false;
+
+			if (connection.getSourcePort().getName().equals(sourcePort)
+					&& connection.getTargetPort().getName().equals(targetPort)) {
+
+				if (connection.getSource() instanceof Actor && connection.getTarget() instanceof Actor) {
+					return ((Actor) connection.getSource()).getName().equals(sourceActor)
+							&& ((Actor) connection.getTarget()).getName().equals(targetActor);
+				} else if ((connection.getSource() instanceof Instance && connection.getTarget() instanceof Instance)) {
+					return ((Instance) connection.getSource()).getName().equals(sourceActor)
+							&& ((Instance) connection.getTarget()).getName().equals(targetActor);
 				}
 
-				if (!connection.getSourcePort().getName().equals(sourcePort)) {
-					return false;
-				}
-
-				if (!((Actor) connection.getTarget()).getName().equals(targetActor)) {
-					return false;
-				}
-
-				if (!connection.getTargetPort().getName().equals(targetPort)) {
-					return false;
-				}
-
-				return true;
-			} else {
-				return false;
 			}
+
+			return false;
 		}
 
 		@Override
