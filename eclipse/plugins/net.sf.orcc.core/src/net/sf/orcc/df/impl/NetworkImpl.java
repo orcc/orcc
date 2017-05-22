@@ -232,7 +232,7 @@ public class NetworkImpl extends GraphImpl implements Network {
 				i++;
 			}
 		}
-		for (Port port : inputs) {
+		for (Port port : getInputs()) {
 			List<Edge> edges = port.getOutgoing();
 			for (Edge edge : edges) {
 				edge.setAttribute("idNoBcast", i);
