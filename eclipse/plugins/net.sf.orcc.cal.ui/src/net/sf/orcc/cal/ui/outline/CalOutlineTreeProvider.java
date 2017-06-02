@@ -42,6 +42,8 @@ import net.sf.orcc.cal.cal.Priority;
 import net.sf.orcc.cal.cal.ScheduleFsm;
 import net.sf.orcc.cal.cal.Variable;
 
+import org.eclipse.swt.graphics.Image;
+
 import org.eclipse.xtext.ui.IImageHelper;
 import org.eclipse.xtext.ui.editor.outline.IOutlineNode;
 import org.eclipse.xtext.ui.editor.outline.impl.DefaultOutlineTreeProvider;
@@ -58,86 +60,70 @@ public class CalOutlineTreeProvider extends DefaultOutlineTreeProvider {
 	private IImageHelper imageHelper;
 
 	protected void _createNode(IOutlineNode parentNode, AstActor actor) {
-		createEStructuralFeatureNode(parentNode, actor,
-				CalPackage.eINSTANCE.getAstActor_Parameters(), null,
+		createEStructuralFeatureNode(parentNode, actor, CalPackage.eINSTANCE.getAstActor_Parameters(), (Image) null,
 				"parameters", false);
 
-		createEStructuralFeatureNode(parentNode, actor,
-				CalPackage.eINSTANCE.getAstActor_Inputs(), null, "input ports",
-				false);
+		createEStructuralFeatureNode(parentNode, actor, CalPackage.eINSTANCE.getAstActor_Inputs(), (Image) null,
+				"input ports", false);
 
-		createEStructuralFeatureNode(parentNode, actor,
-				CalPackage.eINSTANCE.getAstActor_Outputs(), null,
+		createEStructuralFeatureNode(parentNode, actor, CalPackage.eINSTANCE.getAstActor_Outputs(), (Image) null,
 				"output ports", false);
 
-		createEStructuralFeatureNode(parentNode, actor,
-				CalPackage.eINSTANCE.getAstActor_StateVariables(), null,
+		createEStructuralFeatureNode(parentNode, actor, CalPackage.eINSTANCE.getAstActor_StateVariables(), (Image) null,
 				"state variables", false);
 
 		if (!actor.getFunctions().isEmpty()) {
-			createEStructuralFeatureNode(parentNode, actor,
-					CalPackage.eINSTANCE.getAstActor_Functions(), null,
+			createEStructuralFeatureNode(parentNode, actor, CalPackage.eINSTANCE.getAstActor_Functions(), (Image) null,
 					"functions", false);
 		}
 
 		if (!actor.getProcedures().isEmpty()) {
-			createEStructuralFeatureNode(parentNode, actor,
-					CalPackage.eINSTANCE.getAstActor_Procedures(), null,
+			createEStructuralFeatureNode(parentNode, actor, CalPackage.eINSTANCE.getAstActor_Procedures(), (Image) null,
 					"procedures", false);
 		}
 
-		createEStructuralFeatureNode(parentNode, actor,
-				CalPackage.eINSTANCE.getAstActor_Actions(), null, "actions",
-				false);
+		createEStructuralFeatureNode(parentNode, actor, CalPackage.eINSTANCE.getAstActor_Actions(), (Image) null,
+				"actions", false);
 
 		if (actor.getScheduleFsm() != null) {
-			createEStructuralFeatureNode(parentNode, actor,
-					CalPackage.eINSTANCE.getAstActor_ScheduleFsm(), null,
-					"FSM", false);
+			createEStructuralFeatureNode(parentNode, actor, CalPackage.eINSTANCE.getAstActor_ScheduleFsm(),
+					(Image) null, "FSM", false);
 		}
 
 		if (!actor.getPriorities().isEmpty()) {
-			createEStructuralFeatureNode(parentNode, actor,
-					CalPackage.eINSTANCE.getAstActor_Priorities(), null,
+			createEStructuralFeatureNode(parentNode, actor, CalPackage.eINSTANCE.getAstActor_Priorities(), (Image) null,
 					"priorities", false);
 		}
 	}
 
 	protected void _createNode(IOutlineNode parentNode, AstEntity entity) {
-		createEStructuralFeatureNode(parentNode, entity,
-				CalPackage.eINSTANCE.getAstEntity_Package(), _image(entity),
+		createEStructuralFeatureNode(parentNode, entity, CalPackage.eINSTANCE.getAstEntity_Package(), _image(entity),
 				entity.getPackage(), true);
 
-		createEStructuralFeatureNode(parentNode, entity,
-				CalPackage.eINSTANCE.getAstEntity_Imports(),
-				imageHelper.getImage("impc_obj.gif"), "import declarations",
-				false);
+		createEStructuralFeatureNode(parentNode, entity, CalPackage.eINSTANCE.getAstEntity_Imports(),
+				imageHelper.getImage("impc_obj.gif"), "import declarations", false);
 
 		String name = entity.getName();
 		if (entity.getActor() != null) {
-			createEStructuralFeatureNode(parentNode, entity,
-					CalPackage.eINSTANCE.getAstEntity_Actor(),
+			createEStructuralFeatureNode(parentNode, entity, CalPackage.eINSTANCE.getAstEntity_Actor(),
 					_image(entity.getActor()), name, false);
 		} else if (entity.getUnit() != null) {
-			createEStructuralFeatureNode(parentNode, entity,
-					CalPackage.eINSTANCE.getAstEntity_Unit(), null, name, false);
+			createEStructuralFeatureNode(parentNode, entity, CalPackage.eINSTANCE.getAstEntity_Unit(), (Image) null,
+					name, false);
 		}
 	}
 
 	protected void _createNode(IOutlineNode parentNode, AstUnit unit) {
-		createEStructuralFeatureNode(parentNode, unit,
-				CalPackage.eINSTANCE.getAstUnit_Variables(), null, "variables",
-				false);
+		createEStructuralFeatureNode(parentNode, unit, CalPackage.eINSTANCE.getAstUnit_Variables(), (Image) null,
+				"variables", false);
 
 		if (!unit.getFunctions().isEmpty()) {
-			createEStructuralFeatureNode(parentNode, unit,
-					CalPackage.eINSTANCE.getAstUnit_Functions(), null,
+			createEStructuralFeatureNode(parentNode, unit, CalPackage.eINSTANCE.getAstUnit_Functions(), (Image) null,
 					"functions", false);
 		}
 
 		if (!unit.getProcedures().isEmpty()) {
-			createEStructuralFeatureNode(parentNode, unit,
-					CalPackage.eINSTANCE.getAstUnit_Procedures(), null,
+			createEStructuralFeatureNode(parentNode, unit, CalPackage.eINSTANCE.getAstUnit_Procedures(), (Image) null,
 					"procedures", false);
 		}
 	}
