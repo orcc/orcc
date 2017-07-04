@@ -94,12 +94,12 @@ public class GroupInstancesFeature extends AbstractTimeConsumingCustomFeature {
 
 	@Override
 	public String getName() {
-		return "Group selected instances into new network";
+		return "Group selected instance(s) into new network";
 	}
 
 	@Override
 	public String getDescription() {
-		return "Create a new network containing selected elements, and replace them with a new instance refined on this network.";
+		return "Create a new network containing selected element(s), and replace them with a new instance refined on this network.";
 	}
 
 	@Override
@@ -108,7 +108,7 @@ public class GroupInstancesFeature extends AbstractTimeConsumingCustomFeature {
 	}
 
 	/*
-	 * This feature can be executed if user selected at least 2 instances. If
+	 * This feature can be executed if user selected at least 1 instance. If
 	 * other elements are selected (ports, connections) they will be ignored
 	 * 
 	 * (non-Javadoc)
@@ -120,7 +120,7 @@ public class GroupInstancesFeature extends AbstractTimeConsumingCustomFeature {
 	@Override
 	public boolean canExecute(ICustomContext context) {
 		final PictogramElement[] selection = context.getPictogramElements();
-		if (selection.length < 2) {
+		if (selection.length < 1) {
 			return false;
 		}
 
@@ -131,7 +131,7 @@ public class GroupInstancesFeature extends AbstractTimeConsumingCustomFeature {
 			}
 		}
 
-		return cptInstances >= 2;
+		return cptInstances >= 1;
 	}
 
 	/**
