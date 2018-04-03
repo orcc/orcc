@@ -37,12 +37,6 @@ import net.sf.orcc.xdf.ui.features.OpenPropertiesFeature;
 import net.sf.orcc.xdf.ui.features.UngroupNetworkFeature;
 import net.sf.orcc.xdf.ui.features.UpdateRefinementFeature;
 import net.sf.orcc.xdf.ui.features.XronosProfileFeature;
-import net.sf.orcc.xdf.ui.features.fanout.FanOut2;
-import net.sf.orcc.xdf.ui.features.fanout.FanOut4;
-import net.sf.orcc.xdf.ui.features.fanout.FanOut8;
-import net.sf.orcc.xdf.ui.features.fanout.FanOut16;
-import net.sf.orcc.xdf.ui.features.fanout.FanOut32;
-import net.sf.orcc.xdf.ui.features.fanout.FanOut64;
 import net.sf.orcc.xdf.ui.patterns.InputNetworkPortPattern;
 import net.sf.orcc.xdf.ui.patterns.NetworkPortPattern;
 
@@ -170,17 +164,6 @@ public class XdfDiagramToolBehaviorProvider extends DefaultToolBehaviorProvider 
 		entry.setText("Transformations");
 		entry.add(new ContextMenuEntry(new GroupInstancesFeature(getFeatureProvider()), context));
 		entry.add(new ContextMenuEntry(new UngroupNetworkFeature(getFeatureProvider()), context));
-		
-		ContextMenuEntry fanOutEntry = new ContextMenuEntry(null, context);
-		fanOutEntry.setText("Fan out/in");
-		fanOutEntry.add(new ContextMenuEntry(new FanOut2(getFeatureProvider()), context));
-		fanOutEntry.add(new ContextMenuEntry(new FanOut4(getFeatureProvider()), context));
-		fanOutEntry.add(new ContextMenuEntry(new FanOut8(getFeatureProvider()), context));
-		fanOutEntry.add(new ContextMenuEntry(new FanOut16(getFeatureProvider()), context));
-		fanOutEntry.add(new ContextMenuEntry(new FanOut32(getFeatureProvider()), context));
-		fanOutEntry.add(new ContextMenuEntry(new FanOut64(getFeatureProvider()), context));
-		
-		entry.add(fanOutEntry);
 		contextMenuEntries.add(entry);
 
 		// 'Highlight costs' menu entry
