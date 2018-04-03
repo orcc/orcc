@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.xdf.ui.features;
+package net.sf.orcc.xdf.ui.features.fanout;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -42,29 +42,25 @@ import net.sf.orcc.backends.cal.InstancePrinter;
 import net.sf.orcc.df.Actor;
 import net.sf.orcc.df.Instance;
 import net.sf.orcc.df.Network;
-import net.sf.orcc.df.transform.SplitJoin;
+import net.sf.orcc.df.transform.FanOutFanIn;
 import net.sf.orcc.util.FilesManager;
+import net.sf.orcc.xdf.ui.features.AbstractTimeConsumingCustomFeature;
+import net.sf.orcc.xdf.ui.features.UpdateDiagramFeature;
 
 /*
 * @author Rob Stewart
 * @author Idris Ibrahim
 */
-
-public class SplitJoinFeature extends AbstractTimeConsumingCustomFeature {
+abstract public class FanOutFanInFeature extends AbstractTimeConsumingCustomFeature {
 
 	List<Instance> selectedInstances;
 	private IFeatureProvider thisFeature;
 	int parallelDegree;
 
-	public SplitJoinFeature(IFeatureProvider fp, int parallelDegree) {
+	public FanOutFanInFeature(IFeatureProvider fp, int parallelDegree) {
 		super(fp);
 		this.thisFeature = fp;
 		this.parallelDegree = parallelDegree;
-	}
-	
-	@Override
-	public String getName() {
-		return Integer.toString(this.parallelDegree);
 	}
 
 	@Override
@@ -86,7 +82,7 @@ public class SplitJoinFeature extends AbstractTimeConsumingCustomFeature {
 		}
 
 		if (selectedInstances.size() > 0) {
-			canWeExecute = SplitJoin.canFire(currentNetwork, selectedInstances);
+			canWeExecute = FanOutFanIn.canFire(currentNetwork, selectedInstances);
 		}
 
 		return canWeExecute;
@@ -95,8 +91,7 @@ public class SplitJoinFeature extends AbstractTimeConsumingCustomFeature {
 	@Override
 	public void execute(ICustomContext context, IProgressMonitor parentMonitor) {
 
-		/* assume only one actor is selected */
-		SplitJoin fanOutInTransformation = new SplitJoin(parallelDegree, selectedInstances.get(0));
+		FanOutFanIn fanOutInTransformation = new FanOutFanIn(parallelDegree, selectedInstances);
 
 		Network currentNetwork = (Network) getBusinessObjectForPictogramElement(getDiagram());
 
