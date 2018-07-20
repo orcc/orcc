@@ -246,7 +246,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 * 
 	 * @return The number of seconds, as a float
 	 */
-	final private float getDuration(long t0) {
+	final protected float getDuration(long t0) {
 		return (float) (System.currentTimeMillis() - t0) / 1000;
 	}
 
@@ -644,7 +644,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 * OperationCanceledException if needed. This will simply stop the back-end
 	 * execution.
 	 */
-	private void stopIfRequested() {
+	protected void stopIfRequested() {
 		if (monitor != null) {
 			if (monitor.isCanceled()) {
 				throw new OperationCanceledException();
