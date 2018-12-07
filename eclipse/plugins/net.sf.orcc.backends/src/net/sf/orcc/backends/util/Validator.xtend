@@ -114,7 +114,7 @@ class Validator {
 	}
 
 	def private static void checkConnectionSize(Connection connection, int numTokens, int size) {
-		if (connection != null && numTokens >= connection.size ?: size) {
+		if (connection !== null && numTokens >= connection.size ?: size) {
 			val msg = "Potential deadlock due to the size of (" + connection + ")."
 			OrccLogger::warnln(msg)		
 		}

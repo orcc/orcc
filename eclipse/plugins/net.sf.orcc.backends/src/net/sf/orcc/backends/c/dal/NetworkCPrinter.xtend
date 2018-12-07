@@ -104,9 +104,9 @@ class NetworkCPrinter extends CTemplate {
 	
 	def protected allocateFifo(Connection conn, int nbReaders) '''
 		«IF classify»
-			<sw_channel type="fifo" initialtokens="«if (conn.hasAttribute("InitialTokens")) conn.<Integer>getValueAsObject("InitialTokens") else 0»" tokensize="«conn.<Integer>getValueAsObject("TokenRate")*conn.<Integer>getValueAsObject("TokenSize")»" size="«if (conn.size != null) conn.size else fifoSize»" name="C«conn.<Object>getValueAsObject("idNoBcast")»">
+			<sw_channel type="fifo" initialtokens="«if (conn.hasAttribute("InitialTokens")) conn.<Integer>getValueAsObject("InitialTokens") else 0»" tokensize="«conn.<Integer>getValueAsObject("TokenRate")*conn.<Integer>getValueAsObject("TokenSize")»" size="«if (conn.size !== null) conn.size else fifoSize»" name="C«conn.<Object>getValueAsObject("idNoBcast")»">
 		«ELSE»
-			<sw_channel type="fifo" size="«if (conn.size != null) conn.size*sizeOf(conn.getSourcePort().getType()) else fifoSize*sizeOf(conn.getSourcePort().getType())»" name="C«conn.<Object>getValueAsObject("idNoBcast")»">
+			<sw_channel type="fifo" size="«if (conn.size !== null) conn.size*sizeOf(conn.getSourcePort().getType()) else fifoSize*sizeOf(conn.getSourcePort().getType())»" name="C«conn.<Object>getValueAsObject("idNoBcast")»">
 		«ENDIF»
 			<port type="input" name="0"/>
 			<port type="output" name="1"/>

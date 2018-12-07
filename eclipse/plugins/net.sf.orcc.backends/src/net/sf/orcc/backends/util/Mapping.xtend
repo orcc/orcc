@@ -72,7 +72,7 @@ class Mapping extends CommonPrinter {
 					val clusteredActors = actor.<List<String>>getValueAsObject("mergedActors")
 					for (actorName : clusteredActors) {
 						val aTarget = map.get(network.name + "_" + actorName)
-						if (aTarget != null) {
+						if (aTarget !== null) {
 							if (!vertexExists(actor as Vertex)) {
 								actor.tryToMap(aTarget)
 								map.put(network.name + "_" + actor.name, aTarget)
@@ -124,7 +124,7 @@ class Mapping extends CommonPrinter {
 		configuration.normalize
 		val partitioning = configuration.getElementsByTagName("Partitioning").item(0) as Element
 
-		if (partitioning != null) {
+		if (partitioning !== null) {
 			val partitions = partitioning.getElementsByTagName("Partition")
 
 			for (i : 0 .. partitions.length-1) {
@@ -139,7 +139,7 @@ class Mapping extends CommonPrinter {
 					val instName = instance.getAttribute("id")
 					val vertex = network.getChild(instName)
 
-					if (vertex != null) {
+					if (vertex !== null) {
 						tryToMap(vertex, partName)
 					} else {
 						OrccLogger::warnln("Try to map an unknown actor called " + instName)

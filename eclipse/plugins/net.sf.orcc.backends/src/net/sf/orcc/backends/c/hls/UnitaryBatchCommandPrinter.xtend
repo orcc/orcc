@@ -58,7 +58,7 @@ class UnitaryBatchCommandPrinter extends net.sf.orcc.backends.c.InstancePrinter 
 		%COMSPEC% /C vivado_hls -f script_«entityName».tcl
 		«FOR port : actor.inputs»
 			«val connection = incomingPortMap.get(port)»
-			«IF connection != null»
+			«IF connection !== null»
 				%COMSPEC% /C vivado_hls -f script_cast_«entityName»_«connection.targetPort.name»_write.tcl
 			«ENDIF»
 		«ENDFOR»		
@@ -81,7 +81,7 @@ class UnitaryBatchCommandPrinter extends net.sf.orcc.backends.c.InstancePrinter 
 		
 		«FOR port : actor.inputs»
 			«val connection = incomingPortMap.get(port)»
-			«IF connection != null»
+			«IF connection !== null»
 				copy %cd%\subProject_cast_«entityName»_«connection.targetPort.name»_write\solution1\syn\vhdl %cd%\«entityName»TopVHDL
 			«ENDIF»
 		«ENDFOR»

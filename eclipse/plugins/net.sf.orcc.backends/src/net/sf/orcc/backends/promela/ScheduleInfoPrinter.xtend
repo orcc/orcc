@@ -86,7 +86,7 @@ class ScheduleInfoPrinter extends PromelaTemplate {
 	def stateVarsInState(Scheduler scheduler) {
 	'''
 	«FOR state : scheduler.stateToRelevantVars.keySet»
-	«IF state != null»
+	«IF state !== null»
 	<fsmstate name='«state»'>
 		«FOR variable : scheduler.stateToRelevantVars.get(state)»
 		<variable name='«variable.name»'/>
@@ -115,7 +115,7 @@ class ScheduleInfoPrinter extends PromelaTemplate {
 	def connections(Actor instance) {
 	'''
 		«FOR port : instance.incomingPortMap.keySet»
-			«IF balanceEq.getSource(instance.incomingPortMap.get(port)) != null»
+			«IF balanceEq.getSource(instance.incomingPortMap.get(port)) !== null»
 				<input port="«port.name»" instance="«balanceEq.getSource(instance.incomingPortMap.get(port)).simpleName»" channelID="«port.connID(instance)»"/>
 			«ELSE»
 				<input port="«port.name»" instance="NULL" channelID="«port.connID(instance)»"/>
@@ -123,7 +123,7 @@ class ScheduleInfoPrinter extends PromelaTemplate {
 		«ENDFOR»
 		«FOR port : instance.outgoingPortMap.keySet»
 			«FOR con : instance.outgoingPortMap.get(port)»
-				«IF balanceEq.getDestination(con) != null»
+				«IF balanceEq.getDestination(con) !== null»
 					<output port="«port.name»" instance="«balanceEq.getDestination(con).simpleName»" channelID="«port.connID(instance)»"/>
 				«ELSE»
 					<output port="«port.name»" instance="NULL" channelID="«port.connID(instance)»"/>
@@ -134,7 +134,7 @@ class ScheduleInfoPrinter extends PromelaTemplate {
 	}
 	
 	def connID(Port port, Actor actor) {
-		if( actor.getIncomingPortMap().get(port)!=null) {
+		if( actor.getIncomingPortMap().get(port)!==null) {
 			val Connection connection = actor.getIncomingPortMap().get(port)
 			'''chan_«connection.<Object>getValueAsObject("id")»'''
 		} else
@@ -161,15 +161,15 @@ class ScheduleInfoPrinter extends PromelaTemplate {
 	}
 	
 	def enablingActionName(Schedule schedule) {
-	'''«IF schedule.enablingAction!=null»«schedule.enablingAction.name»«ELSE»«schedule.sequence.get(0).name»«ENDIF»'''
+	'''«IF schedule.enablingAction!==null»«schedule.enablingAction.name»«ELSE»«schedule.sequence.get(0).name»«ENDIF»'''
 	}
 	
 	def initStateName(Schedule schedule) {
-	'''«IF schedule.initState!=null»«schedule.initState.name»«ELSE»one_state«ENDIF»'''
+	'''«IF schedule.initState!==null»«schedule.initState.name»«ELSE»one_state«ENDIF»'''
 	}
 
 	def endStateName(Schedule schedule) {
-	'''«IF schedule.endState!=null»«schedule.endState.name»«ELSE»one_state«ENDIF»'''
+	'''«IF schedule.endState!==null»«schedule.endState.name»«ELSE»one_state«ENDIF»'''
 	}
 	
 }

@@ -244,7 +244,7 @@ class NetworkPrinter extends CTemplate {
 	'''
 	
 	def protected allocateFifo(Connection conn, int nbReaders) '''
-		DECLARE_FIFO(«conn.sourcePort.type.doSwitch», «if (conn.size != null) conn.size else fifoSize», «conn.<Object>getValueAsObject("idNoBcast")», «nbReaders»)
+		DECLARE_FIFO(«conn.sourcePort.type.doSwitch», «if (conn.size !== null) conn.size else fifoSize», «conn.<Object>getValueAsObject("idNoBcast")», «nbReaders»)
 	'''
 	
 	def protected allocateGenWeightsActionData(Vertex vertex) '''

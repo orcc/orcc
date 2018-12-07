@@ -114,19 +114,19 @@ class SchedulePrinter extends PromelaTemplate {
 	}
 	
 	def enablingActionName(Schedule schedule) {
-	'''«IF schedule.enablingAction!=null»«schedule.enablingAction.name»«ELSE»«schedule.sequence.get(0).name»«ENDIF»'''
+	'''«IF schedule.enablingAction!==null»«schedule.enablingAction.name»«ELSE»«schedule.sequence.get(0).name»«ENDIF»'''
 	}
 	
 	def initStateName(Schedule schedule) {
-	'''«IF schedule.initState!=null»«schedule.initState.name»«ELSE»one_state«ENDIF»'''
+	'''«IF schedule.initState!==null»«schedule.initState.name»«ELSE»one_state«ENDIF»'''
 	}
 
 	def endStateName(Schedule schedule) {
-	'''«IF schedule.endState!=null»«schedule.endState.name»«ELSE»one_state«ENDIF»'''
+	'''«IF schedule.endState!==null»«schedule.endState.name»«ELSE»one_state«ENDIF»'''
 	}
 
 	def initStateName(Scheduler scheduler) {
-	'''«IF scheduler.initialState!=null»«scheduler.initialState.name»«ELSE»one_state«ENDIF»'''
+	'''«IF scheduler.initialState!==null»«scheduler.initialState.name»«ELSE»one_state«ENDIF»'''
 	}
 	
 }

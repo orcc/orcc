@@ -58,7 +58,7 @@ port(
 	«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
 		«FOR port : instance.getActor.inputs»
 			«val connection = instance.incomingPortMap.get(port)»
-			«IF connection != null && connection.sourcePort == null»
+			«IF connection !== null && connection.sourcePort === null»
 				«connection.castfifoNameWrite»_V_dout   : IN STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1» downto 0);
 				«connection.castfifoNameWrite»_V_empty_n : IN STD_LOGIC;
 				«connection.castfifoNameWrite»_V_read    : OUT STD_LOGIC;
@@ -66,7 +66,7 @@ port(
 		«ENDFOR»
 		«FOR portout : instance.getActor.outputs.filter[! native]»
 			«FOR connection : instance.outgoingPortMap.get(portout)»
-				«IF connection.targetPort == null»
+				«IF connection.targetPort === null»
 					«connection.castfifoNameRead»_V_din    : OUT STD_LOGIC_VECTOR («connection.fifoType.sizeInBits - 1» downto 0);
 					«connection.castfifoNameRead»_V_full_n : IN STD_LOGIC;
 					«connection.castfifoNameRead»_V_write  : OUT STD_LOGIC;
@@ -108,7 +108,7 @@ architecture rtl of TopDesign is
 		«instance.declareComponentSignal»
 		«FOR port : instance.getActor.inputs»
 			«val connection = instance.incomingPortMap.get(port)»
-			«IF connection != null && connection.sourcePort == null»
+			«IF connection !== null && connection.sourcePort === null»
 				component cast_«instance.name»_«connection.targetPort.name»_write_scheduler IS
 					port (
 						«connection.ramName»_address0    : OUT  STD_LOGIC_VECTOR («closestLog_2(connection.safeSize)»-1 downto 0);
@@ -141,7 +141,7 @@ architecture rtl of TopDesign is
 		
 			«FOR port : instance.getActor.outputs.filter[! native]»
 				«FOR connection : instance.outgoingPortMap.get(port)»
-					«IF connection.targetPort == null»
+					«IF connection.targetPort === null»
 						component cast_«instance.name»_«instance.outgoingPortMap.get(port).head.sourcePort.name»_read_scheduler IS
 						port (
 						«connection.ramName»_address0    : OUT STD_LOGIC_VECTOR («closestLog_2(connection.safeSize)»-1 downto 0);
@@ -219,7 +219,7 @@ begin
 	def assignNetworkPorts(Instance instance) '''
 «FOR port : instance.getActor.inputs»
 	«val connection = instance.incomingPortMap.get(port)»
-	«IF connection != null && connection.sourcePort == null»
+	«IF connection !== null && connection.sourcePort === null»
 		top_«connection.castfifoNameWrite»_V_dout <= «connection.castfifoNameWrite»_V_dout;
 		top_«connection.castfifoNameWrite»_V_empty_n <= «connection.castfifoNameWrite»_V_empty_n;
 		«connection.castfifoNameWrite»_V_read <= top_«connection.castfifoNameWrite»_V_read;	
@@ -228,7 +228,7 @@ begin
 
 «FOR portout : instance.getActor.outputs.filter[! native]»
 	«FOR connection : instance.outgoingPortMap.get(portout)»
-		«IF connection.targetPort == null»
+		«IF connection.targetPort === null»
 			«connection.castfifoNameRead»_V_din    <= top_«connection.castfifoNameRead»_V_din;
 			top_«connection.castfifoNameRead»_V_full_n <= «connection.castfifoNameRead»_V_full_n;
 			«connection.castfifoNameRead»_V_write <= top_«connection.castfifoNameRead»_V_write;
@@ -280,7 +280,7 @@ port map(
 	
 «FOR port : instance.getActor.outputs.filter[! native]»
 	«FOR connection : instance.outgoingPortMap.get(port)»
-		«IF connection.targetPort == null»
+		«IF connection.targetPort === null»
 			call_cast_«instance.name»_«connection.sourcePort.name»_read_scheduler : component cast_«instance.name»_«connection.
 		sourcePort.name»_read_scheduler
 			port map(
@@ -314,7 +314,7 @@ port map(
 
 «FOR port : instance.getActor.inputs»		
 	«val connection = instance.incomingPortMap.get(port)»
-	«IF connection != null && connection.sourcePort == null»
+	«IF connection !== null && connection.sourcePort === null»
 		call_cast_«instance.name»_«connection.targetPort.name»_write_scheduler :component cast_«instance.name»_«connection.
 		targetPort.name»_write_scheduler
 				port map(
@@ -354,7 +354,7 @@ port map(
 
 «FOR port : instance.getActor.outputs.filter[! native]»
 	«FOR connection : instance.outgoingPortMap.get(port)»
-		«IF connection.targetPort == null»
+		«IF connection.targetPort === null»
 			«printFifoMapping(connection)»
 		«ENDIF»	
 	«ENDFOR»
@@ -529,24 +529,24 @@ port (
 	
 '''
 
-	def castfifoNameWrite(Connection connection) '''«IF connection != null»myStream_cast_«connection.getAttribute("id").
+	def castfifoNameWrite(Connection connection) '''«IF connection !== null»myStream_cast_«connection.getAttribute("id").
 		objectValue»_write«ENDIF»'''
 
-	def castfifoNameRead(Connection connection) '''«IF connection != null»myStream_cast_«connection.getAttribute("id").
+	def castfifoNameRead(Connection connection) '''«IF connection !== null»myStream_cast_«connection.getAttribute("id").
 		objectValue»_read«ENDIF»'''
 
-	def ramName(Connection connection) '''«IF connection != null»tab_«connection.getAttribute("id").objectValue»«ENDIF»'''
+	def ramName(Connection connection) '''«IF connection !== null»tab_«connection.getAttribute("id").objectValue»«ENDIF»'''
 
-	def wName(Connection connection) '''«IF connection != null»writeIdx_«connection.getAttribute("id").objectValue»«ENDIF»'''
+	def wName(Connection connection) '''«IF connection !== null»writeIdx_«connection.getAttribute("id").objectValue»«ENDIF»'''
 
-	def localwName(Connection connection) '''«IF connection != null»wIdx_«connection.getAttribute("id").objectValue»«ENDIF»'''
+	def localwName(Connection connection) '''«IF connection !== null»wIdx_«connection.getAttribute("id").objectValue»«ENDIF»'''
 
-	def localrName(Connection connection) '''«IF connection != null»rIdx_«connection.getAttribute("id").objectValue»«ENDIF»'''
+	def localrName(Connection connection) '''«IF connection !== null»rIdx_«connection.getAttribute("id").objectValue»«ENDIF»'''
 
-	def rName(Connection connection) '''«IF connection != null»readIdx_«connection.getAttribute("id").objectValue»«ENDIF»'''
+	def rName(Connection connection) '''«IF connection !== null»readIdx_«connection.getAttribute("id").objectValue»«ENDIF»'''
 
 	def fifoType(Connection connection) {
-		if (connection.sourcePort != null) {
+		if (connection.sourcePort !== null) {
 			connection.sourcePort.type
 		} else {
 			connection.targetPort.type
@@ -554,7 +554,7 @@ port (
 	}
 
 	def closestLog_2(Integer x) {
-		if(x == null) closestLog_2(DEFAULT_FIFO_SIZE) else closestLog_2(x.intValue)
+		if(x === null) closestLog_2(DEFAULT_FIFO_SIZE) else closestLog_2(x.intValue)
 	}
 
 	def closestLog_2(int x) {

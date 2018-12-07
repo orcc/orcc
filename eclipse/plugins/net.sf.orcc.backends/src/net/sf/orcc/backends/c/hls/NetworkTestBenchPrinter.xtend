@@ -68,8 +68,8 @@ class NetworkTestBenchPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 			«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
 			«FOR port : instance.getActor.inputs»
 				«val connection = instance.incomingPortMap.get(port)»
-				«IF connection != null»
-					«IF connection.sourcePort == null»
+				«IF connection !== null»
+					«IF connection.sourcePort === null»
 						«connection.castfifoNameWrite»_V_dout   : IN STD_LOGIC_VECTOR («connection.fifoTypeOut.sizeInBits - 1» downto 0); 
 						«connection.castfifoNameWrite»_V_empty_n : IN STD_LOGIC;
 						«connection.castfifoNameWrite»_V_read    : OUT STD_LOGIC;
@@ -78,7 +78,7 @@ class NetworkTestBenchPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 			«ENDFOR»
 			«FOR portout : instance.getActor.outputs.filter[! native]»
 				«FOR connection : instance.outgoingPortMap.get(portout)»
-					«IF connection.targetPort == null»
+					«IF connection.targetPort === null»
 						«connection.castfifoNameRead»_V_din    : OUT STD_LOGIC_VECTOR («connection.fifoTypeOut.sizeInBits - 1» downto 0); 
 						«connection.castfifoNameRead»_V_full_n : IN STD_LOGIC;
 						«connection.castfifoNameRead»_V_write  : OUT STD_LOGIC;
@@ -100,8 +100,8 @@ class NetworkTestBenchPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 			«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
 			«FOR port : instance.getActor.inputs»
 				«val connection = instance.incomingPortMap.get(port)»
-				«IF connection != null»
-					«IF connection.sourcePort == null»
+				«IF connection !== null»
+					«IF connection.sourcePort === null»
 						signal «connection.castfifoNameWrite»_V_dout   :  STD_LOGIC_VECTOR («connection.fifoTypeOut.sizeInBits - 1» downto 0); 
 						signal «connection.castfifoNameWrite»_V_empty_n :  STD_LOGIC;
 						signal «connection.castfifoNameWrite»_V_read    :  STD_LOGIC;
@@ -110,7 +110,7 @@ class NetworkTestBenchPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 			«ENDFOR»
 			«FOR portout : instance.getActor.outputs.filter[! native]»
 				«FOR connection : instance.outgoingPortMap.get(portout)»
-					«IF connection.targetPort == null»
+					«IF connection.targetPort === null»
 						signal «connection.castfifoNameRead»_V_din    : STD_LOGIC_VECTOR («connection.fifoTypeOut.sizeInBits - 1» downto 0); 
 						signal «connection.castfifoNameRead»_V_full_n : STD_LOGIC;
 						signal «connection.castfifoNameRead»_V_write  :  STD_LOGIC;
@@ -178,8 +178,8 @@ class NetworkTestBenchPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 				«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
 					«FOR port : instance.getActor.inputs»			
 						«val connection = instance.incomingPortMap.get(port)»
-						«IF connection != null»
-							«IF connection.sourcePort == null»
+						«IF connection !== null»
+							«IF connection.sourcePort === null»
 								variable count«connection.castfifoNameWrite»: integer:= 0;
 								«ENDIF»
 							«ENDIF»
@@ -202,7 +202,7 @@ class NetworkTestBenchPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 					«FOR instance : network.children.filter(typeof(Instance)).filter[isActor]»
 						«FOR portout : instance.getActor.outputs.filter[! native]»
 							«FOR connection : instance.outgoingPortMap.get(portout)»
-								«IF connection.targetPort == null»
+								«IF connection.targetPort === null»
 									variable count«connection.castfifoNameRead»: integer:= 0;
 								«ENDIF»
 							«ENDFOR»
@@ -273,8 +273,8 @@ class NetworkTestBenchPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 	def waveGenInputs(Instance instance) '''
 		«FOR port : instance.getActor.inputs»
 			«val connection = instance.incomingPortMap.get(port)»
-			«IF connection != null»
-				«IF connection.sourcePort == null»
+			«IF connection !== null»
+				«IF connection.sourcePort === null»
 					«printInputWaveGen(connection.target as Instance, connection)»
 				«ENDIF»
 			«ENDIF»
@@ -285,7 +285,7 @@ class NetworkTestBenchPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 	def waveGenOutputs(Instance instance) '''
 		«FOR portout : instance.getActor.outputs.filter[! native]»
 			«FOR connection : instance.outgoingPortMap.get(portout)»
-				«IF connection.targetPort == null»
+				«IF connection.targetPort === null»
 					«printOutputWaveGen(connection.source as Instance, connection)»
 				«ENDIF»
 			«ENDFOR»
@@ -411,21 +411,21 @@ class NetworkTestBenchPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 	def initOutputs(Instance instance) '''
 		«FOR portout : instance.getActor.outputs.filter[! native]»
 			«FOR connection : instance.outgoingPortMap.get(portout)»
-				«IF connection.targetPort == null»
+				«IF connection.targetPort === null»
 					«connection.castfifoNameRead»_V_full_n <= '1';
 				«ENDIF»
 			«ENDFOR»
 		«ENDFOR»
 	'''
 
-	def castfifoNameWrite(Connection connection) '''«IF connection != null»myStream_cast_«connection.getAttribute("id").
+	def castfifoNameWrite(Connection connection) '''«IF connection !== null»myStream_cast_«connection.getAttribute("id").
 		objectValue»_write«ENDIF»'''
 
-	def castfifoNameRead(Connection connection) '''«IF connection != null»myStream_cast_«connection.getAttribute("id").
+	def castfifoNameRead(Connection connection) '''«IF connection !== null»myStream_cast_«connection.getAttribute("id").
 		objectValue»_read«ENDIF»'''
 
 	def fifoTypeOut(Connection connection) {
-		if (connection.sourcePort == null) {
+		if (connection.sourcePort === null) {
 			connection.targetPort.type
 		} else {
 			connection.sourcePort.type
@@ -433,7 +433,7 @@ class NetworkTestBenchPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 	}
 
 	def fifoTypeIn(Connection connection) {
-		if (connection.targetPort == null) {
+		if (connection.targetPort === null) {
 			connection.sourcePort.type
 		} else {
 			connection.targetPort.type

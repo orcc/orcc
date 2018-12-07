@@ -54,7 +54,7 @@ class UnitaryBatchCommandPrinterLinux extends net.sf.orcc.backends.c.InstancePri
 		vivado_hls -f script_«entityName».tcl
 		«FOR port : actor.inputs»
 			«val connection = incomingPortMap.get(port)»
-			«IF connection != null»
+			«IF connection !== null»
 				vivado_hls -f script_cast_«entityName»_«connection.targetPort.name»_write.tcl
 			«ENDIF»
 		«ENDFOR»		
@@ -73,7 +73,7 @@ class UnitaryBatchCommandPrinterLinux extends net.sf.orcc.backends.c.InstancePri
 		
 		«FOR port : actor.inputs»
 			«val connection = incomingPortMap.get(port)»
-			«IF connection != null»
+			«IF connection !== null»
 				cp subProject_cast_«entityName»_«connection.targetPort.name»_write/solution1/syn/vhdl/* «entityName»TopVHDL/
 			«ENDIF»
 		«ENDFOR»

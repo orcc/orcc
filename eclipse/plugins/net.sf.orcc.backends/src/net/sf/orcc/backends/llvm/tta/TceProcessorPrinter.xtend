@@ -278,7 +278,7 @@ class TceProcessorPrinter extends TTAPrinter {
 	'''
 
 	def private connect(Memory addressSpace) '''
-		«IF (addressSpace == null)»<address-space/>«ELSE»<address-space>«addressSpace.name»</address-space>«ENDIF»
+		«IF (addressSpace === null)»<address-space/>«ELSE»<address-space>«addressSpace.name»</address-space>«ENDIF»
 	'''
 
 	def getIdf(Processor processor) '''
@@ -303,7 +303,7 @@ class TceProcessorPrinter extends TTAPrinter {
 
 	def private getIdf(FunctionUnit fu) {
 		val impl = hwDb.get(fu.implementation)
-		if (impl == null) {
+		if (impl === null) {
 			OrccLogger::noticeln(
 				"Unknown implementation of " + fu.name + ", the design will not be able to be generated.")
 		} else {
@@ -318,7 +318,7 @@ class TceProcessorPrinter extends TTAPrinter {
 
 	def private getIdf(RegisterFile rf) {
 		val impl = hwDb.get(rf.implementation)
-		if (impl == null) {
+		if (impl === null) {
 			OrccLogger::noticeln(
 				"Unknown implementation of " + rf.name + ", the design will not be able to be generated.")
 		} else {

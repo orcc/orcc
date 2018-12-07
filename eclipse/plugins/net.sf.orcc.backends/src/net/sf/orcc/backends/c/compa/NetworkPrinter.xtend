@@ -138,7 +138,7 @@ class NetworkPrinter extends net.sf.orcc.backends.c.NetworkPrinter {
 	'''
 
 	 override protected allocateFifo(Connection conn, int nbReaders) {
-	  	val size = if (conn.size != null) conn.size else fifoSize
+	  	val size = if (conn.size !== null) conn.size else fifoSize
 		val id = conn.<Object>getValueAsObject("idNoBcast")
 	  	val portSizeInBytes = if (conn.sourcePort.type.sizeInBits == 1) 4 else (conn.sourcePort.type.sizeInBits/8)
 	  	val bufferAddr = memoryBaseAddr

@@ -67,7 +67,7 @@ class TceDesignPrinter extends TTAPrinter {
 				«val actor = vertex.getAdapter(typeof(Actor))»
 				«FOR input: actor.inputs.filter(port | !port.native)»
 					«val incoming = actor.incomingPortMap.get(input)»
-					«IF incoming != null && !processor.mappedActors.contains(incoming.source)»
+					«IF incoming !== null && !processor.mappedActors.contains(incoming.source)»
 						<input name="«input.name»">
 							<address-space>«processor.getMemory(incoming).name»</address-space>
 							<var-name>fifo_«incoming.getValueAsObject("id").toString»</var-name>

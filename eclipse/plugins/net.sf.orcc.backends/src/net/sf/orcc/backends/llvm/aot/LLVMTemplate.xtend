@@ -138,7 +138,7 @@ abstract class LLVMTemplate extends CommonPrinter {
 		} else {
 			type = TypeUtil.getLub(e1.type, e2.type);
 		}
-		if (type == null) {
+		if (type === null) {
 			throw new OrccRuntimeException(
 				"Type mismatch: cannot evaluate the least upper bound between " 
 				+ e1.type + " and " + e2.type);

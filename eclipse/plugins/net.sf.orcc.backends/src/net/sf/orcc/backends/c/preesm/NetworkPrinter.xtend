@@ -93,7 +93,7 @@ class NetworkPrinter extends CTemplate {
 		        <desc>org.sdf4j.model.sdf.types.SDFTextualEdgePropertyTypeFactory</desc>
 		    </key>
 		    <graph edgedefault="directed">
-			    «IF network.simpleName != null»
+			    «IF network.simpleName !== null»
 			    	<data key="name">«network.simpleName»</data>
 			    «ELSE»
 			        <data key="name" />
