@@ -215,7 +215,7 @@ class ActorPrinter extends InstancePrinter {
 				«ENDIF»
 			«ENDFOR» 
 		«ENDIF»
-		«IF ret.value != null»
+		«IF ret.value !== null»
 			return «ret.value.doSwitch»;
 		«ENDIF»
 	'''

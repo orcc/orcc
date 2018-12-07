@@ -237,14 +237,14 @@ class InstancePrinter extends CTemplate {
 			// Using only the very first action with @genWeightsExit tag.			
 			genWeightsExitAction = actor.actions.filter[hasAttribute(GEN_WEIGHTS_EXIT_ATTRIBUTE)].get(0)			
 			genWeightsExitCond	 = genWeightsExitAction.getAttribute(GEN_WEIGHTS_EXIT_ATTRIBUTE)?.getValueAsString("condition")
-			if(genWeightsExitCond == null || genWeightsExitCond == "")
+			if(genWeightsExitCond === null || genWeightsExitCond == "")
 				genWeightsExitCond = "1"
 		}
 		else
 		{
 			genWeightsExit = false			
 			genWeightsExitAction = null
-			genWeightsExitCond == null
+			genWeightsExitCond === null
 		}
 	}
 	
@@ -289,7 +289,7 @@ class InstancePrinter extends CTemplate {
 		«printNativeLibHeaders(linkNativeLibHeaders)»
 
 		«ENDIF»
-		«IF instance != null»
+		«IF instance !== null»
 			«instance.printAttributes»
 		«ELSE»
 			«actor.printAttributes»
@@ -311,7 +311,7 @@ class InstancePrinter extends CTemplate {
 			////////////////////////////////////////////////////////////////////////////////
 			// Input FIFOs
 			«FOR port : actor.inputs»
-				«if (incomingPortMap.get(port) != null) "extern "»fifo_«port.type.doSwitch»_t *«port.fullName»;
+				«if (incomingPortMap.get(port) !== null) "extern "»fifo_«port.type.doSwitch»_t *«port.fullName»;
 			«ENDFOR»
 
 			////////////////////////////////////////////////////////////////////////////////
@@ -322,7 +322,7 @@ class InstancePrinter extends CTemplate {
 				#define SIZE_«port.name» «incomingPortMap.get(port).sizeOrDefaultSize»
 				#define tokens_«port.name» «port.fullName»->contents
 				
-				«if (incomingPortMap.get(port) != null) "extern "»connection_t connection_«entityName»_«port.name»;
+				«if (incomingPortMap.get(port) !== null) "extern "»connection_t connection_«entityName»_«port.name»;
 				#define rate_«port.name» connection_«entityName»_«port.name».rate
 				
 			«ENDFOR»
@@ -337,7 +337,7 @@ class InstancePrinter extends CTemplate {
 			////////////////////////////////////////////////////////////////////////////////
 			// Predecessors
 			«FOR port : actor.inputs»
-				«IF incomingPortMap.get(port) != null»
+				«IF incomingPortMap.get(port) !== null»
 					extern actor_t «incomingPortMap.get(port).source.label»;
 				«ENDIF»
 			«ENDFOR»
@@ -376,10 +376,10 @@ class InstancePrinter extends CTemplate {
 			«ENDFOR»
 
 		«ENDIF»
-		«IF (instance != null && !instance.arguments.nullOrEmpty) || !actor.parameters.nullOrEmpty»
+		«IF (instance !== null && !instance.arguments.nullOrEmpty) || !actor.parameters.nullOrEmpty»
 			////////////////////////////////////////////////////////////////////////////////
 			// Parameter values of the instance
-			«IF instance != null»
+			«IF instance !== null»
 				«FOR arg : instance.arguments»
 					«IF arg.value.exprList»
 						static «IF (arg.value.type as TypeList).innermostType.uint»unsigned «ENDIF»int «arg.variable.name»«arg.value.type.dimensionsExpr.printArrayIndexes» = «arg.value.doSwitch»;
@@ -731,7 +731,7 @@ class InstancePrinter extends CTemplate {
 	'''
 
 	def protected checkConnectivy() {
-		for(port : actor.inputs.filter[incomingPortMap.get(it) == null]) {
+		for(port : actor.inputs.filter[incomingPortMap.get(it) === null]) {
 			OrccLogger::noticeln("["+entityName+"] Input port "+port.name+" not connected.")
 		}
 		for(port : actor.outputs.filter[outgoingPortMap.get(it).nullOrEmpty]) {
@@ -998,7 +998,7 @@ class InstancePrinter extends CTemplate {
 			}
 		}
 		''' 		
-		«IF genWeightsExit && network != null»
+		«IF genWeightsExit && network !== null»
 			// Data structures for profling actions.
 			«FOR child : network.children»
 				«printGenWeightsActionProfilingVars(child.getAdapter(typeof(Actor)))»
@@ -1074,7 +1074,7 @@ class InstancePrinter extends CTemplate {
 			network = actor.eContainer() as Network
 		}
 		''' 
-		«IF network != null»
+		«IF network !== null»
 			void calcGenWeightsActions() {
 				FILE *fpGenWeightsStats = NULL;
 				«IF genWeightsDump»FILE *fpGenWeightsFirings = NULL;«ENDIF»
@@ -1303,7 +1303,7 @@ class InstancePrinter extends CTemplate {
 		'''«entityName»_«port.name»'''
 
 	def protected sizeOrDefaultSize(Connection conn) {
-		if(conn == null || conn.size == null) fifoSize
+		if(conn === null || conn.size === null) fifoSize
 		else conn.size
 	}
 
@@ -1385,7 +1385,7 @@ class InstancePrinter extends CTemplate {
 		val source = load.source.variable
 		val port = source.getPort
 		'''
-			«IF port != null» ««« Loading data from input FIFO
+			«IF port !== null» ««« Loading data from input FIFO
 				«IF (isActionAligned && port.hasAttribute(currentAction.name + "_" + ALIGNABLE)) || port.hasAttribute(ALIGNED_ALWAYS)»
 					«target.name» = tokens_«port.name»[(index_«port.name» % SIZE_«port.name») + («load.indexes.head.doSwitch»)];
 				«ELSE»
@@ -1405,7 +1405,7 @@ class InstancePrinter extends CTemplate {
 		val target = store.target.variable
 		val port = target.port
 		'''
-			«IF port != null» ««« Storing data to output FIFO
+			«IF port !== null» ««« Storing data to output FIFO
 				«IF port.native»
 					printf("«port.name» = %i\n", «store.value.doSwitch»);
 				«ELSEIF (isActionAligned && port.hasAttribute(currentAction.name + "_" + ALIGNABLE)) || port.hasAttribute(ALIGNED_ALWAYS)»
@@ -1427,12 +1427,12 @@ class InstancePrinter extends CTemplate {
 		«IF call.print»
 			printf(«call.arguments.printfArgs.join(", ")»);
 		«ELSE»
-			«IF call.target != null»«call.target.variable.name» = «ENDIF»«call.procedure.name»(«call.arguments.join(", ")[print]»);
+			«IF call.target !== null»«call.target.variable.name» = «ENDIF»«call.procedure.name»(«call.arguments.join(", ")[print]»);
 		«ENDIF»
 	'''
 
 	override caseInstReturn(InstReturn ret) '''
-		«IF ret.value != null»
+		«IF ret.value !== null»
 			return «ret.value.doSwitch»;
 		«ENDIF»
 	'''
@@ -1443,7 +1443,7 @@ class InstancePrinter extends CTemplate {
 	
 	override caseExprVar(ExprVar expr) {
 		val port = expr.copyOf
-		if(port != null && isActionAligned){
+		if(port !== null && isActionAligned){
 			// If the argument is just a local copy of input/output tokens
 			// use directly the FIFO when the tokens are aligned
 			'''&tokens_«port.name»[index_«port.name» % SIZE_«port.name»]'''
@@ -1464,7 +1464,7 @@ class InstancePrinter extends CTemplate {
 	 * @return the corresponding port, or <code>null</code>
 	 */
 	def protected getPort(Var variable) {
-		if(currentAction == null) {
+		if(currentAction === null) {
 			null
 		} else if (currentAction?.inputPattern.contains(variable)) {
 			currentAction.inputPattern.getPort(variable)
@@ -1488,7 +1488,7 @@ class InstancePrinter extends CTemplate {
 	def private copyOf(ExprVar expr) {
 		val action = EcoreHelper.getContainerOfType(expr, Action)
 		val variable = expr.use.variable
-		if(action == null || !expr.type.list || !variable.hasAttribute(COPY_OF_TOKENS)) {
+		if(action === null || !expr.type.list || !variable.hasAttribute(COPY_OF_TOKENS)) {
 			return null
 		}
 		return variable.getValueAsEObject(COPY_OF_TOKENS) as Port
@@ -1530,7 +1530,7 @@ class InstancePrinter extends CTemplate {
 		val fsm = actor.getFsm()
 		transitionPattern.clear
 
-		if (fsm != null) {
+		if (fsm !== null) {
 			for (state : fsm.getStates()) {
 				val pattern = DfFactory::eINSTANCE.createPattern()
 

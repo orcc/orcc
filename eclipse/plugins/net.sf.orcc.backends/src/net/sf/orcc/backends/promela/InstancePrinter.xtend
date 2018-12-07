@@ -433,7 +433,7 @@ class InstancePrinter extends PromelaTemplate {
 			printf(«call.arguments.printfArgs.join(", ")»);
 		'''
 		else '''
-			«IF call.target != null»«call.target.variable.name» = «ENDIF»1;
+			«IF call.target !== null»«call.target.variable.name» = «ENDIF»1;
 		'''
 	}
 	

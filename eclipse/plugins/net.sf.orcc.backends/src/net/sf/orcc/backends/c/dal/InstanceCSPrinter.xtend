@@ -116,8 +116,8 @@ class InstanceCSPrinter extends CTemplate {
 			«ENDFOR»
 		«ENDIF»
 
-		«IF (instance != null && !instance.arguments.nullOrEmpty) || !actor.parameters.nullOrEmpty»
-			«IF instance != null»
+		«IF (instance !== null && !instance.arguments.nullOrEmpty) || !actor.parameters.nullOrEmpty»
+			«IF instance !== null»
 				«FOR arg : instance.arguments»
 					«IF arg.value.exprList»
 						static «IF (arg.value.type as TypeList).innermostType.uint»unsigned «ENDIF»int «arg.variable.name»«arg.value.type.dimensionsExpr.printArrayIndexes» = «arg.value.doSwitch»;
@@ -396,7 +396,7 @@ class InstanceCSPrinter extends CTemplate {
 	override caseInstLoad(InstLoad load) {
 		val srcPort = load.source.variable.getPort
 		'''
-			«IF srcPort != null»
+			«IF srcPort !== null»
 				«load.target.variable.name» = PORT_«srcPort.name»_name[«load.indexes.head.doSwitch»];
 			«ELSE»
 				«IF load.source.variable.isGlobal == true && load.source.variable.assignable == true»
@@ -411,7 +411,7 @@ class InstanceCSPrinter extends CTemplate {
 	override caseInstStore(InstStore store) {
 		val trgtPort = store.target.variable.port
 		'''
-		«IF trgtPort != null»
+		«IF trgtPort !== null»
 			«IF currentAction.outputPattern.varToPortMap.get(store.target.variable).native»
 				printf("«trgtPort.name» = %i\n", «store.value.doSwitch»);
 			«ELSE»
@@ -437,12 +437,12 @@ class InstanceCSPrinter extends CTemplate {
 		«IF call.print»
 			printf(«call.arguments.printfArgs.join(", ")»);
 		«ELSE»
-			«IF call.target != null»«call.target.variable.name» = «ENDIF»«call.procedure.name»(«call.arguments.join(", ")[printCallArg]»);
+			«IF call.target !== null»«call.target.variable.name» = «ENDIF»«call.procedure.name»(«call.arguments.join(", ")[printCallArg]»);
 		«ENDIF»
 	''' }
 
 	override caseInstReturn(InstReturn ret) '''
-		«IF ret.value != null»
+		«IF ret.value !== null»
 			return «ret.value.doSwitch»;
 		«ENDIF»
 	'''
@@ -455,7 +455,7 @@ class InstanceCSPrinter extends CTemplate {
 	//            Helper methods
 	//========================================
 	def private getPort(Var variable) {
-		if(currentAction == null) {
+		if(currentAction === null) {
 			null
 		} else if (currentAction?.inputPattern.contains(variable)) {
 			currentAction.inputPattern.getPort(variable)
@@ -483,7 +483,7 @@ class InstanceCSPrinter extends CTemplate {
 
 	def private isInputConneted(Port port) {
 		// If the port has an input connection, returns true
-		incomingPortMap.get(port) != null
+		incomingPortMap.get(port) !== null
 	}
 
 	//========================================
@@ -502,7 +502,7 @@ class InstanceCSPrinter extends CTemplate {
 	def private buildTransitionPattern() {		
 		val fsm = actor.getFsm()
 
-		if (fsm != null) {
+		if (fsm !== null) {
 			for (state : fsm.getStates()) {
 				val pattern = DfFactory::eINSTANCE.createPattern()
 

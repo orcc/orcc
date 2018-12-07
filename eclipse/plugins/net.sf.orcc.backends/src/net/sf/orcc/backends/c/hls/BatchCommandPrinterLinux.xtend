@@ -55,13 +55,13 @@ class BatchCommandPrinterLinux extends net.sf.orcc.backends.c.NetworkPrinter {
 			vivado_hls -f script_«instance.name».tcl
 			«FOR port : instance.getActor.inputs»
 				«val connection = instance.incomingPortMap.get(port)»
-				«IF connection != null && connection.sourcePort == null»
+				«IF connection !== null && connection.sourcePort === null»
 					vivado_hls -f script_cast_«instance.name»_«connection.targetPort.name»_write.tcl
 				«ENDIF»
 			«ENDFOR»		
 			«FOR port : instance.getActor.outputs.filter[! native]»			
 				«FOR connection : instance.outgoingPortMap.get(port)»
-					«IF connection.targetPort == null»
+					«IF connection.targetPort === null»
 						vivado_hls -f script_cast_«instance.name»_«connection.sourcePort.name»_read.tcl
 					«ENDIF»
 				«ENDFOR»
@@ -73,13 +73,13 @@ class BatchCommandPrinterLinux extends net.sf.orcc.backends.c.NetworkPrinter {
 			cp subProject_«instance.name»/solution1/syn/vhdl/* TopVHDL/
 			«FOR port : instance.getActor.inputs»
 				«val connection = instance.incomingPortMap.get(port)»
-				«IF connection != null && connection.sourcePort == null»
+				«IF connection !== null && connection.sourcePort === null»
 					cp subProject_cast_«instance.name»_«connection.targetPort.name»_write/solution1/syn/vhdl/* TopVHDL/
 				«ENDIF»
 			«ENDFOR»
 			«FOR port : instance.getActor.outputs.filter[! native]»
 				«FOR connection : instance.outgoingPortMap.get(port)»
-					«IF connection.targetPort == null»				
+					«IF connection.targetPort === null»				
 						cp subProject_cast_«instance.name»_«connection.sourcePort.name»_read/solution1/syn/vhdl/* TopVHDL/
 					«ENDIF»
 				«ENDFOR»

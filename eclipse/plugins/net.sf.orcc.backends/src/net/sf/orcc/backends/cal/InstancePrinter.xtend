@@ -132,7 +132,7 @@ actor «actorName» ()
    «printAction(action)»
   «ENDFOR»
   
-  «IF actor.fsm != null»
+  «IF actor.fsm !== null»
   schedule fsm «actor.fsm.initialState.name» :
   «FOR trans : actor.fsm.transitions»
     «trans.source.name» («trans.action.name») --> «trans.target.name»; 
@@ -432,7 +432,7 @@ end
 				var instLoad = inst as InstLoad
 				if (isTargetInputPort(instLoad.source.variable.name)) {
 					var List<String> previousList = new ArrayList
-					if (inputMap.get(instLoad.source.variable.name) != null) {
+					if (inputMap.get(instLoad.source.variable.name) !== null) {
 						previousList = inputMap.get(instLoad.source.variable.name)
 					}
 					val token = formatVarName(instLoad.target.variable.name)
@@ -468,7 +468,7 @@ end
 			if (inst instanceof InstLoad) {
 				var instLoad = inst as InstLoad
 				if (!instLoad.indexes.isEmpty) {
-						var varListAtPort = if (loadLookup.get(instLoad.source.variable.name) == null)
+						var varListAtPort = if (loadLookup.get(instLoad.source.variable.name) === null)
 								new HashMap
 							else
 								loadLookup.get(instLoad.source.variable.name)
@@ -520,7 +520,7 @@ end
 				var instStore = inst as InstStore
 				if (!instStore.indexes.isEmpty) {
 					if (isTargetOutputPort(instStore.target.variable.name)) {
-						var varListAtPort = if (storeLookup.get(instStore.target.variable.name) == null)
+						var varListAtPort = if (storeLookup.get(instStore.target.variable.name) === null)
 								new HashMap
 							else
 								storeLookup.get(instStore.target.variable.name)

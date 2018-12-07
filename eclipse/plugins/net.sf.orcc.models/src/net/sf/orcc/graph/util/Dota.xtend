@@ -71,7 +71,7 @@ class Dota {
 
 	def private getId(Vertex vertex) {
 		var id = vertexMap.get(vertex)
-		if (id == null) {
+		if (id === null) {
 			id = rank
 			vertexMap.put(vertex, id)
 			rank = rank + 1

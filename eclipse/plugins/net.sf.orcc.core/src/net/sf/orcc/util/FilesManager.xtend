@@ -78,7 +78,7 @@ class FilesManager {
 	def static extract(String path, String targetFolder) {
 		val targetF = new File(targetFolder.sanitize)
 		val url = path.url
-		if(url == null) {
+		if(url === null) {
 			throw new FileNotFoundException(path)
 		}
 		if (url.protocol.equals("jar")) {
@@ -256,7 +256,7 @@ class FilesManager {
 		// Search in all reachable bundles for the given path resource
 		val bundle = FrameworkUtil::getBundle(FilesManager)
 		val url =
-			if(bundle != null) {
+			if(bundle !== null) {
 				val bundles = bundle.bundleContext.bundles
 				bundles
 					// Search only in Orcc plugins
@@ -264,7 +264,7 @@ class FilesManager {
 					// We want an URL to the resource
 					.map[getEntry(path)]
 					// We keep the first URL not null (we found the resource)
-					.findFirst[it != null]
+					.findFirst[it !== null]
 			}
 			// Fallback, we are not in a bundle context (maybe unit tests execution?),
 			// we use the default ClassLoader method. The problem with this method is
@@ -381,7 +381,7 @@ class FilesManager {
 	static def readFile(String path) {
 
 		val url = path.url
-		if(url == null) {
+		if(url === null) {
 			throw new FileNotFoundException(path)
 		}
 

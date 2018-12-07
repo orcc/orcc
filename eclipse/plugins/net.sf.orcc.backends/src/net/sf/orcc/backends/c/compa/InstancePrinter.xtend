@@ -68,7 +68,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 	override protected printStateTransitions(State state) '''
 		«FOR trans : state.outgoing.map[it as Transition] SEPARATOR " else "»
 			if («trans.action.inputPattern.checkInputPattern»«trans.action.scheduler.name»()) {
-				«IF trans.action.outputPattern != null»
+				«IF trans.action.outputPattern !== null»
 					«trans.action.outputPattern.printOutputPattern»
 						_FSM_state = my_state_«state.name»;
 						goto finished;
@@ -181,7 +181,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		// Action loop
 		«FOR action : actions SEPARATOR " else "»
 			if («inputPattern.checkInputPattern»«action.scheduler.name»()) {
-				«IF action.outputPattern != null»
+				«IF action.outputPattern !== null»
 					«action.outputPattern.printOutputPattern»
 						goto finished;
 					}
@@ -403,7 +403,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 		extern void xil_printf( const char *ctrl1, ...);
 «««		#define xil_printf	printf
 
-		«IF instance != null»
+		«IF instance !== null»
 			«instance.printAttributes»
 		«ELSE»
 			«actor.printAttributes»
@@ -422,7 +422,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			// Input FIFOs
 			«IF printMainFunc != true»
 				«FOR port : actor.inputs»
-					«if (incomingPortMap.get(port) != null) "extern "» fifo_«port.type.doSwitch»_t *«port.fullName»;
+					«if (incomingPortMap.get(port) !== null) "extern "» fifo_«port.type.doSwitch»_t *«port.fullName»;
 				«ENDFOR»
 			«ENDIF»
 			////////////////////////////////////////////////////////////////////////////////
@@ -437,7 +437,7 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			////////////////////////////////////////////////////////////////////////////////
 			// Predecessors
 			«FOR port : actor.inputs»
-				«IF incomingPortMap.get(port) != null»
+				«IF incomingPortMap.get(port) !== null»
 					extern actor_t «incomingPortMap.get(port).source.label»;
 				«ENDIF»
 			«ENDFOR»
@@ -476,10 +476,10 @@ class InstancePrinter extends net.sf.orcc.backends.c.InstancePrinter {
 			#include "decoder_parser_parseheaders_test.h"
 		«ENDIF»
 		
-		«IF (instance != null && !instance.arguments.nullOrEmpty) || !actor.parameters.nullOrEmpty»
+		«IF (instance !== null && !instance.arguments.nullOrEmpty) || !actor.parameters.nullOrEmpty»
 			////////////////////////////////////////////////////////////////////////////////
 			// Parameter values of the instance
-			«IF instance != null»
+			«IF instance !== null»
 				«FOR arg : instance.arguments»
 					«IF arg.value.exprList»
 						static «IF (arg.value.type as TypeList).innermostType.uint»unsigned «ENDIF»int «arg.variable.name»«arg.value.type.dimensionsExpr.printArrayIndexes» = «arg.value.doSwitch»;

@@ -62,7 +62,7 @@ import net.sf.orcc.ir.TypeBool
 		
 		«FOR port : actor.inputs»
 			«val connection = incomingPortMap.get(port)»
-			«IF connection != null»
+			«IF connection !== null»
 				stream<«connection.fifoType.doSwitch»>	«connection.fifoName»;
 				int counter_«connection.fifoName»;
 				«connection.fifoType.doSwitch» tab_«connection.fifoName»[1000];
@@ -99,7 +99,7 @@ import net.sf.orcc.ir.TypeBool
 			// read data
 			«FOR port : actor.inputs»
 				«val connection = incomingPortMap.get(port)»
-				«IF connection != null»
+				«IF connection !== null»
 					fp=fopen("«entityName»_«port.name».txt","r");
 					for (i=0 ; i<1000 ; i++){
 						fscanf(fp, "%d", &tmp_«connection.fifoName»);
@@ -114,7 +114,7 @@ import net.sf.orcc.ir.TypeBool
 			
 				«FOR port : actor.inputs»
 					«val connection = incomingPortMap.get(port)»
-					«IF connection != null»
+					«IF connection !== null»
 					for (i=0 ; i<1000 ; i++){
 						if(!«connection.fifoName».full()){
 							«connection.fifoName».write(tab_«connection.fifoName»[counter_«connection.fifoName»]);
@@ -171,14 +171,14 @@ import net.sf.orcc.ir.TypeBool
 	'''	
 	
 	def fifoType(Connection connection) {
-		if(connection.sourcePort == null){
+		if(connection.sourcePort === null){
 		connection.targetPort.type}
 		else{
 			connection.sourcePort.type
 		}
 	}
 	
-	def fifoName(Connection connection) '''«IF connection != null»myStream_«connection.getAttribute("id").objectValue»«ENDIF»'''
+	def fifoName(Connection connection) '''«IF connection !== null»myStream_«connection.getAttribute("id").objectValue»«ENDIF»'''
 	
 	override caseTypeBool(TypeBool type) 
 	'''bool'''

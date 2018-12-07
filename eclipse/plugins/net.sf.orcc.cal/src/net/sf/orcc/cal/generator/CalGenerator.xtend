@@ -156,16 +156,16 @@ class CalGenerator implements IGenerator {
 		val astEntity = calResource.entity
 
 		// Transform the AstEntity into an Actor or a Unit
-		val entity = if (astEntity.unit != null) {
+		val entity = if (astEntity.unit !== null) {
 				unitTransformer.doSwitch(astEntity.unit)
-			} else if (astEntity.actor != null) {
+			} else if (astEntity.actor !== null) {
 				actorTransformer.doSwitch(astEntity.actor)
 			} else {
 				null
 			}
 
 		// Check errors...
-		if (entity == null) {
+		if (entity === null) {
 			OrccLogger.warnln("Unable to transform the CAL content")
 			return ""
 		}
@@ -245,7 +245,7 @@ class CalGenerator implements IGenerator {
 		val dependingResource = newHashSet
 		for (imp : astEntity.imports) {
 			val calFile = imp.getExistingCalFile
-			if (calFile != null) {
+			if (calFile !== null) {
 				dependingResource.add(
 					calResourceSet.getResource(URI.createPlatformResourceURI(calFile.fullPath.toString, true), true)
 				)

@@ -67,7 +67,7 @@ class ActorNetworkTestBenchPrinter extends net.sf.orcc.backends.c.InstancePrinte
 			
 			«FOR port : actor.inputs»
 				«val connection = incomingPortMap.get(port)»
-				«IF connection != null»
+				«IF connection !== null»
 					«connection.castfifoNameWrite»_V_dout   : IN STD_LOGIC_VECTOR («connection.fifoTypeIn.sizeInBits - 1» downto 0);
 					«connection.castfifoNameWrite»_V_empty_n : IN STD_LOGIC;
 					«connection.castfifoNameWrite»_V_read    : OUT STD_LOGIC;
@@ -103,7 +103,7 @@ class ActorNetworkTestBenchPrinter extends net.sf.orcc.backends.c.InstancePrinte
 			
 			«FOR port : actor.inputs»
 			«val connection = incomingPortMap.get(port)»
-			«IF connection != null»
+			«IF connection !== null»
 				Signal «connection.castfifoNameWrite»_V_dout   :  STD_LOGIC_VECTOR («connection.fifoTypeIn.sizeInBits - 1» downto 0);
 				Signal «connection.castfifoNameWrite»_V_empty_n :  STD_LOGIC;
 				Signal «connection.castfifoNameWrite»_V_read    :  STD_LOGIC;				
@@ -158,7 +158,7 @@ class ActorNetworkTestBenchPrinter extends net.sf.orcc.backends.c.InstancePrinte
 				ap_ready =>ap_ready,
 				«FOR port : actor.inputs»
 					«val connection = incomingPortMap.get(port)»
-					«IF connection != null»
+					«IF connection !== null»
 						«connection.castfifoNameWrite»_V_dout   => «connection.castfifoNameWrite»_V_dout,
 						«connection.castfifoNameWrite»_V_empty_n => «connection.castfifoNameWrite»_V_empty_n,
 						«connection.castfifoNameWrite»_V_read    => «connection.castfifoNameWrite»_V_read,
@@ -207,7 +207,7 @@ class ActorNetworkTestBenchPrinter extends net.sf.orcc.backends.c.InstancePrinte
 					variable line_number : line;
 					«FOR port : actor.inputs»
 						«val connection = incomingPortMap.get(port)»
-						«IF connection != null»
+						«IF connection !== null»
 							variable count«connection.castfifoNameWrite»: integer:= 0;
 						«ENDIF»
 					«ENDFOR»
@@ -216,7 +216,7 @@ class ActorNetworkTestBenchPrinter extends net.sf.orcc.backends.c.InstancePrinte
 					if rising_edge(ap_clk) then
 					«FOR port : actor.inputs»
 						«val connection = incomingPortMap.get(port)»
-						«IF connection != null»
+						«IF connection !== null»
 							«printInputWaveGen(connection, connection.castfifoNameWrite)»
 						«ENDIF»
 					«ENDFOR»
@@ -378,14 +378,14 @@ class ActorNetworkTestBenchPrinter extends net.sf.orcc.backends.c.InstancePrinte
 			end if;
 	'''
 
-	def castfifoNameWrite(Connection connection) '''«IF connection != null»myStream_cast_«connection.getAttribute("id").
+	def castfifoNameWrite(Connection connection) '''«IF connection !== null»myStream_cast_«connection.getAttribute("id").
 		objectValue»_write«ENDIF»'''
 
-	def castfifoNameRead(Connection connection) '''«IF connection != null»myStream_cast_«connection.getAttribute("id").
+	def castfifoNameRead(Connection connection) '''«IF connection !== null»myStream_cast_«connection.getAttribute("id").
 		objectValue»_read«ENDIF»'''
 
 	def fifoTypeOut(Connection connection) {
-		if (connection.sourcePort == null) {
+		if (connection.sourcePort === null) {
 			connection.targetPort.type
 		} else {
 			connection.sourcePort.type
@@ -393,7 +393,7 @@ class ActorNetworkTestBenchPrinter extends net.sf.orcc.backends.c.InstancePrinte
 	}
 
 	def fifoTypeIn(Connection connection) {
-		if (connection.targetPort == null) {
+		if (connection.targetPort === null) {
 			connection.sourcePort.type
 		} else {
 			connection.targetPort.type

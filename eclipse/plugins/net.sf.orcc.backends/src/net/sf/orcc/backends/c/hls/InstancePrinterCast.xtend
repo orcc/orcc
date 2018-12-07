@@ -212,7 +212,7 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 		static void cast_«entityName»_«connOut.sourcePort.name»_read_untagged_0() {
 			i32 «connOut.maskName» = «connOut.localrName» & («connOut.safeSize - 1» );
 			«IF connOut.fifoType.bool»
-				«IF connOut.targetPort != null»			
+				«IF connOut.targetPort !== null»			
 				«connOut.fifoType» tmp_«connOut.targetPort.name»;
 				«ELSE»
 				«connOut.fifoType» tmp_«connOut.sourcePort.name»;
@@ -248,26 +248,26 @@ class InstancePrinterCast extends net.sf.orcc.backends.c.InstancePrinter {
 		
 	'''
 
-	def castfifoNameWrite(Connection connection) '''«IF connection != null»myStream_cast_«connection.getAttribute("id").
+	def castfifoNameWrite(Connection connection) '''«IF connection !== null»myStream_cast_«connection.getAttribute("id").
 		objectValue»_write«ENDIF»'''
 
-	def castfifoNameRead(Connection connection) '''«IF connection != null»myStream_cast_«connection.getAttribute("id").
+	def castfifoNameRead(Connection connection) '''«IF connection !== null»myStream_cast_«connection.getAttribute("id").
 		objectValue»_read«ENDIF»'''
 
-	def ramName(Connection connection) '''«IF connection != null»tab_«connection.getAttribute("id").objectValue»«ENDIF»'''
+	def ramName(Connection connection) '''«IF connection !== null»tab_«connection.getAttribute("id").objectValue»«ENDIF»'''
 
-	def wName(Connection connection) '''«IF connection != null»writeIdx_«connection.getAttribute("id").objectValue»«ENDIF»'''
+	def wName(Connection connection) '''«IF connection !== null»writeIdx_«connection.getAttribute("id").objectValue»«ENDIF»'''
 
-	def localwName(Connection connection) '''«IF connection != null»wIdx_«connection.getAttribute("id").objectValue»«ENDIF»'''
+	def localwName(Connection connection) '''«IF connection !== null»wIdx_«connection.getAttribute("id").objectValue»«ENDIF»'''
 
-	def localrName(Connection connection) '''«IF connection != null»rIdx_«connection.getAttribute("id").objectValue»«ENDIF»'''
+	def localrName(Connection connection) '''«IF connection !== null»rIdx_«connection.getAttribute("id").objectValue»«ENDIF»'''
 
-	def rName(Connection connection) '''«IF connection != null»readIdx_«connection.getAttribute("id").objectValue»«ENDIF»'''
+	def rName(Connection connection) '''«IF connection !== null»readIdx_«connection.getAttribute("id").objectValue»«ENDIF»'''
 
-	def maskName(Connection connection) '''«IF connection != null»mask_«connection.getAttribute("id").objectValue»«ENDIF»'''
+	def maskName(Connection connection) '''«IF connection !== null»mask_«connection.getAttribute("id").objectValue»«ENDIF»'''
 
 	def fifoType(Connection connection) {
-		if (connection.sourcePort != null) {
+		if (connection.sourcePort !== null) {
 			connection.sourcePort.type
 		} else {
 			connection.targetPort.type

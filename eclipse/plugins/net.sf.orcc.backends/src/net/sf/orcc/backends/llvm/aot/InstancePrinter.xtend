@@ -177,7 +177,7 @@ class InstancePrinter extends LLVMTemplate {
 
 		;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		; Parameters
-		«IF instance != null»
+		«IF instance !== null»
 			«FOR arg : instance.arguments»
 				@«arg.variable.name» = internal global «arg.variable.type.doSwitch» «arg.value.doSwitch»
 			«ENDFOR»
@@ -388,8 +388,8 @@ class InstancePrinter extends LLVMTemplate {
 	'''
 
 	def protected printAlignmentConditions(Action action, State state) '''
-		«val stateName = if(state != null) '''«state.name»_''' else ""»
-		«val actionName = if(state != null) '''«state.name»_«action.name»''' else '''«action.name»'''»
+		«val stateName = if(state !== null) '''«state.name»_''' else ""»
+		«val actionName = if(state !== null) '''«state.name»_«action.name»''' else '''«action.name»'''»
 		«val portToIndexMap = portToIndexByPatternMap.get(action.inputPattern)»
 		«val connections = action.outputPattern.ports.notNative.map[outgoingPortMap.get(it)].flatten.toList»
 		«FOR port : action.inputPattern.ports»
@@ -492,7 +492,7 @@ class InstancePrinter extends LLVMTemplate {
 	'''
 
 	def private checkInputPattern(Action action, Pattern pattern, State state) {
-		val stateName = if(state != null) '''«state.name»_''' else ""
+		val stateName = if(state !== null) '''«state.name»_''' else ""
 		val portToIndexMap = portToIndexByPatternMap.get(pattern)
 		val firstPort = pattern.ports.notNative.head
 		val firstName = firstPort.name + "_" + incomingPortMap.get(firstPort).getSafeId(firstPort)
@@ -519,7 +519,7 @@ class InstancePrinter extends LLVMTemplate {
 	}
 
 	def private checkOutputPattern(Action action, Pattern pattern, State state) {
-		val stateName = if(state != null) '''«state.name»_''' else ""
+		val stateName = if(state !== null) '''«state.name»_''' else ""
 		val connections = pattern.ports.notNative.map[outgoingPortMap.get(it)].flatten.toList
 		'''
 			«FOR connection : connections»
@@ -676,7 +676,7 @@ class InstancePrinter extends LLVMTemplate {
 	}
 
 	def protected initialize(Var variable) {
-		if(variable.initialValue != null) variable.initialValue.doSwitch
+		if(variable.initialValue !== null) variable.initialValue.doSwitch
 		else "zeroinitializer"
 	}
 
@@ -783,7 +783,7 @@ class InstancePrinter extends LLVMTemplate {
 	def private printExternalFifo(Connection conn, Port port) {
 		val fifoName = "fifo_" + conn.getSafeId(port)
 		val type = port.type.doSwitch
-		if(conn != null) {
+		if(conn !== null) {
 			val addrSpace = conn.addrSpace
 			'''
 			@«fifoName»_content = external«addrSpace» global [«conn.safeSize» x «type»]
@@ -889,8 +889,8 @@ class InstancePrinter extends LLVMTemplate {
 
 	override caseInstReturn(InstReturn retInst) {
 		val action = EcoreHelper::getContainerOfType(retInst, typeof(Action))
-		if ( action == null || EcoreHelper::getContainerOfType(retInst, typeof(Procedure)) == action.scheduler) {
-			if(retInst.value == null)
+		if ( action === null || EcoreHelper::getContainerOfType(retInst, typeof(Procedure)) == action.scheduler) {
+			if(retInst.value === null)
 				'''ret void'''
 			else
 				'''ret «retInst.value.type.doSwitch» «retInst.value.doSwitch»'''
@@ -903,7 +903,7 @@ class InstancePrinter extends LLVMTemplate {
 		'''
 			«IF variable.type.list»
 				«val innerType = (variable.type as TypeList).innermostType»
-				«IF action != null && action.outputPattern.contains(variable) && ! action.outputPattern.varToPortMap.get(variable).native»
+				«IF action !== null && action.outputPattern.contains(variable) && ! action.outputPattern.varToPortMap.get(variable).native»
 					«val port = action.outputPattern.varToPortMap.get(variable)»
 					«FOR connection : outgoingPortMap.get(port)»
 						«action.printPortAccess(connection, port, variable, store.indexes.head, store)»
@@ -926,17 +926,17 @@ class InstancePrinter extends LLVMTemplate {
 		'''
 			«IF variable.type.list»
 				«val innerType = (variable.type as TypeList).innermostType»
-				«IF action != null && action.inputPattern.contains(variable) && ! action.inputPattern.varToPortMap.get(variable).native»
+				«IF action !== null && action.inputPattern.contains(variable) && ! action.inputPattern.varToPortMap.get(variable).native»
 					«val port = action.inputPattern.varToPortMap.get(variable)»
 					«val connection = incomingPortMap.get(port)»
 					«action.printPortAccess(connection, port, variable, load.indexes.head, load)»
 					«target» = load«port.properties» «innerType.doSwitch»«connection.addrSpace»* «varName(variable, load)»_«connection.getSafeId(port)»
-				«ELSEIF action != null && action.outputPattern.contains(variable) && ! action.outputPattern.varToPortMap.get(variable).native»
+				«ELSEIF action !== null && action.outputPattern.contains(variable) && ! action.outputPattern.varToPortMap.get(variable).native»
 					«val port = action.outputPattern.varToPortMap.get(variable)»
 					«val connection = outgoingPortMap.get(port).head»
 					«action.printPortAccess(connection, port, variable, load.indexes.head, load)»
 					«target» = load«port.properties» «innerType.doSwitch»«connection.addrSpace»* «varName(variable, load)»_«connection.getSafeId(port)»
-				«ELSEIF action != null && action.peekPattern.contains(variable)»
+				«ELSEIF action !== null && action.peekPattern.contains(variable)»
 					«val port = action.peekPattern.varToPortMap.get(variable)»
 					«val connection = incomingPortMap.get(port)»
 					«action.printPortAccess(connection, port, variable, load.indexes.head, load)»
@@ -958,7 +958,7 @@ class InstancePrinter extends LLVMTemplate {
 		«IF call.print»
 			call i32 (i8*, ...)* @printf(«call.arguments.join(", ")[printArgument((it as ArgByVal).value.type)]»)
 		«ELSE»
-			«IF call.target != null»%«call.target.variable.name» = «ENDIF»call «call.procedure.returnType.doSwitch» @«call.procedure.name» («call.arguments.format(call.procedure.parameters).join(", ")»)
+			«IF call.target !== null»%«call.target.variable.name» = «ENDIF»call «call.procedure.returnType.doSwitch» @«call.procedure.name» («call.arguments.format(call.procedure.parameters).join(", ")»)
 		«ENDIF»
 	'''
 

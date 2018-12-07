@@ -189,7 +189,7 @@ class ActorPrinter extends InstancePrinter {
 			!actions = !{«actor.actions.join(", ")[objectReference]»}
 		«ENDIF»
 
-		«IF actor.moC != null»
+		«IF actor.moC !== null»
 			!MoC = !{«actor.moC.objectReference»}
 		«ENDIF»
 
@@ -367,7 +367,7 @@ class ActorPrinter extends InstancePrinter {
 
 	def private actionScheduler_MD() {
 		val outsideFSM = if ( ! actor.actionsOutsideFsm.empty) '''metadata «actor.actionsOutsideFsm.objectReference»''' else "null"
-		val fsm = if (actor.fsm != null) '''metadata «actor.fsm.objectReference»''' else "null"
+		val fsm = if (actor.fsm !== null) '''metadata «actor.fsm.objectReference»''' else "null"
 		'''
 			«actor.objectReference» = metadata !{«outsideFSM», «fsm»}
 			«IF ! actor.actionsOutsideFsm.empty»
@@ -375,7 +375,7 @@ class ActorPrinter extends InstancePrinter {
 				;; Actions outside FSM
 				«actor.actionsOutsideFsm.objectReference» = metadata !{«actor.actionsOutsideFsm.join(", ")['''metadata «objectReference»''']»}
 			«ENDIF»
-			«IF actor.fsm != null»
+			«IF actor.fsm !== null»
 
 				;; FSM
 				«FSM_MD»
@@ -438,7 +438,7 @@ class ActorPrinter extends InstancePrinter {
 	'''
 
 	override caseInstReturn(InstReturn retInst) {
-		if(retInst.value == null)
+		if(retInst.value === null)
 			'''ret void'''
 		else
 			'''ret «retInst.value.type.doSwitch» «retInst.value.doSwitch»'''
