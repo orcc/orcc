@@ -6,7 +6,7 @@ Bundle-Version: 2.3.1.qualifier
 Bundle-ClassPath: .
 Bundle-Vendor: %providerName
 Bundle-Localization: plugin
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Export-Package: net.sf.orcc.graph,
  net.sf.orcc.graph.impl,
  net.sf.orcc.graph.util,

@@ -12,7 +12,7 @@ Require-Bundle: net.sf.orcc.core;bundle-version="2.3.1",
  com.google.guava,
  org.eclipse.xtext.xbase.lib
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Vendor: IETR/INSA Rennes
 Export-Package: net.sf.orcc.simulators,
  net.sf.orcc.simulators.jade,

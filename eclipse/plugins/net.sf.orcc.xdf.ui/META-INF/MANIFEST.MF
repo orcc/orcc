@@ -21,7 +21,7 @@ Require-Bundle: net.sf.orcc.ui,
  com.google.guava,
  org.eclipse.jdt.core,
  org.eclipse.emf.common
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Import-Package: net.sf.orcc.ui
 Bundle-ClassPath: lib/klay_0.11.0.jar,
