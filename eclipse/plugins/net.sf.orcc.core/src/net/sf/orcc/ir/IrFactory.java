@@ -728,11 +728,13 @@ public interface IrFactory extends EFactory {
 	/**
 	 * Creates a new list type with the given size and element type. Type is
 	 * copied.
-	 * 
+	 *
 	 * @param size
 	 *            the size of this list type
 	 * @param type
 	 *            the type of this list's elements
+	 * @param dyn
+	 *            the type of memory of this list
 	 */
 	TypeList createTypeList(Expression size, Type type);
 
@@ -744,8 +746,36 @@ public interface IrFactory extends EFactory {
 	 *            the size of this list type
 	 * @param type
 	 *            the type of this list's elements
+	 * @param dyn
+	 *            the type of memory of this list
+	 */
+	TypeList createTypeList(Expression size, Type type, boolean dyn);
+
+	/**
+	 * Creates a new list type with the given size and element type. Type is
+	 * copied.
+	 *
+	 * @param size
+	 *            the size of this list type
+	 * @param type
+	 *            the type of this list's elements
+	 * @param dyn
+	 *            the type of memory of this list
 	 */
 	TypeList createTypeList(int size, Type type);
+
+	/**
+	 * Creates a new list type with the given size and element type. Type is
+	 * copied.
+	 * 
+	 * @param size
+	 *            the size of this list type
+	 * @param type
+	 *            the type of this list's elements
+	 * @param dyn
+	 *            the type of memory of this list
+	 */
+	TypeList createTypeList(int size, Type type, boolean dyn);
 
 	/**
 	 * Returns a new object of class '<em>Type String</em>'.

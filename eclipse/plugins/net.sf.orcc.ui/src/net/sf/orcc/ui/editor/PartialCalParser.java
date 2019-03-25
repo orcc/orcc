@@ -238,7 +238,7 @@ public class PartialCalParser extends CalSwitch<EObject> {
 		Type type = (Type) doSwitch(listType.getType());
 		AstExpression expression = listType.getSize();
 		Expression size = (Expression) doSwitch(expression);
-		return IrFactory.eINSTANCE.createTypeList(size, type);
+		return IrFactory.eINSTANCE.createTypeList(size, type, listType.isDyn());
 	}
 
 	@Override

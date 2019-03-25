@@ -165,7 +165,7 @@ public class Typer extends CalSwitch<Type> {
 		AstExpression expression = listType.getSize();
 		Expression size = Evaluator.getValue(expression);
 		size = EcoreUtil.copy(size);
-		return IrFactory.eINSTANCE.createTypeList(size, type);
+		return IrFactory.eINSTANCE.createTypeList(size, type, listType.isDyn());
 	}
 
 	@Override

@@ -32,10 +32,16 @@ import static net.sf.orcc.ir.IrFactory.eINSTANCE;
 import static net.sf.orcc.util.OrccAttributes.COPY_OF_TOKENS;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 
 import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstActor;
@@ -45,6 +51,8 @@ import net.sf.orcc.cal.cal.AstPort;
 import net.sf.orcc.cal.cal.AstProcedure;
 import net.sf.orcc.cal.cal.AstState;
 import net.sf.orcc.cal.cal.AstTag;
+import net.sf.orcc.cal.cal.AstType;
+import net.sf.orcc.cal.cal.AstTypeList;
 import net.sf.orcc.cal.cal.ExpressionVariable;
 import net.sf.orcc.cal.cal.Function;
 import net.sf.orcc.cal.cal.InputPattern;
@@ -90,9 +98,6 @@ import net.sf.orcc.ir.Var;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.util.EcoreHelper;
 
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.util.EcoreUtil;
-
 /**
  * This class transforms an AST actor to its IR equivalent.
  * 
@@ -107,6 +112,8 @@ public class ActorTransformer extends CalSwitch<Actor> {
 	private int untaggedCount;
 
 	final StructTransformer structTransformer;
+	private Map<Variable, AstAction> toDelete;
+	private Map<Variable, AstAction> toCopy;
 
 	/**
 	 * Creates a new AST to IR transformation.
@@ -124,6 +131,46 @@ public class ActorTransformer extends CalSwitch<Actor> {
 	 */
 	@Override
 	public Actor caseAstActor(AstActor astActor) {
+		toDelete = new HashMap<>();
+		toCopy = new HashMap<>();
+		for (AstAction action : astActor.getActions()) {
+			for (InputPattern inPattern : action.getInputs()) {
+				if (inPattern.getPort().getType() instanceof AstTypeList) {
+					AstTypeList tpe = (AstTypeList) inPattern.getPort().getType();
+					if(tpe.isDyn()) {
+						for (Variable var : inPattern.getTokens()) {
+							toDelete.put(var, action);
+						}
+					}
+				}
+			}
+
+			for (Variable variable : action.getVariables()) {
+				AstType tpe = variable.getType();
+				if (tpe instanceof AstTypeList && ((AstTypeList)tpe).isDyn()) {
+					toDelete.put(variable, action);
+				}
+			}
+
+			for (OutputPattern outPattern : action.getOutputs()) {
+				AstType oTpe = outPattern.getPort().getType();
+				if(oTpe instanceof AstTypeList && ((AstTypeList)oTpe).isDyn()) {
+					for (AstExpression exp: outPattern.getValues()) {
+						if (exp instanceof ExpressionVariable) {
+							Variable variable = ((ExpressionVariable) exp).getValue().getVariable();
+							toDelete.remove(variable);
+						}
+					}
+				} else {
+					for (AstExpression exp: outPattern.getValues()) {
+						if (exp instanceof ExpressionVariable) {
+							Variable variable = ((ExpressionVariable) exp).getValue().getVariable();
+							toCopy.put(variable, action);
+						}
+					}
+				}
+			}
+		}
 
 		untaggedCount = 0;
 
@@ -226,6 +273,21 @@ public class ActorTransformer extends CalSwitch<Actor> {
 
 		actor.getActions().addAll(actions.getAllActions());
 		actor.getInitializes().addAll(initializes.getAllActions());
+
+		for (AstAction astAction : astActor.getActions()) {
+			for (Variable variable : astAction.getVariables()) {
+				AstType tpe = variable.getType();
+				if (tpe instanceof AstTypeList && ((AstTypeList)tpe).isDyn()) {
+					Var var = Frontend.instance.getMapping(variable);
+					var.setAttribute("alloc", true);
+				}
+			}
+		}
+
+		for (Entry<Variable, AstAction> entry : toDelete.entrySet()) {
+			Var var = Frontend.instance.getMapping(entry.getKey());
+			var.setAttribute("del", true);
+		}
 
 		return actor;
 	}
@@ -521,6 +583,11 @@ public class ActorTransformer extends CalSwitch<Actor> {
 				var.addAttribute(COPY_OF_TOKENS);
 				return true;
 			}
+		}
+
+		if(toCopy.containsKey(variable)) {
+			var.setAttribute("cpy", true);
+			return true;
 		}
 
 		return false;

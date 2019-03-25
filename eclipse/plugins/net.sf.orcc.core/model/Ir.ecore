@@ -144,7 +144,10 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="use" eType="#//Use" containment="true"
         resolveProxies="false"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Type" abstract="true"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Type" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="dyn" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        defaultValueLiteral="false"/>
+  </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="TypeBool" eSuperTypes="#//Type"/>
   <eClassifiers xsi:type="ecore:EClass" name="TypeFloat" eSuperTypes="#//Type">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="size" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"

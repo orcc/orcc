@@ -410,6 +410,15 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getType_Dyn() {
+		return (EAttribute) typeEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -1596,6 +1605,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		createEReference(exprVarEClass, EXPR_VAR__USE);
 
 		typeEClass = createEClass(TYPE);
+		createEAttribute(typeEClass, TYPE__DYN);
 
 		typeBoolEClass = createEClass(TYPE_BOOL);
 
@@ -2021,6 +2031,10 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 
 		initEClass(typeEClass, Type.class, "Type", IS_ABSTRACT, !IS_INTERFACE,
 				IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getType_Dyn(), ecorePackage.getEBoolean(), "dyn",
+				"false", 0, 1, Type.class, !IS_TRANSIENT, !IS_VOLATILE,
+				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
+				IS_ORDERED);
 
 		initEClass(typeBoolEClass, TypeBool.class, "TypeBool", !IS_ABSTRACT,
 				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);

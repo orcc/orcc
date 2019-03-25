@@ -43,6 +43,23 @@ import org.eclipse.emf.ecore.EObject;
 public interface Type extends EObject {
 
 	/**
+	 * Returns the value of the '<em><b>Dyn</b></em>' attribute.
+	 * The default value is <code>"false"</code>.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Dyn</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Dyn</em>' attribute.
+	 * @see #setDyn(boolean)
+	 * @see net.sf.orcc.ir.IrPackage#getType_Dyn()
+	 * @model default="false"
+	 * @generated
+	 */
+	boolean isDyn();
+
+	/**
 	 * Returns a list of dimensions of this type. Returns an empty list if the
 	 * type is not a list.
 	 * 
@@ -123,5 +140,20 @@ public interface Type extends EObject {
 	 *            the size of this type
 	 */
 	void setSize(int size);
+
+	/**
+	 * Returns if the the list is dynamic
+	 *
+	 * @return the type of the list
+	 */
+	boolean getDyn();
+
+	/**
+	 * Set if the list is dynamic.
+	 *
+	 * @param dyn
+	 *            the new status
+	 */
+	void setDyn(boolean dyn);
 
 }

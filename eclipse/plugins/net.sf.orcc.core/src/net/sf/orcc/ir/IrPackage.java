@@ -803,6 +803,14 @@ public interface IrPackage extends EPackage {
 		EClass TYPE = eINSTANCE.getType();
 
 		/**
+		 * The meta object literal for the '<em><b>Dyn</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute TYPE__DYN = eINSTANCE.getType_Dyn();
+
+		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.TypeBoolImpl <em>Type Bool</em>}' class.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @see net.sf.orcc.ir.impl.TypeBoolImpl
@@ -2404,13 +2412,22 @@ public interface IrPackage extends EPackage {
 	int TYPE = 25;
 
 	/**
+	 * The feature id for the '<em><b>Dyn</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TYPE__DYN = 0;
+
+	/**
 	 * The number of structural features of the '<em>Type</em>' class. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int TYPE_FEATURE_COUNT = 0;
+	int TYPE_FEATURE_COUNT = 1;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.TypeBoolImpl <em>Type Bool</em>}' class.
@@ -2420,6 +2437,15 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 */
 	int TYPE_BOOL = 26;
+
+	/**
+	 * The feature id for the '<em><b>Dyn</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TYPE_BOOL__DYN = TYPE__DYN;
 
 	/**
 	 * The number of structural features of the '<em>Type Bool</em>' class. <!--
@@ -2440,6 +2466,15 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 */
 	int TYPE_FLOAT = 27;
+
+	/**
+	 * The feature id for the '<em><b>Dyn</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TYPE_FLOAT__DYN = TYPE__DYN;
 
 	/**
 	 * The feature id for the '<em><b>Size</b></em>' attribute.
@@ -2468,6 +2503,15 @@ public interface IrPackage extends EPackage {
 	int TYPE_INT = 28;
 
 	/**
+	 * The feature id for the '<em><b>Dyn</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TYPE_INT__DYN = TYPE__DYN;
+
+	/**
 	 * The feature id for the '<em><b>Size</b></em>' attribute. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
@@ -2493,6 +2537,15 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 */
 	int TYPE_LIST = 29;
+
+	/**
+	 * The feature id for the '<em><b>Dyn</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TYPE_LIST__DYN = TYPE__DYN;
 
 	/**
 	 * The feature id for the '<em><b>Size Expr</b></em>' containment reference.
@@ -2532,6 +2585,15 @@ public interface IrPackage extends EPackage {
 	int TYPE_STRING = 30;
 
 	/**
+	 * The feature id for the '<em><b>Dyn</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TYPE_STRING__DYN = TYPE__DYN;
+
+	/**
 	 * The feature id for the '<em><b>Size</b></em>' attribute. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
@@ -2556,6 +2618,15 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 */
 	int TYPE_UINT = 31;
+
+	/**
+	 * The feature id for the '<em><b>Dyn</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TYPE_UINT__DYN = TYPE__DYN;
 
 	/**
 	 * The feature id for the '<em><b>Size</b></em>' attribute. <!--
@@ -2583,6 +2654,15 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 */
 	int TYPE_VOID = 32;
+
+	/**
+	 * The feature id for the '<em><b>Dyn</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TYPE_VOID__DYN = TYPE__DYN;
 
 	/**
 	 * The number of structural features of the '<em>Type Void</em>' class. <!--
@@ -4021,6 +4101,17 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 */
 	EClass getType();
+
+	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.Type#isDyn <em>Dyn</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Dyn</em>'.
+	 * @see net.sf.orcc.ir.Type#isDyn()
+	 * @see #getType()
+	 * @generated
+	 */
+	EAttribute getType_Dyn();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.TypeBool <em>Type Bool</em>}'.

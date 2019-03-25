@@ -369,7 +369,7 @@ AstTypeDouble: {AstTypeDouble} 'double';
 
 AstTypeInt: {AstTypeInt} 'int' ('(' 'size' '=' size = AstExpression ')')?;
 
-AstTypeList: 'List' '(' 'type' ':' type = AstType ',' 'size' '=' size = AstExpression ')';
+AstTypeList: 'List' (dyn ?= '*' )? '(' 'type' ':' type = AstType ',' 'size' '=' size = AstExpression ')';
 
 AstTypeString: {AstTypeString} 'String';
 

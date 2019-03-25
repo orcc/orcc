@@ -935,10 +935,28 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	@Override
+	public TypeList createTypeList(Expression size, Type type, boolean dyn) {
+		TypeListImpl typeList = new TypeListImpl();
+		typeList.setSizeExpr(size);
+		typeList.setType(EcoreUtil.copy(type));
+		typeList.setDyn(dyn);
+		return typeList;
+	}
+
+	@Override
 	public TypeList createTypeList(int size, Type type) {
 		TypeListImpl typeList = new TypeListImpl();
 		typeList.setSize(size);
 		typeList.setType(EcoreUtil.copy(type));
+		return typeList;
+	}
+
+	@Override
+	public TypeList createTypeList(int size, Type type, boolean dyn) {
+		TypeListImpl typeList = new TypeListImpl();
+		typeList.setSize(size);
+		typeList.setType(EcoreUtil.copy(type));
+		typeList.setDyn(dyn);
 		return typeList;
 	}
 

@@ -35,7 +35,9 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Type;
 
+import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
 
 /**
@@ -46,6 +48,17 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
  * 
  */
 public abstract class TypeImpl extends EObjectImpl implements Type {
+
+	/**
+	 * The default value of the '{@link #isDyn() <em>Dyn</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #isDyn()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final boolean DYN_EDEFAULT = false;
+	protected boolean dyn = false;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -62,6 +75,15 @@ public abstract class TypeImpl extends EObjectImpl implements Type {
 	@Override
 	protected EClass eStaticClass() {
 		return IrPackage.Literals.TYPE;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public boolean isDyn() {
+		return dyn;
 	}
 
 	@Override
@@ -111,6 +133,91 @@ public abstract class TypeImpl extends EObjectImpl implements Type {
 
 	@Override
 	public void setSize(int size) {
+	}
+
+	@Override
+	public boolean getDyn() {
+		return dyn;
+	}
+
+	@Override
+	public void setDyn(boolean dyn) {
+		this.dyn = dyn;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public Object eGet(int featureID, boolean resolve, boolean coreType) {
+		switch (featureID) {
+		case IrPackage.TYPE__DYN:
+			return isDyn();
+		}
+		return super.eGet(featureID, resolve, coreType);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public void eSet(int featureID, Object newValue) {
+		switch (featureID) {
+		case IrPackage.TYPE__DYN:
+			setDyn((Boolean) newValue);
+			return;
+		}
+		super.eSet(featureID, newValue);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public void eUnset(int featureID) {
+		switch (featureID) {
+		case IrPackage.TYPE__DYN:
+			setDyn(DYN_EDEFAULT);
+			return;
+		}
+		super.eUnset(featureID);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public boolean eIsSet(int featureID) {
+		switch (featureID) {
+		case IrPackage.TYPE__DYN:
+			return dyn != DYN_EDEFAULT;
+		}
+		return super.eIsSet(featureID);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public String toString() {
+		if (eIsProxy())
+			return super.toString();
+
+		StringBuffer result = new StringBuffer(super.toString());
+		result.append(" (dyn: ");
+		result.append(dyn);
+		result.append(')');
+		return result.toString();
 	}
 
 }

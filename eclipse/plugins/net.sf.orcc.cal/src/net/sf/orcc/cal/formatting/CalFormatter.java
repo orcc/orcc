@@ -525,18 +525,18 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 	private void configureTypeList(FormattingConfig c) {
 		AstTypeListElements access = f.getAstTypeListAccess();
 
-		c.setNoSpace().around(access.getLeftParenthesisKeyword_1());
-		c.setNoSpace().after(access.getTypeKeyword_2());
-		c.setNoSpace().before(access.getCommaKeyword_5());
-		c.setNoSpace().after(access.getSizeKeyword_6());
-		c.setNoSpace().after(access.getEqualsSignKeyword_7());
-		c.setNoSpace().before(access.getRightParenthesisKeyword_9());
+		c.setNoSpace().around(access.getLeftParenthesisKeyword_2());
+		c.setNoSpace().after(access.getColonKeyword_4());
+		c.setNoSpace().before(access.getCommaKeyword_6());
+		c.setNoSpace().after(access.getSizeKeyword_7());
+		c.setNoSpace().after(access.getEqualsSignKeyword_8());
+		c.setNoSpace().before(access.getRightParenthesisKeyword_10());
 
-		c.setNoLinewrap().around(access.getLeftParenthesisKeyword_1());
-		c.setNoLinewrap().around(access.getColonKeyword_3());
-		c.setNoLinewrap().around(access.getCommaKeyword_5());
-		c.setNoLinewrap().around(access.getEqualsSignKeyword_7());
-		c.setNoLinewrap().around(access.getRightParenthesisKeyword_9());
+		c.setNoLinewrap().around(access.getLeftParenthesisKeyword_2());
+		c.setNoLinewrap().around(access.getColonKeyword_4());
+		c.setNoLinewrap().around(access.getCommaKeyword_6());
+		c.setNoLinewrap().around(access.getEqualsSignKeyword_8());
+		c.setNoLinewrap().around(access.getRightParenthesisKeyword_10());
 	}
 
 	private void configureTypeUint(FormattingConfig c) {

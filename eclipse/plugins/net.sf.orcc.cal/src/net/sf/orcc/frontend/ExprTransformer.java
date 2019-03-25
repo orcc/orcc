@@ -39,6 +39,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.cal.cal.AstExpression;
+import net.sf.orcc.cal.cal.AstType;
+import net.sf.orcc.cal.cal.AstTypeList;
 import net.sf.orcc.cal.cal.ExpressionBinary;
 import net.sf.orcc.cal.cal.ExpressionBoolean;
 import net.sf.orcc.cal.cal.ExpressionCall;
@@ -366,8 +368,12 @@ public class ExprTransformer extends CalSwitch<Expression> {
 		Variable variable = expression.getValue().getVariable();
 		Var var = Frontend.instance.getMapping(variable);
 
+		AstType tpe = variable.getType();
+		boolean cpy = ((!(tpe instanceof AstTypeList) || !(((AstTypeList)tpe).isDyn())) && !var.getType().isDyn()) ||
+		var.hasAttribute("cpy");
+
 		Expression value;
-		if (var.getType().isList()) {
+		if (var.getType().isList() && cpy) {
 			if (target == null) {
 				EObject exprContainer = expression.eContainer();
 				EObject procContainer = procedure.eContainer();

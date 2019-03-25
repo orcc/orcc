@@ -249,7 +249,7 @@ public class TypeUtil {
 			if (type != null) {
 				// only return a list when the underlying type is valid
 				int size = Math.max(listType1.getSize(), listType2.getSize());
-				return IrFactory.eINSTANCE.createTypeList(size, type);
+				return IrFactory.eINSTANCE.createTypeList(size, type, listType1.getDyn() && listType2.getDyn());
 			}
 		} else if (t1.isUint() && t2.isUint()) {
 			return IrFactory.eINSTANCE.createTypeUint(Math.max(
