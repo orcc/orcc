@@ -3,23 +3,28 @@ Bundle-ManifestVersion: 2
 Bundle-Name: net.sf.orcc.cal.tests
 Bundle-SymbolicName: net.sf.orcc.cal.tests
 Bundle-Version: 2.3.1.qualifier
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-ActivationPolicy: lazy
 Require-Bundle: net.sf.orcc.backends;bundle-version="2.3.1",
  net.sf.orcc.cal;bundle-version="2.3.1",
  net.sf.orcc.cal.ui;bundle-version="2.3.1",
+ net.sf.orcc.cal.tests;bundle-version="2.3.1",
  net.sf.orcc.core;bundle-version="2.3.1",
- org.eclipse.xtext;bundle-version="2.0.0",
- org.eclipse.xtext.junit4;bundle-version="2.0.0",
+ org.eclipse.xtext,
+ org.eclipse.xtext.junit4,
+ org.eclipse.xtext.xbase.lib;bundle-version="2.14.0",
  org.junit;bundle-version="4.8.0",
  org.eclipse.jdt.core;bundle-version="3.7.0",
  org.eclipse.xtend.lib,
  com.google.guava,
- org.eclipse.xtext.xbase.lib,
+ org.eclipse.xtext.testing,
+ org.eclipse.xtext.xbase.testing,
  org.eclipse.core.runtime,
  org.eclipse.ui.workbench;resolution:=optional,
- org.objectweb.asm;bundle-version="[5.0.1,6.0.0)";resolution:=optional
-Export-Package: net.sf.orcc.cal
-Import-Package: org.junit.runner;version="4.5.0",
+ org.objectweb.asm;bundle-version="7.2.0";resolution:=optional
+Export-Package: net.sf.orcc.cal.tests;x-internal=true
+Import-Package: org.junit;version="4.5.0", 
+ org.junit.runner;version="4.5.0",
  org.junit.runner.manipulation;version="4.5.0",
  org.junit.runner.notification;version="4.5.0",
  org.junit.runners;version="4.5.0",

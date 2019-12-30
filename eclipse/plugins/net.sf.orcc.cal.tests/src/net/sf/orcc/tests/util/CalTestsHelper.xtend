@@ -31,14 +31,15 @@ package net.sf.orcc.tests.util;
 import com.google.inject.Inject
 import com.google.inject.Provider
 import java.util.Collections
-import net.sf.orcc.cal.CalInjectorProvider
+import net.sf.orcc.cal.tests.CalInjectorProvider
 import net.sf.orcc.cal.cal.AstEntity
 import org.eclipse.emf.common.util.URI
 import org.eclipse.xtext.junit4.AbstractXtextTests
-import org.eclipse.xtext.junit4.InjectWith
-import org.eclipse.xtext.junit4.util.ParseHelper
+import org.eclipse.xtext.testing.InjectWith
+import org.eclipse.xtext.testing.util.ParseHelper
 import org.eclipse.xtext.resource.XtextResourceSet
 import com.google.inject.Injector
+
 
 /**
  * This class provides methods to test more efficiently CAL actors and units

@@ -48,7 +48,9 @@ import org.eclipse.emf.common.util.URI
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.emf.ecore.resource.ResourceSet
 import org.eclipse.xtext.generator.IFileSystemAccess
-import org.eclipse.xtext.generator.IGenerator
+import org.eclipse.xtext.generator.IGenerator2
+import org.eclipse.xtext.generator.IFileSystemAccess2
+import org.eclipse.xtext.generator.IGeneratorContext
 
 /**
  * Generates code from your model files on save.
@@ -70,7 +72,7 @@ import org.eclipse.xtext.generator.IGenerator
  * 
  * @author Antoine Lorence
  */
-class CalGenerator implements IGenerator {
+class CalGenerator implements IGenerator2 {
 
 	// These class will be used to transform AST objects into IR equivalent
 	private val actorTransformer = new ActorTransformer
@@ -115,7 +117,7 @@ class CalGenerator implements IGenerator {
 	 * 
 	 * This method is called by net.sf.orcc.cal.ui.builder.CalBuilder
 	 */
-	override void doGenerate(Resource calResource, IFileSystemAccess fsa) {
+	override void doGenerate(Resource calResource, IFileSystemAccess2 fsa, IGeneratorContext ctx) {
 
 		val irSubPath = calResource.irRelativePath
 
@@ -132,7 +134,7 @@ class CalGenerator implements IGenerator {
 			// The imported resource is in the same project. We need to transform
 			// and serialize it BEFORE the calResource
 			if (importedResource.isInSameProject(calResource)) {
-				importedResource.doGenerate(fsa)
+				importedResource.doGenerate(fsa, ctx)
 			}
 			// The imported resource is in another project. If Xtext did its job correctly,
 			// this project was built in a previous session. Since Frontend has been cleaned
@@ -276,11 +278,15 @@ class CalGenerator implements IGenerator {
 	 * Perform cleans needed by the end of a session.
 	 */
 	def afterBuild() {
-
 		// We need to flush all Caches, because it can explode the memory consumption...
 		CacheManager.instance.unloadAllCaches();
 
 		// The current build session ends, reset the sets
 		loadedResources.clear
 	}
+	
+	override afterGenerate(Resource input, IFileSystemAccess2 fsa, IGeneratorContext context) {}
+	
+	override beforeGenerate(Resource input, IFileSystemAccess2 fsa, IGeneratorContext context) {}
+	
 }

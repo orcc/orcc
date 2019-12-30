@@ -29,18 +29,19 @@
 package net.sf.orcc.tests.main
 
 import com.google.inject.Inject
-import net.sf.orcc.cal.CalInjectorProvider
+import net.sf.orcc.cal.tests.CalInjectorProvider
 import net.sf.orcc.cal.cal.AstEntity
 import net.sf.orcc.df.Actor
 import net.sf.orcc.frontend.ActorTransformer
 import net.sf.orcc.frontend.UnitTransformer
 import net.sf.orcc.tests.util.CalTestsHelper
 import net.sf.orcc.tests.util.TestInterpreter
-import org.eclipse.xtext.junit4.InjectWith
-import org.eclipse.xtext.junit4.XtextRunner
-import org.eclipse.xtext.junit4.validation.ValidationTestHelper
+import org.eclipse.xtext.testing.InjectWith
+import org.eclipse.xtext.testing.validation.ValidationTestHelper
+import org.eclipse.xtext.testing.XtextRunner
 import org.junit.Test
 import org.junit.runner.RunWith
+
 
 @RunWith(typeof(XtextRunner))
 @InjectWith(typeof(CalInjectorProvider))

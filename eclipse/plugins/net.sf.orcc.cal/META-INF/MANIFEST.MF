@@ -1,42 +1,58 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: RVC-CAL Xtext model plug-in
-Bundle-Vendor: IETR/INSA Rennes
+Bundle-Name: %pluginName
+Bundle-Vendor: %providerName
+Bundle-Localization: plugin
 Bundle-Version: 2.3.1.qualifier
-Bundle-SymbolicName: net.sf.orcc.cal; singleton:=true
+Bundle-SymbolicName: net.sf.orcc.cal;singleton:=true
+Automatic-Module-Name: net.sf.orcc.cal
 Bundle-ActivationPolicy: lazy
 Require-Bundle: net.sf.orcc.core;bundle-version="2.3.1";visibility:=reexport,
- org.eclipse.xtext;bundle-version="2.12.0",
+ net.sf.orcc.models;visibility:=reexport,
+ net.sf.orcc.cal;bundle-version="2.3.1";visibility:=reexport,
+ org.eclipse.xtext.xtext.generator,
+ org.eclipse.xtext.xbase,
+ org.eclipse.xtext.common.types,
+ org.eclipse.xtext.xbase.lib;bundle-version="2.20.0",
+ org.eclipse.xtext.util,
+ org.eclipse.xtend.lib;bundle-version="2.20.0",
  org.antlr.runtime;bundle-version="3.2.0",
  org.apache.commons.logging;resolution:=optional,
  org.apache.commons.lang,
+ org.eclipse.equinox.common;bundle-version="3.6.0",
  org.eclipse.core.resources;bundle-version="3.7.0",
  org.eclipse.core.runtime;bundle-version="3.7.0",
- org.eclipse.emf.common;bundle-version="2.7.0",
- org.eclipse.emf.ecore;bundle-version="2.7.0",
- org.eclipse.emf.mwe2.launch;bundle-version="2.0.0";resolution:=optional,
- org.eclipse.xtext.generator;bundle-version="2.0.0";resolution:=optional,
- org.eclipse.jdt.core;bundle-version="3.7.0",
- org.eclipse.xtext.util;bundle-version="2.0.0",
- org.objectweb.asm;bundle-version="5.0.1",
- org.eclipse.xtext.xbase.lib,
- org.eclipse.xtext.common.types
+ org.eclipse.emf.common;bundle-version="2.17.0",
+ org.eclipse.emf.ecore;bundle-version="2.20.0";visibility:=reexport,
+ org.eclipse.emf.mwe2.launch;bundle-version="2.11.1";resolution:=optional,
+ org.eclipse.jdt.core;bundle-version="3.20.0",
+ org.objectweb.asm;bundle-version="7.2.0",
+ org.eclipse.xtext,
+ org.eclipse.xtext.ecore,
+ org.eclipse.emf.codegen.ecore,
+ org.eclipse.emf.mwe2.lib,
+ org.eclipse.xtext.builder
 Import-Package: org.apache.log4j,
- org.eclipse.xtext.xbase.lib
+ org.eclipse.xtext.xtext.ecoreInference
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Export-Package: net.sf.orcc.cache,
+ net.sf.orcc.cache.impl,
+ net.sf.orcc.cache.util,
  net.sf.orcc.cal,
  net.sf.orcc.cal.cal,
  net.sf.orcc.cal.cal.impl,
  net.sf.orcc.cal.cal.util,
- net.sf.orcc.cal.parser.antlr,
- net.sf.orcc.cal.parser.antlr.internal,
+ net.sf.orcc.cal.formatting,
+ net.sf.orcc.cal.formatting2,
+ net.sf.orcc.cal.generator,
+ net.sf.orcc.cal.scoping,
  net.sf.orcc.cal.services,
  net.sf.orcc.cal.util,
  net.sf.orcc.cal.validation,
  net.sf.orcc.frontend,
- net.sf.orcc.cal.formatting,
- net.sf.orcc.cal.scoping,
- net.sf.orcc.cal.generator,
- net.sf.orcc.cal.serializer
-Bundle-ClassPath: .,lib/jgrapht-0.9.0/jgrapht-core-0.9.0.jar,lib/jgrapht-0.9.0/jgrapht-ext-0.9.0.jar
+ net.sf.orcc.cal.parser.antlr,
+ net.sf.orcc.cal.serializer,
+ net.sf.orcc.cal.parser.antlr.internal
+Bundle-ClassPath: .,
+ lib/jgrapht-0.9.0/jgrapht-core-0.9.0.jar,
+ lib/jgrapht-0.9.0/jgrapht-ext-0.9.0.jar

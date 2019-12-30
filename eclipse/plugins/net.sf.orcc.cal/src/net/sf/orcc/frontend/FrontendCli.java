@@ -72,6 +72,8 @@ import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.xtext.builder.MonitorBasedCancelIndicator;
+import org.eclipse.xtext.generator.GeneratorContext;
 import org.eclipse.xtext.generator.IGenerator;
 import org.eclipse.xtext.generator.JavaIoFileSystemAccess;
 import org.w3c.dom.Document;
@@ -212,6 +214,11 @@ public class FrontendCli implements IApplication {
 			final JavaIoFileSystemAccess fsa = injector
 					.getInstance(JavaIoFileSystemAccess.class);
 
+			MonitorBasedCancelIndicator cancelIndicator = new MonitorBasedCancelIndicator(
+					new NullProgressMonitor()); //maybe use reflection to read from fsa
+			GeneratorContext generatorContext = new GeneratorContext();
+			generatorContext.setCancelIndicator(cancelIndicator);
+			
 			for (final IProject project : orderedProjects) {
 
 				OrccLogger.traceln("+-------------------");
@@ -222,7 +229,7 @@ public class FrontendCli implements IApplication {
 						.getLocation().toString());
 				calGenerator.beforeBuild(project, resourceSet);
 				for (final Resource res : resourcesMap.get(project)) {
-					calGenerator.doGenerate(res, fsa);
+					calGenerator.doGenerate(res, fsa, generatorContext);
 					OrccLogger.traceln("Build " + res.getURI().toString());
 				}
 				calGenerator.afterBuild();

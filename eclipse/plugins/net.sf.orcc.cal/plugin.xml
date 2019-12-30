@@ -26,4 +26,20 @@
         </run>
      </application>
   </extension>
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <!-- @generated Cal -->
+      <package
+            uri="http://orcc.sf.net/cal/Cal"
+            class="net.sf.orcc.cal.cal.CalPackage"
+            genModel="model/custom/Cal.genmodel"/>
+   </extension>
+
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <!-- @generated Cache -->
+      <package
+            uri="http://orcc.sf.net/cache"
+            class="net.sf.orcc.cache.CachePackage"
+            genModel="model/Cache.genmodel"/>
+   </extension>
+
 </plugin>

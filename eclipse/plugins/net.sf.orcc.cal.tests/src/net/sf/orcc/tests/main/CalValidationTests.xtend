@@ -29,7 +29,7 @@
 package net.sf.orcc.tests.main
 
 import com.google.inject.Inject
-import net.sf.orcc.cal.CalInjectorProvider
+import net.sf.orcc.cal.tests.CalInjectorProvider
 import net.sf.orcc.cal.validation.CalValidator
 import net.sf.orcc.cal.validation.StructuralValidator
 import net.sf.orcc.cal.validation.TypeValidator
@@ -37,9 +37,9 @@ import net.sf.orcc.cal.validation.WarningValidator
 import net.sf.orcc.tests.util.CalTestsHelper
 import org.eclipse.emf.common.util.URI
 import org.eclipse.emf.ecore.EObject
-import org.eclipse.xtext.junit4.InjectWith
-import org.eclipse.xtext.junit4.XtextRunner
-import org.eclipse.xtext.junit4.validation.ValidationTestHelper
+import org.eclipse.xtext.testing.InjectWith
+import org.eclipse.xtext.testing.validation.ValidationTestHelper
+import org.eclipse.xtext.testing.XtextRunner
 import org.eclipse.xtext.junit4.validation.ValidatorTester
 import org.junit.Test
 import org.junit.runner.RunWith

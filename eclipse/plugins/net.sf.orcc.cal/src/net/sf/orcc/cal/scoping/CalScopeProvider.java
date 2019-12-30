@@ -79,7 +79,7 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 			AstState state = CalFactory.eINSTANCE.createAstState();
 			state.setName(name);
 			state.setNode(leaf);
-
+			
 			fsm.getStates().add(state);
 			nameSet.add(name);
 		}

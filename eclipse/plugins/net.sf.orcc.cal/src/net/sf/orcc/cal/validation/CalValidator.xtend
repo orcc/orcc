@@ -5,6 +5,7 @@ package net.sf.orcc.cal.validation
 
 import com.google.inject.Inject
 import net.sf.orcc.cal.cal.AstEntity
+import net.sf.orcc.cal.validation.ValidationError
 import org.eclipse.xtext.validation.CheckType
 import org.eclipse.xtext.validation.Check
 import java.util.List

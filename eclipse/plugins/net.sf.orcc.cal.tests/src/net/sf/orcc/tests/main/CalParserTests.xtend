@@ -29,16 +29,16 @@
 package net.sf.orcc.tests.main
 
 import com.google.inject.Inject
-import net.sf.orcc.cal.CalInjectorProvider
+import net.sf.orcc.cal.tests.CalInjectorProvider
 import net.sf.orcc.cal.services.Evaluator
 import net.sf.orcc.cal.services.Typer
 import net.sf.orcc.ir.Expression
 import net.sf.orcc.ir.IrFactory
 import net.sf.orcc.tests.util.CalTestsHelper
 import org.eclipse.emf.ecore.util.EcoreUtil
-import org.eclipse.xtext.junit4.InjectWith
-import org.eclipse.xtext.junit4.XtextRunner
-import org.eclipse.xtext.junit4.validation.ValidationTestHelper
+import org.eclipse.xtext.testing.InjectWith
+import org.eclipse.xtext.testing.validation.ValidationTestHelper
+import org.eclipse.xtext.testing.XtextRunner
 import org.junit.Test
 import org.junit.runner.RunWith
 

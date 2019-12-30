@@ -6,23 +6,25 @@
 	<artifactId>net.sf.orcc</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
-	
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<xtend-version>2.15.0</xtend-version>
-		<tycho-version>0.26.0</tycho-version>
+		<xtend-version>2.20.0</xtend-version>
+		<xtext-version>2.20.0</xtext-version>
+		<tycho-version>1.5.1</tycho-version>
+		<codehaus-version>3.0.0</codehaus-version>
 	</properties>
 
 	<repositories>
 		<repository>
 			<id>eclipse</id>
 			<layout>p2</layout>
-			<url>http://download.eclipse.org/releases/neon/201606221000</url>
+			<url>https://download.eclipse.org/releases/2019-12/201912181000</url>
 		</repository>
 		<repository>
 			<id>xtext</id>
 			<layout>p2</layout>
-			<url>http://download.eclipse.org/modeling/tmf/xtext/updates/releases/2.15.0/</url>
+			<url>http://download.eclipse.org/modeling/tmf/xtext/updates/releases/2.20.0/</url>
 		</repository>
 	</repositories>
 
@@ -33,22 +35,27 @@
 			<version>3.8.1</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+		    <groupId>org.codehaus.mojo</groupId>
+    		<artifactId>build-helper-maven-plugin</artifactId>
+   			<version>${codehaus-version}</version>
+		</dependency>
 	</dependencies>
 
 
 
 	<build>
-		<!-- ${basedir} is an environment variable which points to the directory 
+		<!-- ${basedir} is an environment variable which points to the directory
 			of the currently compiled module defined above -->
 		<sourceDirectory>${basedir}/src</sourceDirectory>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.3</version>
+				<version>3.8.1</version>
 				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
+					<source>1.13</source>
+					<target>1.13</target>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -69,7 +76,7 @@
 						<environment>
 							<os>win32</os>
 							<ws>win32</ws>
-							<arch>x86</arch>
+							<arch>x86_64</arch>
 						</environment>
 						<environment>
 							<os>linux</os>
@@ -84,12 +91,12 @@
 					</environments>
 				</configuration>
 			</plugin>
-			<!-- register the directories src-gen and xtend-gen inside the project 
+			<!-- register the directories src-gen and xtend-gen inside the project
 				folder as source directories -->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>
-				<version>1.6</version>
+				<version>${codehaus-version}</version>
 				<executions>
 					<execution>
 						<id>add-source</id>
@@ -101,6 +108,7 @@
 							<sources>
 								<source>${basedir}/src-gen</source>
 								<source>${basedir}/xtend-gen</source>
+								<source>${basedir}/emf-gen</source>
 							</sources>
 						</configuration>
 					</execution>
@@ -109,7 +117,7 @@
 			<!-- clean output directories -->
 			<plugin>
 				<artifactId>maven-clean-plugin</artifactId>
-				<version>2.5</version>
+				<version>3.1.0</version>
 				<executions>
 					<execution>
 						<id>auto-clean</id>
@@ -132,6 +140,12 @@
 									</includes>
 								</fileset>
 								<fileset>
+									<directory>${basedir}/emf-gen</directory>
+									<includes>
+										<include>**</include>
+									</includes>
+								</fileset>
+								<fileset>
 									<directory>${project.build.directory}</directory>
 									<includes>
 										<include>**</include>
@@ -149,9 +163,9 @@
 				<version>${xtend-version}</version>
 				<executions>
 					<execution>
-						<!-- the phase "generate-resources" is obviously wrong for compiling 
-							Xtend to Java, but it is the only way that the MWE2 workflow is executed 
-							*before* the Xtend compiler is triggered. It is not possible to define orders 
+						<!-- the phase "generate-resources" is obviously wrong for compiling
+							Xtend to Java, but it is the only way that the MWE2 workflow is executed
+							*before* the Xtend compiler is triggered. It is not possible to define orders
 							for plug-ins in the same phase -->
 						<phase>generate-resources</phase>
 						<goals>

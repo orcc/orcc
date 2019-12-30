@@ -1,13 +1,22 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Orcc back-ends plug-in
+Bundle-Name: %pluginName
 Bundle-SymbolicName: net.sf.orcc.backends;singleton:=true
 Bundle-Version: 2.3.1.qualifier
-Bundle-Vendor: IETR/INSA Rennes
-Require-Bundle: net.sf.orcc.core;bundle-version="2.3.1",
- org.eclipse.xtext.xbase.lib;bundle-version="2.4.0",
+Bundle-Vendor: %providerName
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.emf.ecore;visibility:=reexport,
+ net.sf.orcc.core;bundle-version="2.3.1";visibility:=reexport,
+ net.sf.orcc.models;visibility:=reexport,
+ org.eclipse.xtext;bundle-version="2.20.0",
  org.apache.commons.cli;bundle-version="1.2.0",
- org.apache.commons.lang;bundle-version="2.6.0"
+ org.apache.commons.lang;bundle-version="2.6.0",
+ com.google.guava,
+ org.eclipse.xtext.xbase.lib,
+ org.eclipse.xtend.lib,
+ org.eclipse.xtend.lib.macro,
+ net.sf.orcc.cal
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
@@ -17,10 +26,13 @@ Export-Package: net.sf.orcc.backends,
  net.sf.orcc.backends.c.transform,
  net.sf.orcc.backends.cal,
  net.sf.orcc.backends.ir,
+ net.sf.orcc.backends.ir.impl,
  net.sf.orcc.backends.ir.util,
  net.sf.orcc.backends.llvm.transform,
  net.sf.orcc.backends.llvm.tta.transform,
  net.sf.orcc.backends.transform,
  net.sf.orcc.backends.transform.ssa,
- net.sf.orcc.backends.util
-
+ net.sf.orcc.backends.util,
+ net.sf.orcc.backends.llvm.tta.architecture,
+ net.sf.orcc.backends.llvm.tta.architecture.impl,
+ net.sf.orcc.backends.llvm.tta.architecture.util
