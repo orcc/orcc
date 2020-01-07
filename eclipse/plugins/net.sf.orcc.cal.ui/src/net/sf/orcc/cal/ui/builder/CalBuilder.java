@@ -31,10 +31,10 @@ package net.sf.orcc.cal.ui.builder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.xtext.builder.BuilderParticipant;
-import org.eclipse.xtext.generator.GeneratorDelegate;
-import org.eclipse.xtext.generator.IGenerator;
+import org.eclipse.xtext.generator.IGenerator2;
 
 import net.sf.orcc.cal.generator.CalGenerator;
+import net.sf.orcc.cal.generator.CalGeneratorContext;
 
 /**
  * Hack the default BuilderParticipant to call methods at the beginning and the
@@ -44,30 +44,25 @@ import net.sf.orcc.cal.generator.CalGenerator;
  * 
  */
 public class CalBuilder extends BuilderParticipant {
-
+	
 	@Override
 	public void build(IBuildContext context, IProgressMonitor monitor) throws CoreException {
 
-		final IGenerator generator = getGenerator();
-		if (generator instanceof GeneratorDelegate) {
-			GeneratorDelegate generatorDelegate = (GeneratorDelegate) generator;
-			if (generatorDelegate.getLegacyGenerator() instanceof CalGenerator) {
-				((CalGenerator) generatorDelegate.getLegacyGenerator()).beforeBuild(context.getBuiltProject(),
-						context.getResourceSet());
-			}
-		} else if (generator instanceof CalGenerator) {
+		final IGenerator2 generator = getGenerator2(); 
+		final CalGeneratorContext ctx = new CalGeneratorContext(context.getBuiltProject(), context.getResourceSet());
+		
+		if (generator instanceof CalGenerator) {
 			((CalGenerator) generator).beforeBuild(context.getBuiltProject(), context.getResourceSet());
+		} else {
+			generator.beforeGenerate(null, null, ctx);
 		}
 
 		super.build(context, monitor);
-
-		if (generator instanceof GeneratorDelegate) {
-			GeneratorDelegate generatorDelegate = (GeneratorDelegate) generator;
-			if (generatorDelegate.getLegacyGenerator() instanceof CalGenerator) {
-				((CalGenerator) generatorDelegate.getLegacyGenerator()).afterBuild();
-			}
-		} else if (generator instanceof CalGenerator) {
+			
+		if (generator instanceof CalGenerator) {
 			((CalGenerator) generator).afterBuild();
+		} else {
+			generator.afterGenerate(null, null, ctx);
 		}
 	}
 }

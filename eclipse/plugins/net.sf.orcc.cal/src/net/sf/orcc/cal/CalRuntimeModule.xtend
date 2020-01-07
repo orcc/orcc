@@ -40,6 +40,8 @@ import org.eclipse.xtext.parser.antlr.IPartialParsingHelper
 import org.eclipse.xtext.parser.antlr.ISyntaxErrorMessageProvider
 import com.google.inject.Binder
 import com.google.inject.Singleton
+import org.eclipse.xtext.formatting.IFormatter
+import net.sf.orcc.cal.formatting.CalFormatter
 
 /** 
  * Use this class to register components to be used within the IDE.

@@ -47,7 +47,6 @@ import org.eclipse.core.runtime.Path
 import org.eclipse.emf.common.util.URI
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.emf.ecore.resource.ResourceSet
-import org.eclipse.xtext.generator.IFileSystemAccess
 import org.eclipse.xtext.generator.IGenerator2
 import org.eclipse.xtext.generator.IFileSystemAccess2
 import org.eclipse.xtext.generator.IGeneratorContext
@@ -84,11 +83,17 @@ class CalGenerator implements IGenerator2 {
 
 	private var IProject currentProject
 	private var ResourceSet calResourceSet
-	private var ResourceSet irResourceSet
-
+	private var ResourceSet irResourceSet;
+	
 	@Inject
 	private var Provider<ResourceSet> rsProvider
-
+	
+//	@Inject
+//	def CalGenerator(Provider<ResourceSet> rsProvider) {
+//		this.rsProvider = rsProvider
+//		irResourceSet = rsProvider.get
+//	}
+	
 	/**
 	 * Start a build session. This method is called by net.sf.orcc.cal.ui.builder.CalBuilder
 	 * each time a build is triggered for a specific project.
@@ -119,6 +124,9 @@ class CalGenerator implements IGenerator2 {
 	 */
 	override void doGenerate(Resource calResource, IFileSystemAccess2 fsa, IGeneratorContext ctx) {
 
+//		val root = ResourcesPlugin.getWorkspace().getRoot()
+//		currentProject = root.getProject(calResource.URI.segment(1))
+//		calResourceSet = calResource.resourceSet
 		val irSubPath = calResource.irRelativePath
 
 		if (loadedResources.contains(calResource)) {
@@ -285,8 +293,15 @@ class CalGenerator implements IGenerator2 {
 		loadedResources.clear
 	}
 	
-	override afterGenerate(Resource input, IFileSystemAccess2 fsa, IGeneratorContext context) {}
+	override afterGenerate(Resource input, IFileSystemAccess2 fsa, IGeneratorContext context) {
+		if (context instanceof CalGeneratorContext) {
+			afterBuild()
+		}
+	}
 	
-	override beforeGenerate(Resource input, IFileSystemAccess2 fsa, IGeneratorContext context) {}
-	
+	override beforeGenerate(Resource input, IFileSystemAccess2 fsa, IGeneratorContext context) {
+		if (context instanceof CalGeneratorContext) {
+			beforeBuild(context.project, context.resourceSet);
+		}
+	}
 }

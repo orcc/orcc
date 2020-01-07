@@ -106,7 +106,7 @@ public class Instantiator extends DfVisitor<Void> {
 					} else {
 						OrccLogger.warnln("Instance argument "
 								+ argument.getVariable().getName()
-								+ " is not a parameter of actor"
+								+ " is not a parameter of actor "
 								+ actor.getSimpleName());
 					}
 				}

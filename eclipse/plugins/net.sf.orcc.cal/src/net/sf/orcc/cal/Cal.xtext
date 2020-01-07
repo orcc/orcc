@@ -335,7 +335,7 @@ ExpressionLiteral:
 
 ExpressionBoolean: value=BOOL;
 
-BOOL returns ecore::EBoolean: 'true' | 'false';
+terminal BOOL returns ecore::EBoolean: 'true' | 'false';
 
 ExpressionFloat: value=REAL;
 
