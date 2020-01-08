@@ -40,15 +40,20 @@ import org.eclipse.xtext.parser.antlr.IPartialParsingHelper
 import org.eclipse.xtext.parser.antlr.ISyntaxErrorMessageProvider
 import com.google.inject.Binder
 import com.google.inject.Singleton
-import org.eclipse.xtext.formatting.IFormatter
-import net.sf.orcc.cal.formatting.CalFormatter
 import org.eclipse.xtext.scoping.IScopeProvider
 import net.sf.orcc.cal.scoping.CalScopeProvider
+import org.eclipse.xtext.scoping.IgnoreCaseLinking
+import net.sf.orcc.cal.scoping.CalScopeProvider
+import org.eclipse.xtext.scoping.impl.ImportedNamespaceAwareLocalScopeProvider
+import org.eclipse.xtext.scoping.impl.AbstractDeclarativeScopeProvider
+import org.eclipse.xtext.scoping.IGlobalScopeProvider
+import com.google.inject.name.Names
+import org.eclipse.xtext.scoping.impl.DefaultGlobalScopeProvider
 
 /** 
  * Use this class to register components to be used within the IDE.
  */
-class CalRuntimeModule extends net.sf.orcc.cal.AbstractCalRuntimeModule {
+class CalRuntimeModule extends AbstractCalRuntimeModule {
 	override void configure(Binder binder) {
 		super.configure(binder)
 		binder.bind(typeof(IOutputConfigurationProvider)).to(typeof(CalOutputConfigurationProvider)).in(
@@ -80,7 +85,20 @@ class CalRuntimeModule extends net.sf.orcc.cal.AbstractCalRuntimeModule {
 		return typeof(PatchedPartialParsingHelper)
 	}
 
-	override def Class<? extends IScopeProvider> bindIScopeProvider() {
+	override Class<? extends IScopeProvider> bindIScopeProvider() {
 		return typeof(CalScopeProvider);
 	}
+	
+	def void configureIScopeProviderDelegate(Binder binder) {
+		binder.bind(typeof(IScopeProvider)).annotatedWith(Names.named(AbstractDeclarativeScopeProvider.NAMED_DELEGATE)).to(typeof(ImportedNamespaceAwareLocalScopeProvider));
+	}
+	
+	override Class<? extends IGlobalScopeProvider> bindIGlobalScopeProvider() {
+		return typeof(DefaultGlobalScopeProvider);
+	}
+
+	def void configureIgnoreCaseLinking(Binder binder) {
+		binder.bindConstant().annotatedWith(typeof(IgnoreCaseLinking)).to(false);
+	}
+	
 }
