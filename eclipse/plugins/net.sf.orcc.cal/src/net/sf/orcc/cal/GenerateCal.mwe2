@@ -89,19 +89,7 @@ Workflow {
 		cleaner = {
 			enabled = false
 		}
-//		language = StandardLanguage {
-//			name = "${projectName}.Cal"
-//			grammarUri = grammarURI
-//			fileExtensions = fileExtensions
-//
-//			serializer = {
-//				generateStub = false
-//			}
-//			validator = {
-//				 composedCheck = "org.eclipse.xtext.validation.ImportUriValidator"
-//				 composedCheck = "org.eclipse.xtext.validation.NamesAreUniqueValidator"
-//			}
-//		}
+
 		language = XtextGeneratorLanguage {
 		    name = "${projectName}.Cal"
 		    fileExtensions = fileExtensions
@@ -129,9 +117,9 @@ Workflow {
 		        composedCheck = "org.eclipse.xtext.validation.ImportUriValidator"
 		        composedCheck = "org.eclipse.xtext.validation.NamesAreUniqueValidator"
 		    }
-		    fragment = scoping.ImportNamespacesScopingFragment2 {
-		    	generateStub = false
-		    }
+//		    fragment = scoping.ImportNamespacesScopingFragment2 {
+//		    	generateStub = false
+//		    }
 		    fragment = exporting.QualifiedNamesFragment2 {}
 		    fragment = builder.BuilderIntegrationFragment2 {}
 		    fragment = generator.GeneratorFragment2 {}

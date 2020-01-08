@@ -42,6 +42,8 @@ import com.google.inject.Binder
 import com.google.inject.Singleton
 import org.eclipse.xtext.formatting.IFormatter
 import net.sf.orcc.cal.formatting.CalFormatter
+import org.eclipse.xtext.scoping.IScopeProvider
+import net.sf.orcc.cal.scoping.CalScopeProvider
 
 /** 
  * Use this class to register components to be used within the IDE.
@@ -76,5 +78,9 @@ class CalRuntimeModule extends net.sf.orcc.cal.AbstractCalRuntimeModule {
 	 */
 	override Class<? extends IPartialParsingHelper> bindIPartialParserHelper() {
 		return typeof(PatchedPartialParsingHelper)
+	}
+
+	override def Class<? extends IScopeProvider> bindIScopeProvider() {
+		return typeof(CalScopeProvider);
 	}
 }
