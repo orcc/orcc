@@ -123,7 +123,7 @@ Workflow {
 		    fragment = exporting.QualifiedNamesFragment2 {}
 		    fragment = builder.BuilderIntegrationFragment2 {}
 		    fragment = generator.GeneratorFragment2 {}
-//		    fragment = formatting.Formatter2Fragment2 {}
+		    fragment = formatting.Formatter2Fragment2 {}
 //		    fragment = ui.labeling.LabelProviderFragment2 {}
 //		    fragment = ui.outline.QuickOutlineFragment2 {}
 //		    fragment = ui.outline.OutlineTreeProviderFragment2 {}

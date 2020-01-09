@@ -64,7 +64,9 @@ import org.eclipse.xtext.formatting.impl.FormattingConfig;
  * 
  * Also see {@link org.eclipse.xtext.xtext.XtextFormattingTokenSerializer} as an
  * example
+ * Use formatting2.CalFormatter
  */
+@Deprecated
 public class CalFormatter extends AbstractDeclarativeFormatter {
 
 	private CalGrammarAccess f;
