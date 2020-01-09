@@ -47,6 +47,8 @@ Workflow {
     }
     
     component = EcoreGenerator {
+    	generateEdit = false
+    	generateEditor = false
         genModel = "platform:/resource/${projectName}/model/custom/Cal.genmodel"
         srcPath = "platform:/resource/${projectName}/src"
     }
