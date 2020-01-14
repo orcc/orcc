@@ -27,4 +27,5 @@ Export-Package: net.sf.orcc.ui,
  net.sf.orcc.ui.launching
 Bundle-Vendor: IETR/INSA Rennes
 Bundle-ClassPath: .
+Automatic-Module-Name: net.sf.orcc.ui
 

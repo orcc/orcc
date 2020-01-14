@@ -30,3 +30,4 @@ Import-Package: org.junit;version="4.5.0",
  org.junit.runners;version="4.5.0",
  org.junit.runners.model;version="4.5.0",
  org.hamcrest.core
+Automatic-Module-Name: net.sf.orcc.cal.tests

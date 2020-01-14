@@ -26,3 +26,4 @@ Bundle-ActivationPolicy: lazy
 Import-Package: net.sf.orcc.ui
 Bundle-ClassPath: lib/klay_0.11.0.jar,
  .
+Automatic-Module-Name: net.sf.orcc.xdf.ui

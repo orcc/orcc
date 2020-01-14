@@ -36,3 +36,4 @@ Export-Package: net.sf.orcc.backends,
  net.sf.orcc.backends.llvm.tta.architecture,
  net.sf.orcc.backends.llvm.tta.architecture.impl,
  net.sf.orcc.backends.llvm.tta.architecture.util
+Automatic-Module-Name: net.sf.orcc.backends

@@ -29,3 +29,4 @@ Export-Package: net.sf.orcc.cal.ide.contentassist.antlr,
  net.sf.orcc.cal.ui.contentassist,
  net.sf.orcc.cal.ui.internal,
  net.sf.orcc.cal.ui.quickfix
+Automatic-Module-Name: net.sf.orcc.cal.ui

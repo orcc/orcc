@@ -22,4 +22,5 @@ Export-Package: net.sf.orcc.simulators,
  net.sf.orcc.simulators.runtime.std.video.impl,
  net.sf.orcc.simulators.slow
 Bundle-ClassPath: .
+Automatic-Module-Name: net.sf.orcc.simulators
 

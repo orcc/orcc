@@ -38,4 +38,5 @@ Export-Package: net.sf.orcc,
  net.sf.orcc.tools.merger.actor,
  net.sf.orcc.tools.stats,
  net.sf.orcc.util
+Automatic-Module-Name: net.sf.orcc.core
 
